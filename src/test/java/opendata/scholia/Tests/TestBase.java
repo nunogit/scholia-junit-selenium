@@ -1,6 +1,5 @@
-package com.yourcompany.Tests;
+package opendata.scholia.Tests;
 
-import com.saucelabs.common.SauceOnDemandAuthentication;
 
 import org.junit.*;
 import org.junit.rules.TestName;
@@ -9,14 +8,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import com.saucelabs.junit.ConcurrentParameterized;
-import com.saucelabs.junit.SauceOnDemandTestWatcher;
-
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import java.net.URL;
 import java.util.LinkedList;
 
-import com.saucelabs.common.SauceOnDemandSessionIdProvider;
+//Only if using saucelabs
+//import com.saucelabs.common.SauceOnDemandAuthentication;
+//import com.saucelabs.common.SauceOnDemandSessionIdProvider;
+//import com.saucelabs.junit.ConcurrentParameterized;
+//import com.saucelabs.junit.SauceOnDemandTestWatcher;
 
 
 
@@ -28,32 +29,33 @@ import com.saucelabs.common.SauceOnDemandSessionIdProvider;
  *
  * @author Neil Manvar
  */
-@Ignore
-@RunWith(ConcurrentParameterized.class)
-public class TestBase implements SauceOnDemandSessionIdProvider {
+//@Ignore
+//@RunWith(ConcurrentParameterized.class)
+public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 
     public static String username = System.getenv("SAUCE_USERNAME");
     public static String accesskey = System.getenv("SAUCE_ACCESS_KEY");
     public static String seleniumURI;
     public static String buildTag;
+    
     /**
      * Constructs a {@link SauceOnDemandAuthentication} instance using the supplied user name/access key.  To use the authentication
      * supplied by environment variables or from an external file, use the no-arg {@link SauceOnDemandAuthentication} constructor.
      */
-    public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication(username, accesskey);
+    //public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication(username, accesskey);
 
     /**
      * JUnit Rule which will mark the Sauce Job as passed/failed when the test succeeds or fails.
      */
-    @Rule
-    public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication);
+    //@Rule
+    //public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication);
 
-    @Rule
-    public TestName name = new TestName() {
-        public String getMethodName() {
-            return String.format("%s", super.getMethodName());
-        }
-    };
+    //@Rule
+    //public TestName name = new TestName() {
+    //    public String getMethodName() {
+    //        return String.format("%s", super.getMethodName());
+    //    }
+    //};
 
     protected String browser;
     protected String os;
@@ -74,20 +76,20 @@ public class TestBase implements SauceOnDemandSessionIdProvider {
      * @param deviceOrientation
      */
 
-    public TestBase(String os, String version, String browser, String deviceName, String deviceOrientation) {
-        super();
-        this.os = os;
-        this.version = version;
-        this.browser = browser;
-        this.deviceName = deviceName;
-        this.deviceOrientation = deviceOrientation;
-    }
+   // public TestBase(String os, String version, String browser, String deviceName, String deviceOrientation) {
+   //     super();
+   //     this.os = os;
+   //     this.version = version;
+   //     this.browser = browser;
+   //     this.deviceName = deviceName;
+   //     this.deviceOrientation = deviceOrientation;
+   // }
 
     /**
      * @return a LinkedList containing String arrays representing the browser combinations the test should be run against. The values
      * in the String array are used as part of the invocation of the test constructor
      */
-    @ConcurrentParameterized.Parameters
+    //@ConcurrentParameterized.Parameters
     public static LinkedList browsersStrings() {
         LinkedList browsers = new LinkedList();
 
@@ -114,21 +116,30 @@ public class TestBase implements SauceOnDemandSessionIdProvider {
         capabilities.setCapability(CapabilityType.VERSION, version);
         capabilities.setCapability("deviceName", deviceName);
         capabilities.setCapability("device-orientation", deviceOrientation);
-        capabilities.setCapability(CapabilityType.PLATFORM, os);
+        //capabilities.setCapability(CapabilityType.PLATFORM, os);
 
-        String methodName = name.getMethodName();
-        capabilities.setCapability("name", methodName);
+        //String methodName = name.getMethodName();
+        //capabilities.setCapability("name", methodName);
 
         //Getting the build name.
         //Using the Jenkins ENV var. You can use your own. If it is not set test will run without a build id.
         if (buildTag != null) {
             capabilities.setCapability("build", buildTag);
         }
-        this.driver = new RemoteWebDriver(
-                new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
-                capabilities);
-
-        this.sessionId = (((RemoteWebDriver) driver).getSessionId()).toString();
+        
+        //TODO Improve driver selection
+        
+        //WebDriver driver = new FirefoxDriver();
+		//comment the above 2 lines and uncomment below 2 lines to use Chrome
+        
+        System.setProperty("webdriver.chrome.driver", "/chromedriver");
+      	WebDriver driver = new ChromeDriver();
+        
+        //this.driver = new RemoteWebDriver(
+        //        new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
+        //        capabilities);
+        //this.sessionId = (((RemoteWebDriver) driver).getSessionId()).toString();
+        
     }
 
     @After
@@ -139,7 +150,6 @@ public class TestBase implements SauceOnDemandSessionIdProvider {
     /**
      * @return the value of the Sauce Job id.
      */
-    @Override
     public String getSessionId() {
         return sessionId;
     }
@@ -149,7 +159,7 @@ public class TestBase implements SauceOnDemandSessionIdProvider {
         //get the uri to send the commands to.
         seleniumURI = "@ondemand.saucelabs.com:443";
         //If available add build tag. When running under Jenkins BUILD_TAG is automatically set.
-        //You can set this manually on manual runs.
+        //check for travis
         buildTag = System.getenv("BUILD_TAG");
         if (buildTag == null) {
             buildTag = System.getenv("SAUCE_BUILD_NAME");
