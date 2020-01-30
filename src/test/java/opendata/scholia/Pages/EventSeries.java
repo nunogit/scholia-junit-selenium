@@ -33,11 +33,8 @@ public class EventSeries extends ScholiaContentPage{
         
 
         
-        this.addDataTable("list-of-events");
-        this.addDataTable("topics");
-        this.addDataTable("persons");
-        this.addDataTable("proceedings-publications");
-        this.addDataTable("recent-publications");
+        this.addDataTable("event-series");
+   
         
     }
     

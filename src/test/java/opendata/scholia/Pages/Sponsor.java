@@ -22,7 +22,7 @@ public class Sponsor extends ScholiaContentPage{
         
         this.addDataTable("recently-published-sponsored-work");
         this.addDataTable("authors-on-sponsored-work");
-        this.addDataTable("#co-sponsors");
+        this.addDataTable("co-sponsors");
     }
 
 

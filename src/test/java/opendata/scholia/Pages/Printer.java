@@ -20,7 +20,7 @@ public class Printer extends ScholiaContentPage{
         this.driver = driver;
         PageFactory.initElements(driver, this);
         
-        this.addDataTable("items-in-catalogue");
+        this.addDataTable("printed-works-per-publisher");
         
     }
 

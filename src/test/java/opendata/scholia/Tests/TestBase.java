@@ -12,6 +12,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+
 
 //Only if using saucelabs
 //import com.saucelabs.common.SauceOnDemandAuthentication;
@@ -133,9 +135,11 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 		//comment the above 2 lines and uncomment below 2 lines to use Chrome
         
         System.setProperty("webdriver.chrome.driver", "/chromedriver");
-      	WebDriver driver = new ChromeDriver();
-        
-        //this.driver = new RemoteWebDriver(
+      	this.driver = new ChromeDriver();
+      	driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+      	
+      	
+      	//this.driver = new RemoteWebDriver(
         //        new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
         //        capabilities);
         //this.sessionId = (((RemoteWebDriver) driver).getSessionId()).toString();

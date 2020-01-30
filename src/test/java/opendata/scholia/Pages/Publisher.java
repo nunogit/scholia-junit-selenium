@@ -23,7 +23,6 @@ public class Publisher extends ScholiaContentPage{
         
         this.addDataTable("journals");
         this.addDataTable("list-of-editors");
-        this.addDataTable("awards");
         this.addDataTable("mostCited");
         
     }
