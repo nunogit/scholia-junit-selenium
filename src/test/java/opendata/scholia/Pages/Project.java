@@ -31,10 +31,13 @@ public class Project extends ScholiaContentPage{
         this.driver = driver;
         PageFactory.initElements(driver, this);
         
-        this.addDataTable("list-of-recipients");
-        this.addDataTable("recent-publications-by-recipients");
-        this.addDataTable("co-awards");
-        this.addDataTable("gender-distribution");
+        this.addDataTable("prolific-authors");
+        this.addDataTable("recentArticles");
+        
+       // this.addDataTable("list-of-recipients");
+       // this.addDataTable("recent-publications-by-recipients");
+       // this.addDataTable("co-awards");
+       // this.addDataTable("gender-distribution");
 
     }
     
