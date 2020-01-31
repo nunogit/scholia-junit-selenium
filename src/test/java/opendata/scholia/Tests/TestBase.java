@@ -134,11 +134,18 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         //WebDriver driver = new FirefoxDriver();
 		//comment the above 2 lines and uncomment below 2 lines to use Chrome
         
-        System.setProperty("webdriver.chrome.driver", "/chromedriver");
-      	this.driver = new ChromeDriver();
-      	driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-      	
-      	
+        String javaHome = System.getenv("DRIVER");
+        
+        if(javaHome != null && javaHome.length() > 0)
+        	System.setProperty("webdriver.chrome.driver", javaHome);
+        else {
+        	System.setProperty("webdriver.chrome.driver", "/chromedriver");
+        }
+
+    	this.driver = new ChromeDriver();
+  		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+
+        
       	//this.driver = new RemoteWebDriver(
         //        new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
         //        capabilities);
