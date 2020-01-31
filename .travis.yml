@@ -15,12 +15,11 @@ env:
     - DRIVER=selenium_chrome
     - CHROME_BIN=/usr/bin/google-chrome
 
-
 before_install:
   - # start your web application and listen on `localhost`
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 script:
-#  - whereis google-chrome-stable
-#  - whereis chromedriver
+  - whereis google-chrome-stable
+  - whereis chromedriver
 #  - "mvn test"
