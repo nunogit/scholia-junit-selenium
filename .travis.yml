@@ -22,5 +22,6 @@ before_install:
 script:
 #  - whereis google-chrome-stable
 #  - whereis chromedriver
-   - "ls -lhisa /usr/bin/"
+#   - "ls -lhisa /usr/bin/"
+   - "find / -name chromedriver*"
 #  - "mvn test"
