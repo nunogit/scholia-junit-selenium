@@ -32,7 +32,9 @@ public class Location extends ScholiaContentPage{
         PageFactory.initElements(driver, this);
         
         this.addDataTable("nearby-organizations");
-        this.addDataTable("nearby-locations-as-topics-in-works");
+        
+        // tables sometimes 0?
+        //this.addDataTable("nearby-locations-as-topics-in-works");
         
     }
     
