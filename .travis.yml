@@ -23,5 +23,5 @@ script:
 #  - whereis google-chrome-stable
 #  - whereis chromedriver
 #   - "ls -lhisa /usr/bin/"
-   - "find / -name chromedriver*"
+   - "sudo find / -name chromedriver*"
 #  - "mvn test"
