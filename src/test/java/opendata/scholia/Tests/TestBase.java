@@ -143,7 +143,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         }
 
     	this.driver = new ChromeDriver();
-  		driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+  		driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
 
         
       	//this.driver = new RemoteWebDriver(
