@@ -21,6 +21,6 @@ before_install:
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 script:
-  - whereis google-chrome-stable
-  - whereis chromedriver
+#  - whereis google-chrome-stable
+#  - whereis chromedriver
 #  - "mvn test"
