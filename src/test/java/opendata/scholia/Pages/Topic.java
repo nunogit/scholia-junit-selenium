@@ -38,7 +38,8 @@ public class Topic extends ScholiaContentPage{
         this.addDataTable("venues");
         this.addDataTable("topCited");
         this.addDataTable("most-cited-authors");
-        this.addDataTable("author-awards");
+        //can be 0
+        //driver.this.addDataTable("author-awards");
         
     }
     
