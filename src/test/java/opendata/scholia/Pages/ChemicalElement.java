@@ -33,7 +33,9 @@ public class ChemicalElement extends ScholiaContentPage{
         
         this.addDataTable("isotopes");
         this.addDataTable("allotropes");
-        this.addDataTable("recentArticles");
+        
+        // can be 0 removed for now
+        //this.addDataTable("recentArticles");
         	
     }
     
