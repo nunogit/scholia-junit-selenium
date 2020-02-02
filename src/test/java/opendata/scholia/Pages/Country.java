@@ -32,7 +32,9 @@ public class Country extends ScholiaContentPage{
         PageFactory.initElements(driver, this);
         
         this.addDataTable("organizations");
-        this.addDataTable("authors");
+        
+        // can be 0
+        //driver.this.addDataTable("authors");
         
     }
     
