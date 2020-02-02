@@ -22,7 +22,7 @@ public class Publisher extends ScholiaContentPage{
         PageFactory.initElements(driver, this);
         
         this.addDataTable("journals");
-        this.addDataTable("list-of-editors");
+        //this.addDataTable("list-of-editors");
         this.addDataTable("mostCited");
         
     }
