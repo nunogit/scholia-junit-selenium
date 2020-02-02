@@ -24,7 +24,10 @@ public class Venue extends ScholiaContentPage{
         this.addDataTable("topics");
         this.addDataTable("prolific-authors");
         
-        this.addDataTable("co-authors");
+        //https://tools.wmflabs.org/scholia/venue/Q4775205
+        //can be 0?
+        //driver.this.addDataTable("co-authors");
+        
         this.addDataTable("cited-venues");
         this.addDataTable("citing-venues");
         this.addDataTable("most-cited-works");
