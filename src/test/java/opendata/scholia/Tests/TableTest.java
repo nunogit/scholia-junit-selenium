@@ -3,6 +3,8 @@ package opendata.scholia.Tests;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +18,13 @@ import opendata.scholia.Pages.*;
 
 import opendata.scholia.Pages.Author;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
+import opendata.scholia.util.GitReader;
+import opendata.scholia.util.PageType;
 
 
 public class TableTest extends TestBase {
 
-	@Test
+	//@Test
 	public void testDataTables() {
 		
 		
@@ -99,6 +103,62 @@ public class TableTest extends TestBase {
 				assertTrue(id, scpage.getDataTableSize(id) > 0);		
 			}
 		}	
+	}
+	
+	void testPage(ScholiaContentPage scPage, String sURL) {
+		scPage.setURL((String) sURL);
+		scPage.visitPage();
+		
+		List<String> idList = scPage.dataTableIdList();
+		
+		for(String id : idList) {
+			System.out.println( sURL);
+			System.out.println("-- " + id+ " " + scPage.getDataTableSize(id));
+			assertTrue(id, scPage.getDataTableSize(id) > 0);		
+		}
+	}
+	
+	@Test public void testDataTablesFromGit() {
+		Class[] cArg = new Class[1]; //Our constructor has 1 arguments
+		cArg[0] = WebDriver.class; 
+		
+		GitReader gitReader = new GitReader();
+		try {
+			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<String> pageList = gitReader.getList();
+		for(String stringURL : pageList) {
+			try {
+				Class className = PageType.getPageType(new URL(stringURL));
+				ScholiaContentPage scpage = (ScholiaContentPage) className.getDeclaredConstructor(cArg).newInstance(driver);
+				testPage(scpage, stringURL);
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 	//@Test

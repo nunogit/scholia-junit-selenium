@@ -7,19 +7,31 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
+import java.util.Vector;
 
 
 public class GitReader {
 
+	URL url;
+	
+	
+	public void setURL(String url) throws MalformedURLException {
+		 this.url = new URL(url);
+	}
+	
     public GitReader() {
+    }
 
-        URL url = null;
-		try {
-			url = new URL("http://gist.githubusercontent.com/yonbergman/7a0b05d6420dada16b92885780567e60/raw/114aa2ffb1c680174f9757431e672b5df53237eb/data.csv");
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	public List getList() {
+
+		return readFile();
+		
+	}
+	
+	private List<String> readFile() {
+		List<String> line = new Vector<String>();
+		
         URLConnection connection = null;
 		try {
 			connection = url.openConnection();
@@ -36,16 +48,13 @@ public class GitReader {
 			e1.printStackTrace();
 		}
         BufferedReader buffer = null;
-        String line = "";
-        String csvSplitBy = ",";
+        String l = "";
 
         try {
 
             buffer = new BufferedReader(input);
-            while ((line = buffer.readLine()) != null) {
-                String[] room = line.split(csvSplitBy);
-                System.out.println(line);
-                System.out.println("room [capacity =" + room[0] + " , price=" + room[1]);
+            while ((l = buffer.readLine()) != null) {
+                line.add(l);
             }
 
         } catch (FileNotFoundException e) {
@@ -61,7 +70,9 @@ public class GitReader {
                 }
             }
         }
+    	return line;
+	}
+	
 
-    }
 
 }
