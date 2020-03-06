@@ -30,6 +30,13 @@ before_install:
 
 before_script:
   - sh -e /etc/init.d/xvfb start
+  
+deploy:
+  provider: releases
+  api_key: "xxx"
+  file: "xxx"
+  skip_cleanup: true
+  draft: true
    
 
 script:
