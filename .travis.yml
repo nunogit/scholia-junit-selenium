@@ -31,12 +31,7 @@ before_install:
 before_script:
   - sh -e /etc/init.d/xvfb start
   
-deploy:
-  provider: releases
-  api_key: "e1513c8688cc25485b7877561a1708e945aa8488"
-  file: "README.md"
-  skip_cleanup: true
-  draft: true
+
    
 
 script:
