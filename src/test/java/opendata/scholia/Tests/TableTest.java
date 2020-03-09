@@ -139,6 +139,7 @@ public class TableTest extends TestBase {
 			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("can't connect to retrieve test list");
 			e.printStackTrace();
 		}
 		List<String> pageList = gitReader.getList();
