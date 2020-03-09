@@ -154,9 +154,14 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         System.out.println("system var set... " + javaHome);
 		System.out.flush();
 		
-    	this.driver = new ChromeDriver();
-  		driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
-  		
+		try {
+			this.driver = new ChromeDriver();
+			driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		
   		//this.reportStatistics = new ReportStatistics();
   		//this.reportStatistics.executeBatchJob();
 
