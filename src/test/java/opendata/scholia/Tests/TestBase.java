@@ -138,6 +138,8 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         
         //TODO Improve driver selection
         
+        System.out.println("loading driver...");
+        
         //WebDriver driver = new FirefoxDriver();
 		//comment the above 2 lines and uncomment below 2 lines to use Chrome
         
@@ -156,7 +158,9 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
   		this.reportStatistics = new ReportStatistics();
   		this.reportStatistics.executeBatchJob();
 
-        
+  		System.out.println("driver loaded...");
+  		System.out.flush();
+  		
       	//this.driver = new RemoteWebDriver(
         //        new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
         //        capabilities);
