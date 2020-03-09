@@ -30,6 +30,8 @@ before_install:
 
 before_script:
   - sh -e /etc/init.d/xvfb start
+  
+
    
 
 script:
