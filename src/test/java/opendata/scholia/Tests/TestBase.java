@@ -13,6 +13,8 @@ import opendata.scholia.report.ReportStatistics;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
@@ -155,7 +157,10 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 		System.out.flush();
 		
 		try {
-			this.driver = new ChromeDriver();
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("--headless");
+			
+			this.driver = new ChromeDriver(options);
 			driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
