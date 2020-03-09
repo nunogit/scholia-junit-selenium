@@ -8,6 +8,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import opendata.scholia.report.ReportStatistics;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import java.net.URL;
@@ -40,6 +43,8 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
     public static String seleniumURI;
     public static String buildTag;
     
+   
+    
     /**
      * Constructs a {@link SauceOnDemandAuthentication} instance using the supplied user name/access key.  To use the authentication
      * supplied by environment variables or from an external file, use the no-arg {@link SauceOnDemandAuthentication} constructor.
@@ -66,6 +71,8 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
     protected String deviceOrientation;
     protected String sessionId;
     protected WebDriver driver;
+    
+    protected ReportStatistics reportStatistics;
 
     /**
      * Constructs a new instance of the test.  The constructor requires three string parameters, which represent the operating
@@ -144,6 +151,10 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 
     	this.driver = new ChromeDriver();
   		driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
+  		
+  		System.out.println("hello");
+  		this.reportStatistics = new ReportStatistics();
+  		this.reportStatistics.executeBatchJob();
 
         
       	//this.driver = new RemoteWebDriver(

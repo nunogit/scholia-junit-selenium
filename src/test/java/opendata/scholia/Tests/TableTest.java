@@ -18,6 +18,7 @@ import opendata.scholia.Pages.*;
 
 import opendata.scholia.Pages.Author;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
+import opendata.scholia.report.ReportStatistics;
 import opendata.scholia.util.GitReader;
 import opendata.scholia.util.PageType;
 
@@ -105,7 +106,7 @@ public class TableTest extends TestBase {
 		}	
 	}
 	
-	void testPage(ScholiaContentPage scPage, String sURL) {
+	void testPage(ScholiaContentPage scPage, String sURL, ReportStatistics reportStatistics) {
 		scPage.setURL((String) sURL);
 		scPage.visitPage();
 		
@@ -114,11 +115,22 @@ public class TableTest extends TestBase {
 		for(String id : idList) {
 			System.out.println( sURL);
 			System.out.println("-- " + id+ " " + scPage.getDataTableSize(id));
-			assertTrue(id, scPage.getDataTableSize(id) > 0);		
+			
+			reportStatistics.incrementCounter("widgets_tested", "");
+			if(scPage.getDataTableSize(id) > 0) {
+				assertTrue(id, true);
+			} else{
+				reportStatistics.incrementCounter("widgets_failed", "");
+				assertTrue(id, false);
+			}
 		}
 	}
 	
-	@Test public void testDataTablesFromGit() {
+	@Test
+	public void testDataTablesFromGit() {
+		
+		//assertTrue(true); if(true)return;
+		
 		Class[] cArg = new Class[1]; //Our constructor has 1 arguments
 		cArg[0] = WebDriver.class; 
 		
@@ -134,7 +146,8 @@ public class TableTest extends TestBase {
 			try {
 				Class className = PageType.getPageType(new URL(stringURL));
 				ScholiaContentPage scpage = (ScholiaContentPage) className.getDeclaredConstructor(cArg).newInstance(driver);
-				testPage(scpage, stringURL);
+				testPage(scpage, stringURL, this.reportStatistics);
+				
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

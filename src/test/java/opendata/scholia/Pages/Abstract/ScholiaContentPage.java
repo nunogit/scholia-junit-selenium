@@ -14,6 +14,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import io.prometheus.client.Counter;
 import opendata.scholia.Tests.TestBase;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -27,6 +28,12 @@ public abstract class ScholiaContentPage{
 	
 	private String url = "";
 	
+	static final Counter widgetsTested = Counter.build()
+		      .name("widgets_tested")
+		      .help("Tested.").register();
+	static final Counter widgetsFailed = Counter.build()
+		      .name("widgets_failed")
+		      .help("Failed.").register();
 	
     public ScholiaContentPage(WebDriver driver) {
     	//TODO  improve
@@ -37,6 +44,8 @@ public abstract class ScholiaContentPage{
     	
     	dataTableMap = new HashMap();
     	widgetMap = new HashMap();
+    	
+      
     }
     
     public void setURL(String url) {
@@ -47,6 +56,9 @@ public abstract class ScholiaContentPage{
     	//TODO  improve
     	if(driver==null) System.out.println("no driver");
         this.driver.get(url);
+        
+        //widgetsTested.labels(url);
+        //widgetsFailed.labels(url);
  
     }
 
@@ -75,8 +87,12 @@ public abstract class ScholiaContentPage{
 	public boolean checkDataTables() {
 		
 		for (Map.Entry<String,WebElement> entry : dataTableMap.entrySet()) {  
+			widgetsTested.inc();
 			List<WebElement> rows = driver.findElements(By.xpath("//*[@id=\""+entry.getKey()+ "\"]/tbody/tr"));
-			if(rows.size()==0) return false;
+			if(rows.size()==0) {
+				widgetsFailed.inc();
+				return false;
+			}
 		}
 		return true;
 	}
