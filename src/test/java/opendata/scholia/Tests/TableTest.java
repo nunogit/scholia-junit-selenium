@@ -134,6 +134,9 @@ public class TableTest extends TestBase {
 		Class[] cArg = new Class[1]; //Our constructor has 1 arguments
 		cArg[0] = WebDriver.class; 
 		
+		System.out.println("about to test...");
+		System.out.flush();
+		
 		GitReader gitReader = new GitReader();
 		try {
 			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
@@ -143,6 +146,9 @@ public class TableTest extends TestBase {
 			System.out.flush();
 			e.printStackTrace();
 		}
+		
+		System.out.println("read success");
+		System.out.flush();
 		List<String> pageList = gitReader.getList();
 		for(String stringURL : pageList) {
 			try {
