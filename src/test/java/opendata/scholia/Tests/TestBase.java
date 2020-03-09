@@ -151,12 +151,14 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         	System.setProperty("webdriver.chrome.driver", "/chromedriver");
         }
 
+        System.out.println("system var set... " + javaHome);
+		System.out.flush();
+		
     	this.driver = new ChromeDriver();
   		driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
   		
-  		System.out.println("hello");
-  		this.reportStatistics = new ReportStatistics();
-  		this.reportStatistics.executeBatchJob();
+  		//this.reportStatistics = new ReportStatistics();
+  		//this.reportStatistics.executeBatchJob();
 
   		System.out.println("driver loaded...");
   		System.out.flush();
