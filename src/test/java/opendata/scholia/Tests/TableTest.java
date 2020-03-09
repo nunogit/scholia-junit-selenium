@@ -140,6 +140,7 @@ public class TableTest extends TestBase {
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			System.out.println("can't connect to retrieve test list");
+			System.out.flush();
 			e.printStackTrace();
 		}
 		List<String> pageList = gitReader.getList();
