@@ -74,7 +74,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
     protected String sessionId;
     protected WebDriver driver;
     
-    protected ReportStatistics reportStatistics;
+
 
     /**
      * Constructs a new instance of the test.  The constructor requires three string parameters, which represent the operating

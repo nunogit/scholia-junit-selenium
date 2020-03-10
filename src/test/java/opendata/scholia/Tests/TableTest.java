@@ -106,7 +106,7 @@ public class TableTest extends TestBase {
 		}	
 	}
 	
-	void testPage(ScholiaContentPage scPage, String sURL, ReportStatistics reportStatistics) {
+	void testPage(ScholiaContentPage scPage, String sURL) {
 		scPage.setURL((String) sURL);
 		scPage.visitPage();
 		
@@ -116,11 +116,11 @@ public class TableTest extends TestBase {
 			System.out.println( sURL);
 			System.out.println("-- " + id+ " " + scPage.getDataTableSize(id));
 			
-			reportStatistics.incrementCounter("widgets_tested", "");
+			ReportStatistics.incrementCounter("widgets_tested", "");
 			if(scPage.getDataTableSize(id) > 0) {
 				assertTrue(id, true);
-			} else{
-				reportStatistics.incrementCounter("widgets_failed", "");
+			} else{ 
+				ReportStatistics.incrementCounter("widgets_failed", "");
 				assertTrue(id, false);
 			}
 		}
@@ -154,7 +154,7 @@ public class TableTest extends TestBase {
 			try {
 				Class className = PageType.getPageType(new URL(stringURL));
 				ScholiaContentPage scpage = (ScholiaContentPage) className.getDeclaredConstructor(cArg).newInstance(driver);
-				testPage(scpage, stringURL, this.reportStatistics);
+				testPage(scpage, stringURL);
 				
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block

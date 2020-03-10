@@ -17,14 +17,16 @@ import io.prometheus.client.exporter.common.TextFormat;
 
 public class ReportStatistics {
 
+	
 	Counter requests = Counter.build().name("requests_total").help("Total requests.").labelNames("path").register();
-
-//Counter widgetsTested = Counter.build()
-//	      .name("widgets_tested")
-//	      .help("Tested.").register();
-//Counter widgetsFailed = Counter.build()
-//	      .name("widgets_failed")
-//	      .help("Failed.").register();
+	private static ReportStatistics reportStatistics;
+	
+	//Counter widgetsTested = Counter.build()
+	//	      .name("widgets_tested")
+	//	      .help("Tested.").register();
+	//Counter widgetsFailed = Counter.build()
+	//	      .name("widgets_failed")
+	//	      .help("Failed.").register();
 
 	HashMap<String, Integer> counter = new HashMap<String, Integer>();
 
@@ -33,7 +35,17 @@ public class ReportStatistics {
 		counter = new HashMap<String, Integer>();
 	}
 
-	public void incrementCounter(String name, String label) {
+	public static void incrementCounter(String name, String label) {
+		setup();
+		reportStatistics.incCounter(name, label);
+	}
+	
+	private static void setup() {
+		if(reportStatistics!=null)
+			reportStatistics = new ReportStatistics();
+	}
+	
+	public void incCounter(String name, String label) {
 		if (counter.containsKey(name))
 			counter.put(name, counter.get(name).intValue() + 1);
 		else
