@@ -112,17 +112,20 @@ public class TableTest extends TestBase {
 		
 		List<String> idList = scPage.dataTableIdList();
 		
+		int i = 0;
 		for(String id : idList) {
-			System.out.println( sURL);
+			System.out.println(sURL);
+			int dataTableSize = scPage.getDataTableSize(id);
 			System.out.println("-- " + id+ " " + scPage.getDataTableSize(id));
 			
 			ReportStatistics.getReportStatistics().incrementCounter("widgets_tested", "");
-			if(scPage.getDataTableSize(id) > 0) {
+			if(dataTableSize > 0) {
 				assertTrue(id, true);
 			} else{ 
 				ReportStatistics.getReportStatistics().incrementCounter("widgets_failed", "");
 				assertTrue(id, false);
 			}
+			if(i++>=1) break;
 		}
 	}
 	

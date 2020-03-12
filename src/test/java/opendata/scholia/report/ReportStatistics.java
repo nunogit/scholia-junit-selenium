@@ -43,7 +43,7 @@ public class ReportStatistics {
 
 	
 	private static void setup() {
-		if(reportStatistics!=null)
+		if(reportStatistics==null)
 			reportStatistics = new ReportStatistics();
 	}
 	
@@ -56,6 +56,7 @@ public class ReportStatistics {
 
 	public void executeBatchJob() throws Exception {
 		CollectorRegistry registry = new CollectorRegistry();
+		
 		Gauge duration = Gauge.build().name("my_batch_job_duration_seconds")
 				.help("Duration of my batch job in seconds.").register(registry);
 		Gauge.Timer durationTimer = duration.startTimer();
@@ -63,20 +64,19 @@ public class ReportStatistics {
 
 			Iterator it = counter.entrySet().iterator();
 			while (it.hasNext()) {
-				Map.Entry pair = (Map.Entry) it.next();
-
-				Counter count = Counter.build().name("requests_total").help("Total requests.").labelNames("path")
-						.register(registry);
-
-				// pair.getValue().intValue();
-				count.inc();
+				Map.Entry <String, Integer>pair = (Map.Entry) it.next();
+				//Counter count = Counter.build().name("requests_total").help("Total requests.").labelNames("path")
+				//		.register(registry);
+				Counter count = Counter.build().name(pair.getKey()).help("help").register(registry);
+				count.inc(pair.getValue().doubleValue());
 
 				it.remove(); // avoids a ConcurrentModificationException
 			}
-
 			Gauge lastSuccess = Gauge.build().name("my_batch_job_last_success")
 					.help("Last time my batch job succeeded, in unixtime.").register(registry);
 			lastSuccess.setToCurrentTime();
+		} catch(Exception e){
+			System.out.println(e);
 		} finally {
 			System.out.println("going to push");
 			durationTimer.setDuration();

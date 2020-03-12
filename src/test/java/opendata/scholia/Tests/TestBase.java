@@ -182,6 +182,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 
     @After
     public void tearDown() throws Exception {
+    	ReportStatistics.getReportStatistics().executeBatchJob();
         driver.quit();
     }
 
