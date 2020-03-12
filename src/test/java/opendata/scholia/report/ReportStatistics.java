@@ -31,21 +31,23 @@ public class ReportStatistics {
 	HashMap<String, Integer> counter = new HashMap<String, Integer>();
 
 	
-	public ReportStatistics() {
+	private ReportStatistics() {
 		counter = new HashMap<String, Integer>();
 	}
 
-	public static void incrementCounter(String name, String label) {
+	
+	public static ReportStatistics getReportStatistics(){
 		setup();
-		reportStatistics.incCounter(name, label);
+		return ReportStatistics.reportStatistics;
 	}
+
 	
 	private static void setup() {
 		if(reportStatistics!=null)
 			reportStatistics = new ReportStatistics();
 	}
 	
-	public void incCounter(String name, String label) {
+	public void incrementCounter(String name, String label) {
 		if (counter.containsKey(name))
 			counter.put(name, counter.get(name).intValue() + 1);
 		else

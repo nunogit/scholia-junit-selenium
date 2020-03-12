@@ -116,11 +116,11 @@ public class TableTest extends TestBase {
 			System.out.println( sURL);
 			System.out.println("-- " + id+ " " + scPage.getDataTableSize(id));
 			
-			ReportStatistics.incrementCounter("widgets_tested", "");
+			ReportStatistics.getReportStatistics().incrementCounter("widgets_tested", "");
 			if(scPage.getDataTableSize(id) > 0) {
 				assertTrue(id, true);
 			} else{ 
-				ReportStatistics.incrementCounter("widgets_failed", "");
+				ReportStatistics.getReportStatistics().incrementCounter("widgets_failed", "");
 				assertTrue(id, false);
 			}
 		}
