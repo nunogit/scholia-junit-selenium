@@ -138,6 +138,7 @@ public class TableTest extends TestBase {
 		cArg[0] = WebDriver.class; 
 		
 		System.out.println("about to test...");
+		System.out.println("loading data from Git...");
 		System.out.flush();
 		
 		GitReader gitReader = new GitReader();
@@ -150,7 +151,7 @@ public class TableTest extends TestBase {
 			e.printStackTrace();
 		}
 		
-		System.out.println("read success");
+		System.out.println("Git list read success...");
 		System.out.flush();
 		List<String> pageList = gitReader.getList();
 		for(String stringURL : pageList) {
