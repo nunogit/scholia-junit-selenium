@@ -25,9 +25,8 @@ RUN apt-get install -y openjdk-8-jdk
 #RUN /usr/local/bin/chromedriver
 #RUN sh -e /etc/init.d/xvfb start
 
-
+RuN mkdir /log/
 # caching dependencies - this only runs if pom.xml changes
-RUN mkdir scholia3
 RUN mkdir scholia
 RUN git clone https://github.com/nunogit/scholia-junit-selenium.git ./scholia
 WORKDIR scholia/

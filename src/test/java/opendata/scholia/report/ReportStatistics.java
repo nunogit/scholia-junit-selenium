@@ -85,7 +85,7 @@ public class ReportStatistics {
             TextFormat.write004(writer1, registry.metricFamilySamples());
             System.out.println(writer1.toString());
             
-            FileWriter fileWriter = new FileWriter("prometheus.log");
+            FileWriter fileWriter = new FileWriter("/log/prometheus.log");
             PrintWriter printWriter = new PrintWriter(fileWriter);
             printWriter.print("Some String");
             printWriter.printf(writer1.toString());
