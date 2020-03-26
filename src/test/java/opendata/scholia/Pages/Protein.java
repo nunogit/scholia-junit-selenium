@@ -1,5 +1,7 @@
 package opendata.scholia.Pages;
 
+import java.util.HashMap;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,14 +19,15 @@ public class Protein extends ScholiaContentPage{
 
     public Protein(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
- 
-        
-        
-        
+        init();
+    }
+    
+    public Protein() {
+    	super();
+    	init();
     }
 
-
+    private void init() {
+    
+    }
 }

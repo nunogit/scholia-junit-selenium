@@ -28,8 +28,7 @@ public class Country extends ScholiaContentPage{
 
     public Country(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
+        init();
         
         this.addDataTable("organizations");
         
@@ -38,8 +37,13 @@ public class Country extends ScholiaContentPage{
         
     }
     
-
-
+    public Country() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
+    }
 
 
 }

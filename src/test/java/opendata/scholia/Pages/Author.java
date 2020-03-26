@@ -17,21 +17,21 @@ public class Author extends ScholiaContentPage{
 
     public Author(WebDriver driver) {
     	super(driver);
-
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-       
+        init();
+    }
+    
+    public Author() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
         this.addDataTable("list-of-publications");
-
         this.addDataTable("venue-statistics");
         this.addDataTable("topics");
         this.addDataTable("most-cited-works");
         this.addDataTable("citing-authors");
         this.addDataTable("events");
-        
-        
-     	
-        
     }
 
 

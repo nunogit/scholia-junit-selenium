@@ -28,19 +28,19 @@ public class ChemicalElement extends ScholiaContentPage{
 
     public ChemicalElement(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
-        this.addDataTable("isotopes");
-        this.addDataTable("allotropes");
-        
-        // can be 0 removed for now
-        //this.addDataTable("recentArticles");
-        	
+        init();       	
     }
     
+    public ChemicalElement() {
+    	super();
+    	init();
+    }
 
-
-
+    private void init() {
+        this.addDataTable("isotopes");
+        this.addDataTable("allotropes");
+        // can be 0 removed for now
+        //this.addDataTable("recentArticles");
+    }
 
 }

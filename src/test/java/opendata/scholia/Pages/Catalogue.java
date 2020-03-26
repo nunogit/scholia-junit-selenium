@@ -17,11 +17,16 @@ public class Catalogue extends ScholiaContentPage{
 
     public Catalogue(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
-        this.addDataTable("items-in-catalogue");
-        
+        init();
+    }
+    
+    public Catalogue() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
+    	 this.addDataTable("items-in-catalogue");
     }
 
 

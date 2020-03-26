@@ -6,38 +6,32 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import opendata.scholia.Pages.Country;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class ChemicalClasses extends ScholiaContentPage{
-
- //  @FindBy(linkText = "i am a link")
- //  private WebElement theActiveLink;
-
- //  @FindBy(id = "your_comments")
- //  private WebElement yourCommentsSpan;
-
- //  @FindBy(id = "comments")
- //  private WebElement commentsTextAreaInput;
-
- //  @FindBy(id = "submit")
- //  private WebElement submitButton;
-    
+public class GenericPage extends ScholiaContentPage{
 
 
-    public ChemicalClasses(WebDriver driver) {
+
+    public GenericPage(WebDriver driver) {
     	super(driver);
         init();
     }
     
-    public ChemicalClasses() {
+    public GenericPage() {
     	super();
     	init();
     }
-
+    
     private void init() {
-    	
+        this.addDataTable("list-of-publications");
+        this.addDataTable("venue-statistics");
+        this.addDataTable("topics");
+        this.addDataTable("most-cited-works");
+        this.addDataTable("citing-authors");
+        this.addDataTable("events");
     }
 
 

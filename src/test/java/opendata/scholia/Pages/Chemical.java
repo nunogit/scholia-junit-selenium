@@ -28,19 +28,22 @@ public class Chemical extends ScholiaContentPage{
 
     public Chemical(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();    	
+    }
+    
+    public Chemical() {
+    	super();
+    	init();
+    }
+    
+
+    private void init() {
         this.addDataTable("structures");
         this.addDataTable("identifiers");
         this.addDataTable("related");
         this.addDataTable("properties");
         this.addDataTable("recentArticles");
-        	
     }
-    
-
-
 
 
 }

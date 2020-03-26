@@ -28,17 +28,19 @@ public class Use extends ScholiaContentPage{
 
     public Use(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
-        this.addDataTable("recent-work-using-the-used");
-        this.addDataTable("co-used");
-
-        	
+        init();	
+    }
+    
+    public Use() {
+    	super();
+    	init();
     }
     
 
-
+    private void init() {
+        this.addDataTable("recent-work-using-the-used");
+        this.addDataTable("co-used");
+    }
 
 
 }

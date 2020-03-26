@@ -28,18 +28,21 @@ public class Location extends ScholiaContentPage{
 
     public Location(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+                
+    }
+    
+    public Location() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
         this.addDataTable("nearby-organizations");
         
         // tables sometimes 0?
         //this.addDataTable("nearby-locations-as-topics-in-works");
-        
     }
-    
-
-
 
 
 }

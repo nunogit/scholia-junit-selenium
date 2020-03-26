@@ -28,17 +28,19 @@ public class Pathway extends ScholiaContentPage{
 
     public Pathway(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Pathway() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
         this.addDataTable("participants");
         this.addDataTable("recentArticles");
         this.addDataTable("citingArticles");
-        	
     }
-    
-
-
 
 
 }

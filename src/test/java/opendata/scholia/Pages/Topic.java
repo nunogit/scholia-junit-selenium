@@ -28,9 +28,15 @@ public class Topic extends ScholiaContentPage{
 
     public Topic(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Topic() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("recently-published-works");
         this.addDataTable("authors");
         this.addDataTable("topics");
@@ -40,11 +46,7 @@ public class Topic extends ScholiaContentPage{
         this.addDataTable("most-cited-authors");
         //can be 0
         //driver.this.addDataTable("author-awards");
-        
     }
-    
-
-
 
 
 }

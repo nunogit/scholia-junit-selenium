@@ -17,16 +17,17 @@ public class Taxon extends ScholiaContentPage{
 
     public Taxon(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
- 
-        
+        init();
+    }
+    
+    public Taxon() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("parents");
         this.addDataTable("genome");
         this.addDataTable("metabolome");
-        
     }
-
-
 }

@@ -72,8 +72,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
     protected String deviceName;
     protected String deviceOrientation;
     protected String sessionId;
-    protected WebDriver driver;
-    
+    protected static WebDriver driver;
 
 
     /**
@@ -145,8 +144,29 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         //WebDriver driver = new FirefoxDriver();
 		//comment the above 2 lines and uncomment below 2 lines to use Chrome
         
-        String javaHome = System.getenv("DRIVER");
+        TestBase.loadLocalDriver();
         
+
+  		//this.reportStatistics = new ReportStatistics();
+  		//this.reportStatistics.executeBatchJob();
+
+
+  		
+      	//this.driver = new RemoteWebDriver(
+        //        new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
+        //        capabilities);
+        //this.sessionId = (((RemoteWebDriver) driver).getSessionId()).toString();
+        
+    }
+
+    private static WebDriver loadLocalDriver() {
+    	if(TestBase.driver != null) {
+    		System.out.println("Driver already loaded... returning");
+    		return TestBase.driver;
+    	}
+        
+    	String javaHome = System.getenv("DRIVER");
+		
         if(javaHome != null && javaHome.length() > 0)
         	System.setProperty("webdriver.chrome.driver", javaHome);
         else {
@@ -160,30 +180,24 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--headless");
 			
-			this.driver = new ChromeDriver(options);
-			driver.manage().timeouts().implicitlyWait(50, TimeUnit.SECONDS);
+			TestBase.driver = new ChromeDriver(options);
+			TestBase.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			
+	  		System.out.println("driver loaded...");
+	  		System.out.flush();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		
-  		//this.reportStatistics = new ReportStatistics();
-  		//this.reportStatistics.executeBatchJob();
+		return TestBase.driver;
+	}
 
-  		System.out.println("driver loaded...");
-  		System.out.flush();
-  		
-      	//this.driver = new RemoteWebDriver(
-        //        new URL("https://" + username+ ":" + accesskey + seleniumURI +"/wd/hub"),
-        //        capabilities);
-        //this.sessionId = (((RemoteWebDriver) driver).getSessionId()).toString();
-        
-    }
-
-    @After
+	@After
     public void tearDown() throws Exception {
-    	ReportStatistics.getReportStatistics().executeBatchJob();
-        driver.quit();
+    	//ReportStatistics.getReportStatistics().executeBatchJob();
+        //driver.quit();
     }
 
     /**

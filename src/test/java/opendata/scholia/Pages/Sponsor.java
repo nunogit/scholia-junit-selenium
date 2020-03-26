@@ -17,13 +17,17 @@ public class Sponsor extends ScholiaContentPage{
 
     public Sponsor(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Sponsor() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("recently-published-sponsored-work");
         this.addDataTable("authors-on-sponsored-work");
         this.addDataTable("co-sponsors");
     }
-
-
 }

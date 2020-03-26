@@ -18,15 +18,20 @@ public class Organization extends ScholiaContentPage{
 
     public Organization(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();  
+      
+    }
+
+    public Organization() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
         this.addDataTable("recent-publications");
         this.addDataTable("recent-citations");
         this.addDataTable("awards");
         this.addDataTable("gender-distribution");
-        
     }
-
 
 }

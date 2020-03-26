@@ -28,18 +28,19 @@ public class ClinicalTrial extends ScholiaContentPage{
 
     public ClinicalTrial(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public ClinicalTrial() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("recent-clinical-trials");
         this.addDataTable("medical-conditions");
         this.addDataTable("interventions");
         this.addDataTable("statistics");
-        
     }
-    
-
-
-
 
 }

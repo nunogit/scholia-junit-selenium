@@ -17,15 +17,19 @@ public class Gene extends ScholiaContentPage{
 
     public Gene(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+                
+    }
+    
+    public Gene() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("transcripts");
         this.addDataTable("proteins");
         this.addDataTable("orthologs");
-        this.addDataTable("variants");
-        
+        this.addDataTable("variants");	
     }
-
-
 }

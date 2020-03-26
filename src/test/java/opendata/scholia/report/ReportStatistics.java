@@ -17,7 +17,6 @@ import io.prometheus.client.exporter.common.TextFormat;
 
 public class ReportStatistics {
 
-	
 	Counter requests = Counter.build().name("requests_total").help("Total requests.").labelNames("path").register();
 	private static ReportStatistics reportStatistics;
 	
@@ -55,6 +54,7 @@ public class ReportStatistics {
 	}
 
 	public void executeBatchJob() throws Exception {
+		
 		CollectorRegistry registry = new CollectorRegistry();
 		
 		Gauge duration = Gauge.build().name("my_batch_job_duration_seconds")
@@ -85,11 +85,11 @@ public class ReportStatistics {
             TextFormat.write004(writer1, registry.metricFamilySamples());
             System.out.println(writer1.toString());
             
-            FileWriter fileWriter = new FileWriter("/log/prometheus.log");
-            PrintWriter printWriter = new PrintWriter(fileWriter);
-            printWriter.print("Some String");
-            printWriter.printf(writer1.toString());
-            printWriter.close();
+            //FileWriter fileWriter = new FileWriter("/log/prometheus.log");
+            //PrintWriter printWriter = new PrintWriter(fileWriter);
+            //printWriter.print("Some String");
+            //printWriter.printf(writer1.toString());
+            //printWriter.close();
 			
 			//PushGateway pg = new PushGateway("146.185.130.187:9091");
 			//pg.setConnectionFactory(new BasicAuthHttpConnectionFactory("HelLo", "HelLo"));

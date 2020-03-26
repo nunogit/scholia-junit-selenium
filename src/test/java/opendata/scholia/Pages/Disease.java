@@ -28,17 +28,18 @@ public class Disease extends ScholiaContentPage{
 
     public Disease(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
-	        this.addDataTable("clinical-trials");
-	        this.addDataTable("related-diseases");
-
-        
+        init();
     }
     
-
-
+    public Disease() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
+	    this.addDataTable("clinical-trials");
+	    this.addDataTable("related-diseases");
+    }
 
 
 }

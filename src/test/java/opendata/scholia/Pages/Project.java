@@ -28,9 +28,15 @@ public class Project extends ScholiaContentPage{
 
     public Project(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Project() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("prolific-authors");
         this.addDataTable("recentArticles");
         
@@ -38,11 +44,7 @@ public class Project extends ScholiaContentPage{
        // this.addDataTable("recent-publications-by-recipients");
        // this.addDataTable("co-awards");
        // this.addDataTable("gender-distribution");
-
     }
-    
-
-
 
 
 }

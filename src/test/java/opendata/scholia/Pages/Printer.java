@@ -17,12 +17,18 @@ public class Printer extends ScholiaContentPage{
 
     public Printer(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
+        init();
         
         this.addDataTable("printed-works-per-publisher");
         
     }
-
-
+    
+    public Printer() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
+    	
+    }
 }

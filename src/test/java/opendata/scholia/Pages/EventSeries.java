@@ -28,18 +28,16 @@ public class EventSeries extends ScholiaContentPage{
 
     public EventSeries(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
-
-        
-        this.addDataTable("event-series");
-   
-        
+        init();
     }
     
+    public EventSeries() {
+    	super();
+    	init();
+    }
 
-
-
+    private void init() {
+        this.addDataTable("event-series"); 	
+    }
 
 }

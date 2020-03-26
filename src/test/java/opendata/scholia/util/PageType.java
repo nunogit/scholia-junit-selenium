@@ -16,6 +16,7 @@ import opendata.scholia.Pages.Disease;
 import opendata.scholia.Pages.Event;
 import opendata.scholia.Pages.EventSeries;
 import opendata.scholia.Pages.Gene;
+import opendata.scholia.Pages.GenericPage;
 import opendata.scholia.Pages.Location;
 import opendata.scholia.Pages.Organization;
 import opendata.scholia.Pages.Pathway;
@@ -59,6 +60,8 @@ public class PageType {
 		pageType.put(Pathway.class, start_pattern + "/pathway/"+q_pattern);
 		pageType.put(Printer.class, start_pattern + "/printer/");
 		pageType.put(Project.class, start_pattern + "/project/"+q_pattern);
+		//TODO fix protein repeaated - protein with q_pattern not handled (only one Protein.class)
+		pageType.put(Protein.class, start_pattern + "/protein/");
 		pageType.put(Protein.class, start_pattern + "/protein/"+q_pattern);
 		pageType.put(Publisher.class, start_pattern + "/publisher/"+q_pattern);
 		pageType.put(Sponsor.class, start_pattern + "/sponsor/"+q_pattern);
@@ -74,8 +77,7 @@ public class PageType {
 				return entry.getKey();
 		}
 		
-		return ScholiaContentPage.class;
-		
+		return GenericPage.class;
 	}
 	
 

@@ -36,16 +36,26 @@ public abstract class ScholiaContentPage{
 		      .help("Failed.").register();
 	
     public ScholiaContentPage(WebDriver driver) {
-    	//TODO  improve
+    	initDriver(driver);
+    	init();
+      
+    }
+    
+    public ScholiaContentPage() {
+    	init();
+    }
+    
+    private void initDriver(WebDriver driver) {
+    	//TODO improve
     	if(driver==null) System.out.println("no driver");
     	
     	this.driver = driver;
     	PageFactory.initElements(driver, this);
-    	
+    }
+    
+    private void init() {
     	dataTableMap = new HashMap();
     	widgetMap = new HashMap();
-    	
-      
     }
     
     public void setURL(String url) {
@@ -54,12 +64,13 @@ public abstract class ScholiaContentPage{
     
     public void visitPage() {
     	//TODO  improve
-    	if(driver==null) System.out.println("no driver");
-        this.driver.get(url);
-        
-        //widgetsTested.labels(url);
-        //widgetsFailed.labels(url);
- 
+    	if(driver==null)
+    		System.out.println("no driver");
+    	
+    	if(!url.contentEquals(this.driver.getCurrentUrl()))
+    		this.driver.get(url);
+    	else
+    		System.out.println("Already visited.");
     }
 
 	
@@ -101,6 +112,10 @@ public abstract class ScholiaContentPage{
 		List<WebElement> rows = driver.findElements(By.xpath("//*[@id=\""+dataTableId+ "\"]/tbody/tr"));
 		return rows.size();
 
+	}
+
+	public void setDriver(WebDriver driver) {
+		initDriver(driver);
 	}
 	
 }

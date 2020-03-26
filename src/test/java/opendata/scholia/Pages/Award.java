@@ -28,13 +28,19 @@ public class Award extends ScholiaContentPage{
 
     public Award(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
-        this.addDataTable("list-of-recipients");
-        this.addDataTable("recent-publications-by-recipients");
-        this.addDataTable("co-awards");
-        this.addDataTable("gender-distribution");
+        init();
+    }
+    
+    public Award() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
+    	  this.addDataTable("list-of-recipients");
+          this.addDataTable("recent-publications-by-recipients");
+          this.addDataTable("co-awards");
+          this.addDataTable("gender-distribution");
     }
     
 

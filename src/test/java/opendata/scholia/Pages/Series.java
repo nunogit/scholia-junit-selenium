@@ -17,14 +17,17 @@ public class Series extends ScholiaContentPage{
 
     public Series(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Series() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("in-series");
         this.addDataTable("published-works");
         this.addDataTable("authors");
-        
     }
-
-
 }

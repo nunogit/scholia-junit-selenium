@@ -28,16 +28,19 @@ public class Event extends ScholiaContentPage{
 
     public Event(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Event() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
         this.addDataTable("coming-deadlines");
         this.addDataTable("future-events");
         this.addDataTable("past-events");
-        
     }
-    
-
 
 
 

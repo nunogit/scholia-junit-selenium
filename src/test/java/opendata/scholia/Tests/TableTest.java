@@ -5,13 +5,18 @@ import static org.junit.Assert.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
+
 
 import opendata.scholia.Pages.*;
 
@@ -21,14 +26,25 @@ import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.report.ReportStatistics;
 import opendata.scholia.util.GitReader;
 import opendata.scholia.util.PageType;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 
+@RunWith(Parameterized.class)
 public class TableTest extends TestBase {
-
+	
+	private ScholiaContentPage scholiaContentPage;
+	private String widgetId;
+	
+	public TableTest(ScholiaContentPage scholiaContentPage, String widgetId) {
+		super();
+		this.scholiaContentPage = scholiaContentPage;
+		this.widgetId = widgetId;
+	}
+	
 	//@Test
 	public void testDataTables() {
-		
-		
+				
 		//List<Class<ScholiaContentPage>> pageTestList = new Vector<Class<ScholiaContentPage>>();
 		Map<Class<?>, String> pageTestList = new HashMap<Class<?>, String>();
 		pageTestList.put(Author.class, "https://tools.wmflabs.org/scholia/author/Q97270");
@@ -70,7 +86,7 @@ public class TableTest extends TestBase {
 		
 			ScholiaContentPage scpage = null;
 			try {
-				scpage = (ScholiaContentPage) className.getDeclaredConstructor(cArg).newInstance(driver);
+				scpage = (ScholiaContentPage) className.getDeclaredConstructor(cArg).newInstance();
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -106,90 +122,27 @@ public class TableTest extends TestBase {
 		}	
 	}
 	
-	void testPage(ScholiaContentPage scPage, String sURL) {
-		scPage.setURL((String) sURL);
+	void testPage(ScholiaContentPage scPage, String widgetId) {
+		System.out.println("visitingPage");
 		scPage.visitPage();
-		
+		System.out.println("visitedPage");
+
 		List<String> idList = scPage.dataTableIdList();
 		
-		int i = 0;
-		for(String id : idList) {
-			System.out.println(sURL);
-			int dataTableSize = scPage.getDataTableSize(id);
-			System.out.println("-- " + id+ " " + scPage.getDataTableSize(id));
-			
-			ReportStatistics.getReportStatistics().incrementCounter("widgets_tested", "");
-			if(dataTableSize > 0) {
-				assertTrue(id, true);
-			} else{ 
-				ReportStatistics.getReportStatistics().incrementCounter("widgets_failed", "");
-				assertTrue(id, false);
-			}
-			if(i++>=1) break;
-		}
+		int dataTableSize = scPage.getDataTableSize(widgetId);
+		System.out.println("-- " + widgetId+ " " + scPage.getDataTableSize(widgetId));
+
 	}
 	
 	@Test
-	public void testDataTablesFromGit() {
-		
-		//assertTrue(true); if(true)return;
-		
-		Class[] cArg = new Class[1]; //Our constructor has 1 arguments
-		cArg[0] = WebDriver.class; 
-		
-		System.out.println("about to test...");
-		System.out.println("loading data from Git...");
-		System.out.flush();
-		
-		GitReader gitReader = new GitReader();
-		try {
-			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("can't connect to retrieve test list");
-			System.out.flush();
-			e.printStackTrace();
-		}
-		
-		System.out.println("Git list read success...");
-		System.out.flush();
-		List<String> pageList = gitReader.getList();
-		for(String stringURL : pageList) {
-			try {
-				Class className = PageType.getPageType(new URL(stringURL));
-				ScholiaContentPage scpage = (ScholiaContentPage) className.getDeclaredConstructor(cArg).newInstance(driver);
-				testPage(scpage, stringURL);
-				
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
+	public void testDataTables3() {
+		scholiaContentPage.setDriver(driver);
+		System.out.println("testing  " + scholiaContentPage + "#" +widgetId);
+		testPage(scholiaContentPage, widgetId);
 	}
 	
 	//@Test
 	public void testDataTables2() {
-		
-		
 		Author author = new Author(driver);
 	
 		//settingArgentina
@@ -201,10 +154,57 @@ public class TableTest extends TestBase {
 		for(String id : idList) {
 			assertTrue(id, author.getDataTableSize(id) > 0);		
 		}
+	}
+	
+	@Parameters
+	public static Collection<Object[]> loadFromGit() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
+		
+		System.out.println("loading URL list from Git...");
+		System.out.flush();
+		
+		GitReader gitReader = new GitReader();
+		try {
+			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
+			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			System.out.println("can't connect to retrieve test list");
+			System.out.flush();
+			e.printStackTrace();
+		}
+		
+		List<String> pageList = gitReader.getList();
+		System.out.println("Read "+ pageList.size()	+" URLs");
+		
+		Collection<Object[]> stringURLCollection = new ArrayList<Object[]>();
+		
+		for(String sURL : pageList) {
+			//Class[] cArg = new Class[1]; //Our constructor has 1 arguments
+			//cArg[0] = WebDriver.class; 
+			Class[] cArg = new Class[0];
 
+			Class classtype = null;
+			classtype = PageType.getPageType(new URL(sURL));
+			
+			System.out.println("Page type "+ classtype);
+			
+			ScholiaContentPage scholiaContentPage = (ScholiaContentPage) classtype.getDeclaredConstructor().newInstance();
+			scholiaContentPage.setURL(sURL);
+			
+			List<String> dataTableIdList = scholiaContentPage.dataTableIdList();
+			System.out.println("There are "+ dataTableIdList.size()	+" dataTables in " + sURL);
+			
+			
+			for(String dataTableId: dataTableIdList) {
+				//Object obj = new Object[][] { {scholiaContentPage, dataTableId},  {scholiaContentPage, dataTableId} };
+				stringURLCollection.add( new Object[]{scholiaContentPage, dataTableId} );
+			}
+		}
 		
-		
-		
+		System.out.println("Git list read success...");
+		System.out.flush();
+
+		return stringURLCollection;
 	}
 	
 

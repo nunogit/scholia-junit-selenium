@@ -17,9 +17,15 @@ public class Venue extends ScholiaContentPage{
 
     public Venue(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Venue() {
+    	super();
+    	init();
+    }
+
+    private void init() {
         this.addDataTable("recently-published-works");
         this.addDataTable("topics");
         this.addDataTable("prolific-authors");
@@ -35,8 +41,5 @@ public class Venue extends ScholiaContentPage{
         this.addDataTable("gender-distribution");
         this.addDataTable("authorships-gender-distribution");
         this.addDataTable("author-awards");
-        
     }
-
-
 }

@@ -18,14 +18,18 @@ public class Publisher extends ScholiaContentPage{
 
     public Publisher(WebDriver driver) {
     	super(driver);
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-        
+        init();
+    }
+    
+    public Publisher() {
+    	super();
+    	init();
+    }
+    
+    private void init() {
         this.addDataTable("journals");
         //this.addDataTable("list-of-editors");
         this.addDataTable("mostCited");
-        
     }
-
 
 }
