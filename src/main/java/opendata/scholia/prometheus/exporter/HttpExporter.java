@@ -65,7 +65,7 @@ public class HttpExporter {
                     	System.out.println(failure.getMessage());
                     }
                     
-                    datatables_errors.inc(failureCount);
+                    datatables_errors.set(failureCount);
                     
                     System.out.println("run count " + runCount);
                     System.out.println("failure count " + failureCount);
