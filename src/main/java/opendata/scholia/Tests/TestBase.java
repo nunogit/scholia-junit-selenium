@@ -179,6 +179,13 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 		try {
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--headless");
+			options.addArguments("start-maximized"); 
+			options.addArguments("enable-automation");
+			options.addArguments("--no-sandbox"); 
+			options.addArguments("--disable-infobars"); 
+			options.addArguments("--disable-dev-shm-usage"); 
+			options.addArguments("--disable-browser-side-navigation"); 
+			options.addArguments("--disable-gpu");
 			
 			TestBase.driver = new ChromeDriver(options);
 			TestBase.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
