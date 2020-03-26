@@ -43,7 +43,7 @@ public class HttpExporter {
                     List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
                     int dataTableWidgetTotal  = 0;
                     for(ScholiaContentPage scp : scholiaContentPageList) 
-                    	dataTableWidgetTotal =+scp.dataTableIdList().size();
+                    	dataTableWidgetTotal += scp.dataTableIdList().size();
                     
                     tested_datatables_total.set(dataTableWidgetTotal);
                     
