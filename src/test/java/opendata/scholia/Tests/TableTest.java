@@ -156,12 +156,8 @@ public class TableTest extends TestBase {
 		}
 	}
 	
-	@Parameters
-	public static Collection<Object[]> loadFromGit() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
-		
-		System.out.println("loading URL list from Git...");
-		System.out.flush();
-		
+	
+	public static List<String> loadFromGit(){
 		GitReader gitReader = new GitReader();
 		try {
 			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
@@ -173,27 +169,49 @@ public class TableTest extends TestBase {
 			e.printStackTrace();
 		}
 		
-		List<String> pageList = gitReader.getList();
+		return gitReader.getList();
+	}
+	
+	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
+		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
+		
+		for(String sURL : sUrlList) {
+			Class[] cArg = new Class[0];
+	
+			Class classtype = null;
+			try {
+				classtype = PageType.getPageType(new URL(sURL));
+				System.out.println("Page type "+ classtype);
+				
+				ScholiaContentPage scholiaContentPage = (ScholiaContentPage) classtype.getDeclaredConstructor().newInstance();
+				scholiaContentPage.setURL(sURL);
+				scholiaContentPageList.add(scholiaContentPage);
+			} catch (MalformedURLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				System.out.println("URL "+sURL+" is invalid");
+			}
+
+		}
+		
+		return scholiaContentPageList;
+	}
+	
+	@Parameters
+	public static Collection<Object[]> setupParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
+		
+		System.out.println("loading URL list from Git...");
+		System.out.flush();
+				
+		List<String> pageList = TableTest.loadFromGit();
 		System.out.println("Read "+ pageList.size()	+" URLs");
 		
+		List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(pageList);
 		Collection<Object[]> stringURLCollection = new ArrayList<Object[]>();
 		
-		for(String sURL : pageList) {
-			//Class[] cArg = new Class[1]; //Our constructor has 1 arguments
-			//cArg[0] = WebDriver.class; 
-			Class[] cArg = new Class[0];
-
-			Class classtype = null;
-			classtype = PageType.getPageType(new URL(sURL));
-			
-			System.out.println("Page type "+ classtype);
-			
-			ScholiaContentPage scholiaContentPage = (ScholiaContentPage) classtype.getDeclaredConstructor().newInstance();
-			scholiaContentPage.setURL(sURL);
+		
+		for(ScholiaContentPage scholiaContentPage : scholiaContentPageList) {
 			
 			List<String> dataTableIdList = scholiaContentPage.dataTableIdList();
-			System.out.println("There are "+ dataTableIdList.size()	+" dataTables in " + sURL);
-			
+			System.out.println("There are "+ dataTableIdList.size()	+" dataTables in " + scholiaContentPage.getURL());	
 			
 			for(String dataTableId: dataTableIdList) {
 				//Object obj = new Object[][] { {scholiaContentPage, dataTableId},  {scholiaContentPage, dataTableId} };

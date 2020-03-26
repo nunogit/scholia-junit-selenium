@@ -117,5 +117,9 @@ public abstract class ScholiaContentPage{
 	public void setDriver(WebDriver driver) {
 		initDriver(driver);
 	}
+
+	public String getURL() {
+		return this.url;
+	}
 	
 }
