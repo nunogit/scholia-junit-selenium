@@ -21,10 +21,9 @@ public class HttpExporter {
     static final Gauge tested_pages_total = Gauge.build().name("tested_pages_total").help("total pages tested").register();
     static final Gauge tested_datatables_total = Gauge.build().name("tested_datatables_total").help("total datatables tested").register();
     
-    static final Gauge datatables_errors = Gauge.build().name("datatables_errors").help("errors in datatables").register();
-    static final Histogram totaltime = Histogram.build().name("totaltime").help("totaltime spent in full testset").register();
+    static final Gauge datatables_errors = Gauge.build().name("erros_datatables_total").help("errors in datatables").register();
    
-    static final Gauge total_time_running = Gauge.build().name("total)time_running").help("total datatables tested").register();
+    static final Gauge total_time_running = Gauge.build().name("test_time_running_seconds_total").help("total datatables tested").register();
 
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
