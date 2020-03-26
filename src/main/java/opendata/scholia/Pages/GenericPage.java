@@ -26,12 +26,6 @@ public class GenericPage extends ScholiaContentPage{
     }
     
     private void init() {
-        this.addDataTable("list-of-publications");
-        this.addDataTable("venue-statistics");
-        this.addDataTable("topics");
-        this.addDataTable("most-cited-works");
-        this.addDataTable("citing-authors");
-        this.addDataTable("events");
     }
 
 
