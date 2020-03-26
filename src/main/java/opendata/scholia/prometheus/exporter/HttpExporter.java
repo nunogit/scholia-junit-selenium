@@ -17,12 +17,11 @@ import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.Tests.TableTest;
 
 public class HttpExporter {
-
+	//TOOD a bit ugly. Improve code
+	
     static final Gauge tested_pages_total = Gauge.build().name("tested_pages_total").help("total pages tested").register();
     static final Gauge tested_datatables_total = Gauge.build().name("tested_datatables_total").help("total datatables tested").register();
-    
     static final Gauge datatables_errors = Gauge.build().name("erros_datatables_total").help("errors in datatables").register();
-   
     static final Gauge total_time_running = Gauge.build().name("test_time_running_seconds_total").help("total datatables tested").register();
 
     
@@ -34,38 +33,52 @@ public class HttpExporter {
     public static void main(String[] args) throws Exception {
         new HTTPServer(1234);
         
-        List<String> sUrlList = TableTest.loadFromGit();
-        tested_pages_total.set(sUrlList.size());  
         
-        List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
-        int dataTableWidgetTotal  = 0;
-        for(ScholiaContentPage scp : scholiaContentPageList) 
-        	dataTableWidgetTotal =+scp.dataTableIdList().size();
+        Thread bgThread = new Thread(() -> {
+            while (true) {
+                try {
+                    List<String> sUrlList = TableTest.loadFromGit();
+                    tested_pages_total.set(sUrlList.size());  
+                    
+                    List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
+                    int dataTableWidgetTotal  = 0;
+                    for(ScholiaContentPage scp : scholiaContentPageList) 
+                    	dataTableWidgetTotal =+scp.dataTableIdList().size();
+                    
+                    tested_datatables_total.set(dataTableWidgetTotal);
+                    
+                    long start = System.currentTimeMillis();
+                    
+                    JUnitCore junit = new JUnitCore();
+                    junit.addListener(new TextListener(System.out));
+                    Result result = junit.run(TableTest.class);
+                    List<Failure> failureList = result.getFailures();
+                    int failureCount = result.getFailureCount();
+                    int runCount = result.getRunCount();
+                    
+                    long end = System.currentTimeMillis();
+                    
+                    float deltaTime = (end - start) / 1000F; 
+                    total_time_running.set(deltaTime);
+                    
+                    for(Failure failure : failureList) {
+                    	System.out.println(failure.getMessage());
+                    }
+                    
+                    datatables_errors.inc(failureCount);
+                    
+                    System.out.println("run count " + runCount);
+                    System.out.println("failure count " + failureCount);
+
+
+                    Thread.sleep(1000 * 60* 60); //every hour
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        bgThread.start();
         
-        tested_datatables_total.set(dataTableWidgetTotal);
-        
-        long start = System.currentTimeMillis();
-        
-        JUnitCore junit = new JUnitCore();
-        junit.addListener(new TextListener(System.out));
-        Result result = junit.run(TableTest.class);
-        List<Failure> failureList = result.getFailures();
-        int failureCount = result.getFailureCount();
-        int runCount = result.getRunCount();
-        
-        long end = System.currentTimeMillis();
-        
-        float deltaTime = (end - start) / 1000F; 
-        total_time_running.set(deltaTime);
-        
-        for(Failure failure : failureList) {
-        	System.out.println(failure.getMessage());
-        }
-        
-        datatables_errors.inc(failureCount);
-        
-        System.out.println("run count " + runCount);
-        System.out.println("failure count " + failureCount);
 
       //  g.set(1);
       //  c.inc(2);
@@ -73,4 +86,9 @@ public class HttpExporter {
       //  h.observe(4);
       //  l.labels("foo").inc(5);
     }
+    
+    
+    
+     
+    
 }
