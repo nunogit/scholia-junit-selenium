@@ -61,8 +61,8 @@ public class CustomMetrics {
             datatables_errors.inc(failureCount);
             
             GaugeMetricFamily ramGauge = new GaugeMetricFamily("ram", "Ram usage", Collections.singletonList("type"));
-            ramGauge.addMetric(Collections.singletonList("ram_used"), tested_pages_total);
-            ramGauge.addMetric(Collections.singletonList("ram_total"), tested_pages_total);
+            //ramGauge.addMetric(Collections.singletonList("ram_used"), tested_pages_total);
+            //ramGauge.addMetric(Collections.singletonList("ram_total"), tested_pages_total);
             
             
 
