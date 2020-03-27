@@ -58,7 +58,7 @@ public class HttpExporter {
                     
                     long end = System.currentTimeMillis();
                     
-                    float deltaTime = (end - start) / 1000F; 
+                    float deltaTime = (end - start) / 1000;
                     total_time_running.set(deltaTime);
                     System.out.println("Delta "+deltaTime);
                     
