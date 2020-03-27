@@ -60,6 +60,7 @@ public class HttpExporter {
                     
                     float deltaTime = (end - start) / 1000F; 
                     total_time_running.set(deltaTime);
+                    System.out.println("Delta "+deltaTime);
                     
                     for(Failure failure : failureList) {
                     	System.out.println(failure.getMessage());
