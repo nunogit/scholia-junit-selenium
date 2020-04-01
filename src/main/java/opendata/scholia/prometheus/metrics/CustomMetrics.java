@@ -65,10 +65,14 @@ public class CustomMetrics {
             //ramGauge.addMetric(Collections.singletonList("ram_total"), tested_pages_total);
             
             
+ 
+            
 
             mfs.add(ramGauge);
             return mfs;
         }
+        
+
     }
 
 }

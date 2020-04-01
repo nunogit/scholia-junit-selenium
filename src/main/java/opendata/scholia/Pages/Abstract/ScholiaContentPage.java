@@ -108,6 +108,22 @@ public abstract class ScholiaContentPage{
 		return true;
 	}
 	
+	//TODO improve this in the future
+	public boolean iframeWidgetHasError(WebElement webelement) {
+
+		String html = webelement.getText().toLowerCase();
+
+		// compared with lower case
+		if(html.contains("query timeout limit reached") ||
+		   html.contains("unable to display result") ||
+		   html.contains("server error: unexpected end of json input")) {
+			return true;
+		}
+		
+
+		return false;
+	}
+	
 	public int getDataTableSize(String dataTableId) {
 		List<WebElement> rows = driver.findElements(By.xpath("//*[@id=\""+dataTableId+ "\"]/tbody/tr"));
 		return rows.size();

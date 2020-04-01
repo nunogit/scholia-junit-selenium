@@ -159,7 +159,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         
     }
 
-    private static WebDriver loadLocalDriver() {
+    protected static WebDriver loadLocalDriver() {
     	if(TestBase.driver != null) {
     		System.out.println("Driver already loaded... returning");
     		return TestBase.driver;

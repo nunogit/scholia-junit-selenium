@@ -16,7 +16,7 @@ import java.util.Vector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
-
+import org.openqa.selenium.WebElement;
 
 import opendata.scholia.Pages.*;
 
@@ -131,6 +131,7 @@ public class TableTest extends TestBase {
 		
 		int dataTableSize = scPage.getDataTableSize(widgetId);
 		System.out.println("-- " + widgetId+ " " + scPage.getDataTableSize(widgetId));
+		assertTrue(dataTableSize > 0);
 
 	}
 	
@@ -140,6 +141,7 @@ public class TableTest extends TestBase {
 		System.out.println("testing  " + scholiaContentPage + "#" +widgetId);
 		testPage(scholiaContentPage, widgetId);
 	}
+	
 	
 	//@Test
 	public void testDataTables2() {
@@ -218,6 +220,7 @@ public class TableTest extends TestBase {
 				stringURLCollection.add( new Object[]{scholiaContentPage, dataTableId} );
 			}
 		}
+		
 		
 		System.out.println("Git list read success...");
 		System.out.flush();
