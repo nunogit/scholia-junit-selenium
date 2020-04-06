@@ -19,18 +19,18 @@ import opendata.scholia.Tests.TableTest;
 public class HttpExporter {
 	//TOOD a bit ugly. Improve code
 	
-    static final Gauge tested_pages_total = Gauge.build().name("tested_pages_total").help("total pages tested").register();
+    static final Gauge tested_pages_total = Gauge.build().name("scholia_pagesTested_total").help("total pages tested").register();
    
-    static final Gauge tested_datatables_total = Gauge.build().name("tested_datatables_total").help("total datatables tested").register();
-    static final Gauge datatables_errors = Gauge.build().name("erros_datatables_total").help("errors in datatables").register();
+    static final Gauge tested_datatables_total = Gauge.build().name("scholia_widgets_dataTablesTested_total").help("total datatables tested").register();
+    static final Gauge datatables_errors =       Gauge.build().name("scholia_widgets_dataTablesTested_errors_total").help("errors in datatables").register();
     
-    static final Gauge tested_SPARQLWidgets_total  = Gauge.build().name("tested_SPARQLWidgets_total").help("total datatables tested").register();
- 	static final Gauge tested_SPARQLWidgets_errors = Gauge.build().name("tested_SPARQLWidgets_errors_total").help("total datatables tested").register();
+    static final Gauge tested_SPARQLWidgets_total  = Gauge.build().name("scholia_widgets_SPARQLWidgetsTested_total").help("total datatables tested").register();
+ 	static final Gauge tested_SPARQLWidgets_errors = Gauge.build().name("scholia_widgets_SPARQLWidgetsTested_errors_total").help("total datatables tested").register();
     
-    static final Gauge total_time_running = Gauge.build().name("test_time_running_seconds_total").help("total datatables tested").register();
+    static final Gauge total_time_running = Gauge.build().name("scholia_runningTime_seconds_total").help("total datatables tested").register();
    
-    static final Gauge memory_process = Gauge.build().labelNames("process_memory").help("memory spent by the exporter").register();
-    
+    static final Gauge memory_process = Gauge.build().labelNames("selenium_memory_processUsageTotal_bytes").help("memory spent by the exporter").register();
+
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
     //static final Summary  s = Summary.build().name("summary").help("meh").register();

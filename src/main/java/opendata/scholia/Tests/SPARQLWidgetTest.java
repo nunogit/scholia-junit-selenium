@@ -77,6 +77,9 @@ public class SPARQLWidgetTest extends TestBase {
 	}
 	
 	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
+		
+		TestBase.loadLocalDriver();		
+		
 		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
 		
 		for(String sURL : sUrlList) {
@@ -99,8 +102,9 @@ public class SPARQLWidgetTest extends TestBase {
 		return scholiaContentPageList;
 	}
 	
-	@Parameters
-	public static Collection<Object[]> setupParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
+
+	public static List<ScholiaContentPage> getParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
+		TestBase.loadLocalDriver();		
 		
 		System.out.println("loading URL list from Git...");
 		System.out.flush();
@@ -109,24 +113,28 @@ public class SPARQLWidgetTest extends TestBase {
 		System.out.println("Read "+ pageList.size()	+" URLs");
 		
 		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getScholiaContentPageList(pageList);
+				
+		for(ScholiaContentPage scholiaContentPage : scholiaContentPageList) {
+			System.out.println("loading... "+scholiaContentPage.getURL() );
+			driver.get(scholiaContentPage.getURL());	
+			List<WebElement> webElementList = driver.findElements(By.tagName("iframe"));
+			scholiaContentPage.addWebElementList(webElementList);
+		}
+		return scholiaContentPageList;
+	}
+	
+	@Parameters
+	public static Collection<Object[]> setupParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
 		Collection<Object[]> stringURLCollection = new ArrayList<Object[]>();
 		
-		TestBase.loadLocalDriver();		
-		for(ScholiaContentPage scholiaContentPage : scholiaContentPageList) {
-			System.out.println("--"+scholiaContentPage.getURL());
+		List<ScholiaContentPage> webelementList = SPARQLWidgetTest.getParameters();
 				
-			driver.get(scholiaContentPage.getURL());	
-			List<WebElement> iframeList = driver.findElements(By.tagName("iframe"));
-			
-			for(WebElement iframe: iframeList) {
-				stringURLCollection.add( new Object[]{scholiaContentPage, iframe} );
+		for(ScholiaContentPage scholiaContentPage: webelementList) {
+			for(WebElement webElement : scholiaContentPage.getWebElementList()) {
+				stringURLCollection.add( new Object[]{scholiaContentPage, webElement} );
 			}
 		}
 		
-		
-		System.out.println("Git list read success...");
-		System.out.flush();
-
 		return stringURLCollection;
 	}
 	

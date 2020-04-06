@@ -1,5 +1,6 @@
 package opendata.scholia.Pages.Abstract;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.List;
@@ -26,6 +27,8 @@ public abstract class ScholiaContentPage{
 	Map<String, WebElement> dataTableMap;
 	Map<String, WebElement> widgetMap;
 	
+	List<WebElement> webElementList;
+	
 	private String url = "";
 	
 	static final Counter widgetsTested = Counter.build()
@@ -37,8 +40,10 @@ public abstract class ScholiaContentPage{
 	
     public ScholiaContentPage(WebDriver driver) {
     	initDriver(driver);
-    	init();
-      
+    }
+    
+    public List<WebElement> getWebElementList() {
+    	return webElementList; 
     }
     
     public ScholiaContentPage() {
@@ -136,6 +141,10 @@ public abstract class ScholiaContentPage{
 
 	public String getURL() {
 		return this.url;
+	}
+
+	public void addWebElementList(List<WebElement> webElementList) {
+		this.webElementList = webElementList;
 	}
 	
 }
