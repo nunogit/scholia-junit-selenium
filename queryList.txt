@@ -1,0 +1,4490 @@
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) ?role where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?role) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
+          ?work wdt:P50 wd:Q97270 .
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now())+1 as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+    }
+  }
+  union {
+  {
+    select ?work (min(?years) as ?year) (count(?coauthors) as ?number_of_authors) ?author_number where {
+      ?work (p:P50|p:P2093) ?author_statement . 
+      ?author_statement ps:P50 wd:Q97270 .
+      optional { ?author_statement pq:P1545 ?author_number . }
+      ?work (wdt:P50|wdt:P2093) ?coauthors . 
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work ?author_number
+  }
+  bind(coalesce(if(?number_of_authors = 1,
+            'Solo author',
+            if(xsd:integer(?author_number) = 1,
+               'First author',
+               if(xsd:integer(?author_number) = ?number_of_authors,
+                  'Last author',
+                  'Middle author'))), 'Unknown')
+       as ?role)
+   }
+}
+group by ?year ?role
+order by ?year
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 1 
+##defaultView:BarChart
+select ?year ?number_of_pages ?work_label where {
+  {
+    select ?year (sample(?pages) as ?number_of_pages) ?work_label where {
+      {
+        select (str(?year_) as ?year) (0 as ?pages) ("_" as ?work_label) where {
+          ?year_item wdt:P31 wd:Q577 . 
+          ?year_item wdt:P585 ?date .
+          bind(year(?date) as ?year_)
+          {
+            select (min(?year_) as ?earliest_year) (max(?year_) as ?latest_year) where {
+              ?work wdt:P50 wd:Q97270 .
+              ?work wdt:P577 ?publication_date . 
+              bind(year(?publication_date) as ?year_)
+            }
+          }
+          filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+        }
+      }
+      union {
+        ?work wdt:P50 wd:Q97270 .
+        ?work wdt:P1104 ?pages .
+        ?work wdt:P577 ?date . 
+        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')
+        bind(substr(?long_work_label, 1, 20) as ?work_label)
+        bind(str(year(?date)) as ?year) 
+      }
+	} 
+	group by ?year ?work ?work_label
+	order by ?year 
+  }
+}
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 2 
+##defaultView:BubbleChart
+SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
+WITH {
+  SELECT (COUNT(?work) as ?count) ?venue WHERE {
+    ?work wdt:P50 wd:Q97270 .
+    ?work wdt:P1433 ?venue .
+  }
+  GROUP BY ?venue
+} AS %counts
+WHERE {
+  INCLUDE %counts
+  ?venue rdfs:label ?long_venue_label FILTER(LANG(?long_venue_label) = 'en')
+  OPTIONAL { ?venue wdt:P1813 ?short_name . }
+  BIND(COALESCE(?short_name, ?long_venue_label) AS ?venue_label_)
+}
+GROUP BY ?venue ?count
+ORDER BY DESC(?count)  
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 3 
+##defaultView:Graph
+# Egocentric co-author graph for an author
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
+    # Find co-authors
+    ?work wdt:P50 wd:Q97270, ?author1, ?author2 .
+
+    # Filtering 
+    # Only journal and conference articles, books, not (yet?) software
+    # VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022}  
+    # ?work wdt:P31 ?publication_type .
+  }
+  GROUP BY ?author1 ?author2
+  ORDER BY DESC(?count)
+                    
+  # Limit the size of the graph, to avoid overburdening the browser
+  LIMIT 1000
+} AS %authors
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    INCLUDE %authors
+    
+    # Exclude self-links
+    FILTER (?author1 != ?author2)
+    
+    # Color according to gender
+    OPTIONAL {
+      ?author1 wdt:P21 ?gender1 . 
+      BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+    }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
+}
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?topic ?topicLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?topic
+  WHERE {
+    { 
+      wd:Q97270 wdt:P101 ?topic .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?topic WHERE {
+        ?work wdt:P50 wd:Q97270 ;
+              wdt:P921 ?topic . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?topic WHERE {
+        ?work wdt:P50 wd:Q97270 .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921 ?topic . 
+      }
+    }
+  }
+  GROUP BY ?topic
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 5 
+##defaultView:ImageGrid
+SELECT DISTINCT ?image WHERE {
+  {
+    # Images of the person
+    wd:Q97270 wdt:P18 ?image .
+  }
+  UNION {
+    # Images from whatever property value is linked.
+    
+    # Excluded "different from" property and take all other properties
+    wd:Q97270 !wdt:P1889 ?item .
+
+    ?item wdt:P18 ?image . 
+    
+    # All people are humans, so these images are excluded.
+    FILTER (?item != wd:Q5)
+  }
+  UNION {
+    # Images associated with works of the author, both direct images,
+    # images of topics of the works and images of coauthors.
+    wd:Q97270 ^wdt:P50 / (wdt:P921* | wdt:P50) / wdt:P18 ?image .
+  }
+}   
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 6 
+##defaultView:Timeline
+# Timeline for an author
+SELECT ?label ?beginning ?ending ?education_degree_label
+WITH {
+  SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 wd:Q97270 .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work
+} AS %works_with_publication_date
+WITH {
+  
+  SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    INCLUDE %works_with_publication_date
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning 
+} AS %works
+WHERE {
+  # { Birth wd:Q97270 wdt:P569 ?beginning . BIND("Birth" AS ?label) } UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?number_of_citations)
+      LIMIT 1        
+    }
+    BIND("📖 publication of most cited article" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY ?beginning
+      LIMIT 1        
+    }
+    BIND("📖 first publication" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?beginning)
+      LIMIT 1        
+    }
+    BIND("📖 latest publication" AS ?label)
+  }
+  UNION
+  {
+    # Education
+    wd:Q97270 p:P69 ?education_statement .
+    ?education_statement ps:P69 ?education .
+    ?education rdfs:label ?education_label . 
+    FILTER (lang(?education_label) = 'en')
+    BIND(CONCAT("🦉 ", ?education_label) AS ?label)
+    OPTIONAL { ?education_statement pq:P580 ?beginning . }
+    OPTIONAL { ?education_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?education_statement pq:P512 ?education_degree . 
+      ?education_degree rdfs:label ?education_degree_label .
+      FILTER (lang(?education_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    # Affiliation
+    wd:Q97270 p:P1416 | p:P108 ?affiliation_statement .
+    ?affiliation_statement ps:P1416 | ps:P108 ?affiliation .
+    ?affiliation rdfs:label ?affiliation_label .
+    FILTER (lang(?affiliation_label) = 'en')
+    BIND(CONCAT("🏠 ",?affiliation_label) AS ?label)
+    # OPTIONAL { ?affiliation wdt:P18 ?image }
+    OPTIONAL { ?affiliation_statement pq:P580 ?beginning . }
+    OPTIONAL { ?affiliation_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?affiliation_statement pq:P512 ?affiliation_degree . 
+      ?affiliation_degree rdfs:label ?affiliation_degree_label .
+      FILTER (lang(?affiliation_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    wd:Q97270 p:P166 ?award_statement . 
+    ?award_statement ps:P166 ?award .
+    ?award rdfs:label ?award_label .
+    FILTER (lang(?award_label) = 'en')
+    BIND(CONCAT("🏆 ",?award_label) AS ?label)
+    ?award_statement pq:P585 ?beginning .
+  }
+
+} 
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 7 
+##defaultView:Graph
+# Doctoral student/advisor network with a source from a spectific researcher
+PREFIX gas: <http://www.bigdata.com/rdf/gas#>
+
+SELECT DISTINCT ?student1 ?student1Label ?supervisor1 ?supervisor1Label
+WHERE {
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q97270 ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      service gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q97270 ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q97270 ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q97270 ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
+}
+
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 8 
+##defaultView:Map
+SELECT DISTINCT ?image ?item ?itemLabel ?geo (?property_item_label AS ?layer)
+WHERE {
+  wd:Q97270 ?property ?item . 
+  ?item p:P159/pq:P625 | wdt:P276*/wdt:P625 ?geo .
+  ?property_item wikibase:directClaim ?property .
+  OPTIONAL { ?item wdt:P18 ?image . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  
+  # No automatic labeling on the property, - for some reason.
+  ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')
+}  
+
+#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 9 
+##defaultView:BarChart
+SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
+  ?work wdt:P50 wd:Q97270 .
+  ?citing_work wdt:P2860 ?work .
+  bind(if (exists { ?citing_work wdt:P50 wd:Q97270 }, "self-citations", "citations from others") as ?kind)
+  ?citing_work wdt:P577 ?date .
+  BIND(str(YEAR(?date)) AS ?year)
+} group by ?year ?kind
+order by desc(?year)    
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) ?role where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?role) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
+          ?work wdt:P50 wd:Q583725 .
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now())+1 as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+    }
+  }
+  union {
+  {
+    select ?work (min(?years) as ?year) (count(?coauthors) as ?number_of_authors) ?author_number where {
+      ?work (p:P50|p:P2093) ?author_statement . 
+      ?author_statement ps:P50 wd:Q583725 .
+      optional { ?author_statement pq:P1545 ?author_number . }
+      ?work (wdt:P50|wdt:P2093) ?coauthors . 
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work ?author_number
+  }
+  bind(coalesce(if(?number_of_authors = 1,
+            'Solo author',
+            if(xsd:integer(?author_number) = 1,
+               'First author',
+               if(xsd:integer(?author_number) = ?number_of_authors,
+                  'Last author',
+                  'Middle author'))), 'Unknown')
+       as ?role)
+   }
+}
+group by ?year ?role
+order by ?year
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 1 
+##defaultView:BarChart
+select ?year ?number_of_pages ?work_label where {
+  {
+    select ?year (sample(?pages) as ?number_of_pages) ?work_label where {
+      {
+        select (str(?year_) as ?year) (0 as ?pages) ("_" as ?work_label) where {
+          ?year_item wdt:P31 wd:Q577 . 
+          ?year_item wdt:P585 ?date .
+          bind(year(?date) as ?year_)
+          {
+            select (min(?year_) as ?earliest_year) (max(?year_) as ?latest_year) where {
+              ?work wdt:P50 wd:Q583725 .
+              ?work wdt:P577 ?publication_date . 
+              bind(year(?publication_date) as ?year_)
+            }
+          }
+          filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+        }
+      }
+      union {
+        ?work wdt:P50 wd:Q583725 .
+        ?work wdt:P1104 ?pages .
+        ?work wdt:P577 ?date . 
+        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')
+        bind(substr(?long_work_label, 1, 20) as ?work_label)
+        bind(str(year(?date)) as ?year) 
+      }
+	} 
+	group by ?year ?work ?work_label
+	order by ?year 
+  }
+}
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 2 
+##defaultView:BubbleChart
+SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
+WITH {
+  SELECT (COUNT(?work) as ?count) ?venue WHERE {
+    ?work wdt:P50 wd:Q583725 .
+    ?work wdt:P1433 ?venue .
+  }
+  GROUP BY ?venue
+} AS %counts
+WHERE {
+  INCLUDE %counts
+  ?venue rdfs:label ?long_venue_label FILTER(LANG(?long_venue_label) = 'en')
+  OPTIONAL { ?venue wdt:P1813 ?short_name . }
+  BIND(COALESCE(?short_name, ?long_venue_label) AS ?venue_label_)
+}
+GROUP BY ?venue ?count
+ORDER BY DESC(?count)  
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 3 
+##defaultView:Graph
+# Egocentric co-author graph for an author
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
+    # Find co-authors
+    ?work wdt:P50 wd:Q583725, ?author1, ?author2 .
+
+    # Filtering 
+    # Only journal and conference articles, books, not (yet?) software
+    # VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022}  
+    # ?work wdt:P31 ?publication_type .
+  }
+  GROUP BY ?author1 ?author2
+  ORDER BY DESC(?count)
+                    
+  # Limit the size of the graph, to avoid overburdening the browser
+  LIMIT 1000
+} AS %authors
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    INCLUDE %authors
+    
+    # Exclude self-links
+    FILTER (?author1 != ?author2)
+    
+    # Color according to gender
+    OPTIONAL {
+      ?author1 wdt:P21 ?gender1 . 
+      BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+    }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
+}
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?topic ?topicLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?topic
+  WHERE {
+    { 
+      wd:Q583725 wdt:P101 ?topic .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?topic WHERE {
+        ?work wdt:P50 wd:Q583725 ;
+              wdt:P921 ?topic . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?topic WHERE {
+        ?work wdt:P50 wd:Q583725 .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921 ?topic . 
+      }
+    }
+  }
+  GROUP BY ?topic
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 5 
+##defaultView:ImageGrid
+SELECT DISTINCT ?image WHERE {
+  {
+    # Images of the person
+    wd:Q583725 wdt:P18 ?image .
+  }
+  UNION {
+    # Images from whatever property value is linked.
+    
+    # Excluded "different from" property and take all other properties
+    wd:Q583725 !wdt:P1889 ?item .
+
+    ?item wdt:P18 ?image . 
+    
+    # All people are humans, so these images are excluded.
+    FILTER (?item != wd:Q5)
+  }
+  UNION {
+    # Images associated with works of the author, both direct images,
+    # images of topics of the works and images of coauthors.
+    wd:Q583725 ^wdt:P50 / (wdt:P921* | wdt:P50) / wdt:P18 ?image .
+  }
+}   
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 6 
+##defaultView:Timeline
+# Timeline for an author
+SELECT ?label ?beginning ?ending ?education_degree_label
+WITH {
+  SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 wd:Q583725 .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work
+} AS %works_with_publication_date
+WITH {
+  
+  SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    INCLUDE %works_with_publication_date
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning 
+} AS %works
+WHERE {
+  # { Birth wd:Q583725 wdt:P569 ?beginning . BIND("Birth" AS ?label) } UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?number_of_citations)
+      LIMIT 1        
+    }
+    BIND("📖 publication of most cited article" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY ?beginning
+      LIMIT 1        
+    }
+    BIND("📖 first publication" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?beginning)
+      LIMIT 1        
+    }
+    BIND("📖 latest publication" AS ?label)
+  }
+  UNION
+  {
+    # Education
+    wd:Q583725 p:P69 ?education_statement .
+    ?education_statement ps:P69 ?education .
+    ?education rdfs:label ?education_label . 
+    FILTER (lang(?education_label) = 'en')
+    BIND(CONCAT("🦉 ", ?education_label) AS ?label)
+    OPTIONAL { ?education_statement pq:P580 ?beginning . }
+    OPTIONAL { ?education_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?education_statement pq:P512 ?education_degree . 
+      ?education_degree rdfs:label ?education_degree_label .
+      FILTER (lang(?education_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    # Affiliation
+    wd:Q583725 p:P1416 | p:P108 ?affiliation_statement .
+    ?affiliation_statement ps:P1416 | ps:P108 ?affiliation .
+    ?affiliation rdfs:label ?affiliation_label .
+    FILTER (lang(?affiliation_label) = 'en')
+    BIND(CONCAT("🏠 ",?affiliation_label) AS ?label)
+    # OPTIONAL { ?affiliation wdt:P18 ?image }
+    OPTIONAL { ?affiliation_statement pq:P580 ?beginning . }
+    OPTIONAL { ?affiliation_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?affiliation_statement pq:P512 ?affiliation_degree . 
+      ?affiliation_degree rdfs:label ?affiliation_degree_label .
+      FILTER (lang(?affiliation_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    wd:Q583725 p:P166 ?award_statement . 
+    ?award_statement ps:P166 ?award .
+    ?award rdfs:label ?award_label .
+    FILTER (lang(?award_label) = 'en')
+    BIND(CONCAT("🏆 ",?award_label) AS ?label)
+    ?award_statement pq:P585 ?beginning .
+  }
+
+} 
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 7 
+##defaultView:Graph
+# Doctoral student/advisor network with a source from a spectific researcher
+PREFIX gas: <http://www.bigdata.com/rdf/gas#>
+
+SELECT DISTINCT ?student1 ?student1Label ?supervisor1 ?supervisor1Label
+WHERE {
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q583725 ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      service gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q583725 ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q583725 ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q583725 ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
+}
+
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 8 
+##defaultView:Map
+SELECT DISTINCT ?image ?item ?itemLabel ?geo (?property_item_label AS ?layer)
+WHERE {
+  wd:Q583725 ?property ?item . 
+  ?item p:P159/pq:P625 | wdt:P276*/wdt:P625 ?geo .
+  ?property_item wikibase:directClaim ?property .
+  OPTIONAL { ?item wdt:P18 ?image . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  
+  # No automatic labeling on the property, - for some reason.
+  ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')
+}  
+
+#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 9 
+##defaultView:BarChart
+SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
+  ?work wdt:P50 wd:Q583725 .
+  ?citing_work wdt:P2860 ?work .
+  bind(if (exists { ?citing_work wdt:P50 wd:Q583725 }, "self-citations", "citations from others") as ?kind)
+  ?citing_work wdt:P577 ?date .
+  BIND(str(YEAR(?date)) AS ?year)
+} group by ?year ?kind
+order by desc(?year)    
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) ?role where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) ("_" as ?role) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year)  (max(?year_) as ?latest_year) where {
+          ?work wdt:P50 wd:Q55004959 .
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now())+1 as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+    }
+  }
+  union {
+  {
+    select ?work (min(?years) as ?year) (count(?coauthors) as ?number_of_authors) ?author_number where {
+      ?work (p:P50|p:P2093) ?author_statement . 
+      ?author_statement ps:P50 wd:Q55004959 .
+      optional { ?author_statement pq:P1545 ?author_number . }
+      ?work (wdt:P50|wdt:P2093) ?coauthors . 
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work ?author_number
+  }
+  bind(coalesce(if(?number_of_authors = 1,
+            'Solo author',
+            if(xsd:integer(?author_number) = 1,
+               'First author',
+               if(xsd:integer(?author_number) = ?number_of_authors,
+                  'Last author',
+                  'Middle author'))), 'Unknown')
+       as ?role)
+   }
+}
+group by ?year ?role
+order by ?year
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 1 
+##defaultView:BarChart
+select ?year ?number_of_pages ?work_label where {
+  {
+    select ?year (sample(?pages) as ?number_of_pages) ?work_label where {
+      {
+        select (str(?year_) as ?year) (0 as ?pages) ("_" as ?work_label) where {
+          ?year_item wdt:P31 wd:Q577 . 
+          ?year_item wdt:P585 ?date .
+          bind(year(?date) as ?year_)
+          {
+            select (min(?year_) as ?earliest_year) (max(?year_) as ?latest_year) where {
+              ?work wdt:P50 wd:Q55004959 .
+              ?work wdt:P577 ?publication_date . 
+              bind(year(?publication_date) as ?year_)
+            }
+          }
+          filter (?year_ >= ?earliest_year && ?year_ <= ?latest_year)
+        }
+      }
+      union {
+        ?work wdt:P50 wd:Q55004959 .
+        ?work wdt:P1104 ?pages .
+        ?work wdt:P577 ?date . 
+        ?work rdfs:label ?long_work_label . filter(lang(?long_work_label) = 'en')
+        bind(substr(?long_work_label, 1, 20) as ?work_label)
+        bind(str(year(?date)) as ?year) 
+      }
+	} 
+	group by ?year ?work ?work_label
+	order by ?year 
+  }
+}
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 2 
+##defaultView:BubbleChart
+SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
+WITH {
+  SELECT (COUNT(?work) as ?count) ?venue WHERE {
+    ?work wdt:P50 wd:Q55004959 .
+    ?work wdt:P1433 ?venue .
+  }
+  GROUP BY ?venue
+} AS %counts
+WHERE {
+  INCLUDE %counts
+  ?venue rdfs:label ?long_venue_label FILTER(LANG(?long_venue_label) = 'en')
+  OPTIONAL { ?venue wdt:P1813 ?short_name . }
+  BIND(COALESCE(?short_name, ?long_venue_label) AS ?venue_label_)
+}
+GROUP BY ?venue ?count
+ORDER BY DESC(?count)  
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 3 
+##defaultView:Graph
+# Egocentric co-author graph for an author
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?author1 ?author2 WHERE {
+    # Find co-authors
+    ?work wdt:P50 wd:Q55004959, ?author1, ?author2 .
+
+    # Filtering 
+    # Only journal and conference articles, books, not (yet?) software
+    # VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022}  
+    # ?work wdt:P31 ?publication_type .
+  }
+  GROUP BY ?author1 ?author2
+  ORDER BY DESC(?count)
+                    
+  # Limit the size of the graph, to avoid overburdening the browser
+  LIMIT 1000
+} AS %authors
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    INCLUDE %authors
+    
+    # Exclude self-links
+    FILTER (?author1 != ?author2)
+    
+    # Color according to gender
+    OPTIONAL {
+      ?author1 wdt:P21 ?gender1 . 
+      BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+    }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  # Label the results 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
+}
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?topic ?topicLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?topic
+  WHERE {
+    { 
+      wd:Q55004959 wdt:P101 ?topic .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?topic WHERE {
+        ?work wdt:P50 wd:Q55004959 ;
+              wdt:P921 ?topic . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?topic WHERE {
+        ?work wdt:P50 wd:Q55004959 .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921 ?topic . 
+      }
+    }
+  }
+  GROUP BY ?topic
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 5 
+##defaultView:ImageGrid
+SELECT DISTINCT ?image WHERE {
+  {
+    # Images of the person
+    wd:Q55004959 wdt:P18 ?image .
+  }
+  UNION {
+    # Images from whatever property value is linked.
+    
+    # Excluded "different from" property and take all other properties
+    wd:Q55004959 !wdt:P1889 ?item .
+
+    ?item wdt:P18 ?image . 
+    
+    # All people are humans, so these images are excluded.
+    FILTER (?item != wd:Q5)
+  }
+  UNION {
+    # Images associated with works of the author, both direct images,
+    # images of topics of the works and images of coauthors.
+    wd:Q55004959 ^wdt:P50 / (wdt:P921* | wdt:P50) / wdt:P18 ?image .
+  }
+}   
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 6 
+##defaultView:Timeline
+# Timeline for an author
+SELECT ?label ?beginning ?ending ?education_degree_label
+WITH {
+  SELECT ?work (MIN(?publication_date) AS ?beginning) WHERE {
+    ?work wdt:P50 wd:Q55004959 .
+    ?work wdt:P577 ?publication_date . 
+  }
+  GROUP BY ?work
+} AS %works_with_publication_date
+WITH {
+  
+  SELECT ?work ?beginning (COUNT(?citing_article) AS ?number_of_citations) WHERE {
+    INCLUDE %works_with_publication_date
+    OPTIONAL { ?citing_article wdt:P2860 ?work . }
+  }
+  GROUP BY ?work ?beginning 
+} AS %works
+WHERE {
+  # { Birth wd:Q55004959 wdt:P569 ?beginning . BIND("Birth" AS ?label) } UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?number_of_citations)
+      LIMIT 1        
+    }
+    BIND("📖 publication of most cited article" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY ?beginning
+      LIMIT 1        
+    }
+    BIND("📖 first publication" AS ?label)
+  }
+  UNION
+  {
+    { 
+      SELECT ?work ?beginning WHERE {
+        INCLUDE %works
+      }
+      ORDER BY DESC(?beginning)
+      LIMIT 1        
+    }
+    BIND("📖 latest publication" AS ?label)
+  }
+  UNION
+  {
+    # Education
+    wd:Q55004959 p:P69 ?education_statement .
+    ?education_statement ps:P69 ?education .
+    ?education rdfs:label ?education_label . 
+    FILTER (lang(?education_label) = 'en')
+    BIND(CONCAT("🦉 ", ?education_label) AS ?label)
+    OPTIONAL { ?education_statement pq:P580 ?beginning . }
+    OPTIONAL { ?education_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?education_statement pq:P512 ?education_degree . 
+      ?education_degree rdfs:label ?education_degree_label .
+      FILTER (lang(?education_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    # Affiliation
+    wd:Q55004959 p:P1416 | p:P108 ?affiliation_statement .
+    ?affiliation_statement ps:P1416 | ps:P108 ?affiliation .
+    ?affiliation rdfs:label ?affiliation_label .
+    FILTER (lang(?affiliation_label) = 'en')
+    BIND(CONCAT("🏠 ",?affiliation_label) AS ?label)
+    # OPTIONAL { ?affiliation wdt:P18 ?image }
+    OPTIONAL { ?affiliation_statement pq:P580 ?beginning . }
+    OPTIONAL { ?affiliation_statement pq:P582 ?ending . }
+    OPTIONAL {
+      ?affiliation_statement pq:P512 ?affiliation_degree . 
+      ?affiliation_degree rdfs:label ?affiliation_degree_label .
+      FILTER (lang(?affiliation_degree_label) = 'en')
+    }
+  }
+  UNION
+  {
+    wd:Q55004959 p:P166 ?award_statement . 
+    ?award_statement ps:P166 ?award .
+    ?award rdfs:label ?award_label .
+    FILTER (lang(?award_label) = 'en')
+    BIND(CONCAT("🏆 ",?award_label) AS ?label)
+    ?award_statement pq:P585 ?beginning .
+  }
+
+} 
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 7 
+##defaultView:Graph
+# Doctoral student/advisor network with a source from a spectific researcher
+PREFIX gas: <http://www.bigdata.com/rdf/gas#>
+
+SELECT DISTINCT ?student1 ?student1Label ?supervisor1 ?supervisor1Label
+WHERE {
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q55004959 ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      service gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q55004959 ; 
+                gas:traversalDirection "Forward" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q55004959 ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?student1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?supervisor1 ;
+                gas:linkType wdt:P184 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  UNION
+  { 
+    SELECT ?student1 ?supervisor1 (MIN(?depth1) as ?depth)
+    WHERE {
+      SERVICE gas:service {
+        gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                gas:in wd:Q55004959 ; 
+                gas:traversalDirection "Reverse" ;
+                gas:out ?supervisor1 ;
+                gas:out1 ?depth1 ;
+                gas:out2 ?student1 ;
+                gas:linkType wdt:P185 ;
+      }
+    }
+    GROUP BY ?student1 ?supervisor1
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,sv,jp,zh,ru,fr,de" .  } 
+}
+
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 8 
+##defaultView:Map
+SELECT DISTINCT ?image ?item ?itemLabel ?geo (?property_item_label AS ?layer)
+WHERE {
+  wd:Q55004959 ?property ?item . 
+  ?item p:P159/pq:P625 | wdt:P276*/wdt:P625 ?geo .
+  ?property_item wikibase:directClaim ?property .
+  OPTIONAL { ?item wdt:P18 ?image . } 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+  
+  # No automatic labeling on the property, - for some reason.
+  ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')
+}  
+
+#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 9 
+##defaultView:BarChart
+SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
+  ?work wdt:P50 wd:Q55004959 .
+  ?citing_work wdt:P2860 ?work .
+  bind(if (exists { ?citing_work wdt:P50 wd:Q55004959 }, "self-citations", "citations from others") as ?kind)
+  ?citing_work wdt:P577 ?date .
+  BIND(str(YEAR(?date)) AS ?year)
+} group by ?year ?kind
+order by desc(?year)    
+
+#https://tools.wmflabs.org/scholia/award/Q35637 iframe: 0 
+##defaultView:ImageGrid
+SELECT
+  ?year
+  ?recipient ?recipientLabel 
+  ?image
+WITH {
+  SELECT ?recipient ?year (SAMPLE(?image_) AS ?image) WHERE {
+    ?recipient p:P166 ?award_statement . 
+    ?award_statement ps:P166 wd:Q35637 .
+    OPTIONAL {
+      ?award_statement pq:P585 ?time .
+	  BIND(YEAR(?time) AS ?year)
+	}
+    ?recipient wdt:P18 ?image_ .
+  }
+  GROUP BY ?recipient ?year
+} AS %result
+WHERE {
+  INCLUDE %result 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+}
+ORDER BY DESC(?year)
+  
+
+#https://tools.wmflabs.org/scholia/award/Q35637 iframe: 1 
+##defaultView:BubbleChart
+# Count the number of time works by award recipients have set a main topic
+SELECT ?count ?topic ?topicLabel 
+WITH {
+  SELECT ?topic (COUNT(?work) AS ?count) WHERE {
+    ?recipient wdt:P166 wd:Q35637 .
+    ?work wdt:P50 ?recipient .
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result 
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,no,ru,sv,zh" . }  
+}
+ORDER BY DESC(?count)
+LIMIT 50
+
+#https://tools.wmflabs.org/scholia/award/Q35637 iframe: 2 
+##defaultView:Map
+SELECT DISTINCT ?recipient ?recipientLabel ?image ?item ?itemLabel ?geo ?layer
+WITH {
+  SELECT DISTINCT ?recipient ?image ?item ?geo (?property_item_label AS ?layer) WHERE {
+    ?recipient wdt:P166 wd:Q35637 .
+    ?recipient ?property ?item . 
+    ?item wdt:P625 ?geo .
+    ?property_item wikibase:directClaim ?property .
+    ?property_item rdfs:label ?property_item_label . FILTER (LANG(?property_item_label) = 'en')
+    OPTIONAL { ?item wdt:P18 ?image . }
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+
+#https://tools.wmflabs.org/scholia/catalogue/Q42661788 iframe: 0 
+##defaultView:ImageGrid
+SELECT
+  ?image
+  ?item ?itemLabel
+WHERE {
+  ?item wdt:P972 wd:Q42661788 ;
+        wdt:P18 ?image .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+
+
+#https://tools.wmflabs.org/scholia/chemical/Q2270 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q2270 . }
+          union { ?work wdt:P921/wdt:P527+ wd:Q2270 . }
+          union { ?work wdt:P921/wdt:P1269+ wd:Q2270 . }
+          union { wd:Q2270 ?propp ?statement .
+                  ?statement a wikibase:BestRank ;
+                             prov:wasDerivedFrom/pr:P248 ?work . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q2270 . }
+      union { ?work wdt:P921/wdt:P527+ wd:Q2270 . }
+      union { ?work wdt:P921/wdt:P1269+ wd:Q2270 . }
+      union { wd:Q2270 ?propp ?statement .
+              ?statement a wikibase:BestRank ;
+                         prov:wasDerivedFrom/pr:P248 ?work . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/chemical-class/Q41581 iframe: 0 
+##defaultView:Graph
+SELECT ?class ?classLabel ?otherclass ?otherclassLabel ?rgb WITH {
+  SELECT DISTINCT ?class ?otherclass ?rgb WHERE {
+    { VALUES ?class { wd:Q41581 }
+      { ?otherclass wdt:P279 ?class . BIND( "3182BD" AS ?rgb) }
+      UNION
+      { ?otherclass wdt:P31 ?class . BIND( "E6550D" AS ?rgb) }
+    }
+    UNION
+    { VALUES ?otherclass { wd:Q41581 }
+      ?otherclass wdt:P279 ?class .
+    }
+  } LIMIT 500
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+
+
+#https://tools.wmflabs.org/scholia/chemical-class/Q41581 iframe: 1 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q41581 . }
+          union { ?work wdt:P921/wdt:P361+ wd:Q41581 . }
+          union { ?work wdt:P921/wdt:P1269+ wd:Q41581 . }
+          union { wd:Q41581 ?propp ?statement .
+                  ?statement a wikibase:BestRank ;
+                             prov:wasDerivedFrom/pr:P248 ?work . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q41581 . }
+      union { ?work wdt:P921/wdt:P361+ wd:Q41581 . }
+      union { ?work wdt:P921/wdt:P1269+ wd:Q41581 . }
+      union { wd:Q41581 ?propp ?statement .
+              ?statement a wikibase:BestRank ;
+                         prov:wasDerivedFrom/pr:P248 ?work . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/clinical-trial/ iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  ?count
+  ?phase ?phaseLabel
+WHERE {
+  { 
+    SELECT
+      ?year_
+      (COUNT(*) AS ?count)
+      ?phase
+    WHERE {
+      ?trial wdt:P6099 ?phase .
+      ?trial wdt:P580 ?start_datetime .
+      BIND(YEAR(?start_datetime) AS ?year_) 
+    }
+    GROUP BY ?year_ ?phase
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+
+#https://tools.wmflabs.org/scholia/country/Q35 iframe: 0 
+##defaultView:Map{"markercluster":true}.
+SELECT 
+  ?location ?locationLabel 
+  ?work ?workLabel 
+  ?geo
+  ?layer
+WITH {
+  SELECT ?location ?work ?geo ?type WHERE {
+    ?location wdt:P17 wd:Q35 .
+    
+    # Geocoordinates may possible be under a headquarter property
+    ?location wdt:P159? / wdt:P625 ?geo.
+    ?work wdt:P921 ?location .
+    
+    # Filter encyclopedic articles - that may not be so relevant
+    FILTER NOT EXISTS { ?work wdt:P31 wd:Q17329259 }
+  }
+} AS %results
+WHERE {
+  INCLUDE %results
+          
+  # Move here for speed of query
+  OPTIONAL {
+    ?work wdt:P31 / rdfs:label ?layer . 
+    FILTER (LANG(?layer) = 'en')
+  }
+  
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+
+#https://tools.wmflabs.org/scholia/country/Q35 iframe: 1 
+##defaultView:Map{"markercluster":true}.
+SELECT 
+  ?location ?locationLabel 
+  ?work ?workLabel 
+  ?geo
+  ?layer
+WITH {
+  SELECT DISTINCT ?location ?work ?geo ?layer WHERE {
+    ?location wdt:P17 wd:Q35 .
+    
+    # Geocoordinates may possible be under a headquarter property
+    ?location wdt:P159? / wdt:P625 ?geo.
+    ?work wdt:P840 ?location .
+    
+    # Filter encyclopedic articles - that may not be so relevant
+    FILTER NOT EXISTS { ?work wdt:P31 wd:Q17329259 }
+
+    OPTIONAL { ?work wdt:P31 / rdfs:label ?layer . FILTER (LANG(?layer) = 'en') }
+  }
+} AS %results
+WHERE {
+  INCLUDE %results 
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+} 
+
+#https://tools.wmflabs.org/scholia/country/Q35 iframe: 2 
+##defaultView:Map
+SELECT ?coorganization ?coorganizationLabel ?geocoordinates ?example_coauthor ?example_coauthorLabel ?example_work ?example_workLabel
+WITH {  
+  SELECT
+    ?coorganization
+    (SAMPLE(?geocoordinates_) AS ?geocoordinates)
+    (SAMPLE(?coauthor) AS ?example_coauthor)
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    ?organization wdt:P17 wd:Q35 .
+    ?author wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?organization .
+    ?work wdt:P50 ?author, ?coauthor .
+    ?coauthor wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* ?coorganization .
+    FILTER NOT EXISTS { ?coorganization wdt:P17 wd:Q35 }
+    ?coorganization wdt:P625 ?geocoordinates_ .
+  }
+  GROUP BY ?coorganization 
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+#https://tools.wmflabs.org/scholia/country/Q668/topic/Q10737 iframe: 0 
+##defaultView:Graph
+SELECT
+  ?author1 ?author1Label
+  ?author2 ?author2Label
+WITH {  
+  SELECT
+    DISTINCT 
+    ?author1
+    ?author2
+  WHERE {
+    ?author1 ( wdt:P108 | wdt:P1416 ) / wdt:P17 wd:Q668 .
+    ?author2 ( wdt:P108 | wdt:P1416 ) / wdt:P17 wd:Q668 .
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q10737 .
+    ?work wdt:P50 ?author1 .  
+    ?work wdt:P50 ?author2 .
+    FILTER (?author1 != ?author2)
+  }
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+
+
+#https://tools.wmflabs.org/scholia/country/Q668/topic/Q10737 iframe: 1 
+##defaultView:Graph
+SELECT
+  ?author1 ?author1Label
+  ?author2 ?author2Label
+WITH {
+  SELECT DISTINCT ?author1 ?work1 WHERE {
+    hint:Query hint:optimizer "None".
+    ?author1 ( wdt:P108 | wdt:P1416 ) / wdt:P17 wd:Q668 .
+    ?work1 wdt:P50 ?author1 .
+    ?work1 wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q10737 .
+  }
+} AS %author1
+WITH {
+  SELECT DISTINCT ?author2 ?work2 WHERE {
+    hint:Query hint:optimizer "None".
+    ?author2 ( wdt:P108 | wdt:P1416 ) / wdt:P17 wd:Q668 .
+    ?work2 wdt:P50 ?author2 .
+    ?work2 wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q10737 .
+  }
+} AS %author2
+WITH {
+  SELECT
+    DISTINCT 
+    ?author1
+    ?author2 
+  WHERE {
+    INCLUDE %author1
+    INCLUDE %author2
+    {              
+      ?work1 wdt:P2860 / wdt:P50 ?author2 .
+    }
+    UNION 
+    {
+      ?author1 ^wdt:P50 / wdt:P2860 ?work2 .
+    }  
+   
+    FILTER (?author1 != ?author2)
+  }
+} AS %results
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+
+
+#https://tools.wmflabs.org/scholia/disease/Q12156 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q12156 . }
+          union { ?work wdt:P921/wdt:P361+ wd:Q12156 . }
+          union { ?work wdt:P921/wdt:P1269+ wd:Q12156 . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q12156 . }
+      union { ?work wdt:P921/wdt:P361+ wd:Q12156 . }
+      union { ?work wdt:P921/wdt:P1269+ wd:Q12156 . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/disease/Q41112 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q41112 . }
+          union { ?work wdt:P921/wdt:P361+ wd:Q41112 . }
+          union { ?work wdt:P921/wdt:P1269+ wd:Q41112 . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q41112 . }
+      union { ?work wdt:P921/wdt:P361+ wd:Q41112 . }
+      union { ?work wdt:P921/wdt:P1269+ wd:Q41112 . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/disease/Q84263196 iframe: 0 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q84263196 . }
+          union { ?work wdt:P921/wdt:P361+ wd:Q84263196 . }
+          union { ?work wdt:P921/wdt:P1269+ wd:Q84263196 . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q84263196 . }
+      union { ?work wdt:P921/wdt:P361+ wd:Q84263196 . }
+      union { ?work wdt:P921/wdt:P1269+ wd:Q84263196 . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 0 
+##defaultView:Graph
+SELECT
+  ?author1 ?author1Label ?image1 ?rgb
+  ?author2 ?author2Label ?image2 
+WITH {
+  SELECT
+    ?author1 (SAMPLE(?image1_) AS ?image1)
+    ?author2 (SAMPLE(?image2_) AS ?image2)
+    (SAMPLE(?rgb_) AS ?rgb)
+  WHERE {
+    wd:Q131626 ^wdt:P361* / ^( wdt:P108 | wdt:P1416 | wdt:P463 ) ?author1 , ?author2 . 
+    ?work wdt:P50 ?author1 , ?author2 .
+
+    # Only display co-authorship for certain types of documents
+    # Journal and conference articles, books, not (yet?) software
+    VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022 wd:Q17928402 wd:Q947859 wd:Q54670950 }
+    FILTER EXISTS { ?work wdt:P31 ?publication_type . }
+
+    # No self-links.
+    FILTER (?author1 != ?author2)
+
+    # Images
+    OPTIONAL { ?author1 wdt:P18 ?image1_ }
+    OPTIONAL { ?author2 wdt:P18 ?image2_ }
+
+    # Coloring of the nodes
+    BIND("FFFFFF" AS ?rgb_)
+  }
+  GROUP BY ?author1 ?author2
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,sv,ru,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label 
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    { ?author1 wdt:P108 wd:Q131626 . } union { ?author1 wdt:P1416 [ wdt:P361* wd:Q131626 ] .  }
+    { ?author2 wdt:P108 wd:Q131626 . } union { ?author2 wdt:P1416 [ wdt:P361* wd:Q131626 ] .  }
+    {?author1 wdt:P184 ?author2 }
+    UNION
+    {?author2 wdt:P185 ?author1 }
+    ?author1 wdt:P21 ?gender1 . 
+    BIND ( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,sv,ru,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 2 
+##defaultView:BarChart
+# Pages per year bar chart of an organization
+SELECT
+  ?year
+  (SUM(?pages_per_author) AS ?number_of_pages)
+  ?researcher_label
+WHERE {
+  {
+    SELECT
+      ?researcher_label ?work ?year
+      (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
+    WHERE {
+      # Find authors associated with organization
+      FILTER EXISTS { ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:Q131626 . }
+      
+      ?work (wdt:P50|wdt:P2093) ?researcher_of_paper .
+      
+      # Disabled to only look on scholarly articles
+      # ?work wdt:P31 wd:Q13442814 .
+      
+      ?work wdt:P50 ?researcher .
+      ?work wdt:P1104 ?pages .
+      ?work wdt:P577 ?date . 
+      BIND(STR(YEAR(?date)) AS ?year) 
+      ?researcher rdfs:label ?researcher_label . FILTER(LANG(?researcher_label) = 'en')
+    } 
+    GROUP BY ?work ?researcher_label ?year
+  }
+}
+GROUP BY ?year ?researcher_label 
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 3 
+##defaultView:BubbleChart
+# Bubble chart of most cited works of first author associated
+# with an organization
+SELECT
+  ?count ?work ?workLabel
+WITH {
+  # Find researchers associated with the organization and count
+  # the number of citations.
+  SELECT
+    (COUNT(DISTINCT ?citing_work) AS ?count)
+    ?work
+  WHERE {
+    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:Q131626 .
+    ?work p:P50 ?researcher_statement .
+    ?researcher_statement ps:P50 ?researcher .
+    ?researcher_statement pq:P1545 "1" .
+    ?citing_work wdt:P2860 ?work .
+  }
+  GROUP BY ?work                   
+  ORDER BY DESC(?count)
+  LIMIT 20
+} AS %works
+WHERE {
+  # Label the works
+  INCLUDE %works
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" .
+  }
+}
+ORDER BY DESC(?count)
+
+#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 4 
+##defaultView:BarChart
+SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
+WITH {
+  # Find researchers affiliated with the organization
+  SELECT DISTINCT ?researcher WHERE {
+    ?researcher wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* wd:Q131626 .
+  }
+} AS %researchers 
+WITH {
+  # Find works of the researchers and count the number of citations
+  SELECT
+    ?researcher ?work ?year (COUNT(DISTINCT ?citing_work) / COUNT(DISTINCT ?researcher_of_paper) AS ?citations_per_author_)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 | wdt:P2093 ?researcher_of_paper .
+    ?work wdt:P50 ?researcher .
+    ?citing_work wdt:P2860 ?work .
+    ?work wdt:P577 ?date . 
+    BIND(STR(YEAR(?date)) AS ?year)
+  }
+  GROUP BY ?work ?researcher ?year
+} AS %counts
+WHERE {
+  # Label the results
+  INCLUDE %counts    
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+GROUP BY ?year ?researcher ?researcherLabel
+ORDER BY ?year
+
+
+#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 0 
+##defaultView:Graph
+SELECT
+  ?author1 ?author1Label ?image1 ?rgb
+  ?author2 ?author2Label ?image2 
+WITH {
+  SELECT
+    ?author1 (SAMPLE(?image1_) AS ?image1)
+    ?author2 (SAMPLE(?image2_) AS ?image2)
+    (SAMPLE(?rgb_) AS ?rgb)
+  WHERE {
+    wd:Q583725 ^wdt:P361* / ^( wdt:P108 | wdt:P1416 | wdt:P463 ) ?author1 , ?author2 . 
+    ?work wdt:P50 ?author1 , ?author2 .
+
+    # Only display co-authorship for certain types of documents
+    # Journal and conference articles, books, not (yet?) software
+    VALUES ?publication_type { wd:Q13442814 wd:Q571 wd:Q26973022 wd:Q17928402 wd:Q947859 wd:Q54670950 }
+    FILTER EXISTS { ?work wdt:P31 ?publication_type . }
+
+    # No self-links.
+    FILTER (?author1 != ?author2)
+
+    # Images
+    OPTIONAL { ?author1 wdt:P18 ?image1_ }
+    OPTIONAL { ?author2 wdt:P18 ?image2_ }
+
+    # Coloring of the nodes
+    BIND("FFFFFF" AS ?rgb_)
+  }
+  GROUP BY ?author1 ?author2
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,sv,ru,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label 
+WITH {
+  SELECT ?author1 ?author2 ?rgb WHERE {
+    { ?author1 wdt:P108 wd:Q583725 . } union { ?author1 wdt:P1416 [ wdt:P361* wd:Q583725 ] .  }
+    { ?author2 wdt:P108 wd:Q583725 . } union { ?author2 wdt:P1416 [ wdt:P361* wd:Q583725 ] .  }
+    {?author1 wdt:P184 ?author2 }
+    UNION
+    {?author2 wdt:P185 ?author1 }
+    ?author1 wdt:P21 ?gender1 . 
+    BIND ( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,sv,ru,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 2 
+##defaultView:BarChart
+# Pages per year bar chart of an organization
+SELECT
+  ?year
+  (SUM(?pages_per_author) AS ?number_of_pages)
+  ?researcher_label
+WHERE {
+  {
+    SELECT
+      ?researcher_label ?work ?year
+      (SAMPLE(?pages) / COUNT(?researcher_of_paper) AS ?pages_per_author)
+    WHERE {
+      # Find authors associated with organization
+      FILTER EXISTS { ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:Q583725 . }
+      
+      ?work (wdt:P50|wdt:P2093) ?researcher_of_paper .
+      
+      # Disabled to only look on scholarly articles
+      # ?work wdt:P31 wd:Q13442814 .
+      
+      ?work wdt:P50 ?researcher .
+      ?work wdt:P1104 ?pages .
+      ?work wdt:P577 ?date . 
+      BIND(STR(YEAR(?date)) AS ?year) 
+      ?researcher rdfs:label ?researcher_label . FILTER(LANG(?researcher_label) = 'en')
+    } 
+    GROUP BY ?work ?researcher_label ?year
+  }
+}
+GROUP BY ?year ?researcher_label 
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 3 
+##defaultView:BubbleChart
+# Bubble chart of most cited works of first author associated
+# with an organization
+SELECT
+  ?count ?work ?workLabel
+WITH {
+  # Find researchers associated with the organization and count
+  # the number of citations.
+  SELECT
+    (COUNT(DISTINCT ?citing_work) AS ?count)
+    ?work
+  WHERE {
+    ?researcher wdt:P108 | wdt:P463 | (wdt:P1416 / wdt:P361*) wd:Q583725 .
+    ?work p:P50 ?researcher_statement .
+    ?researcher_statement ps:P50 ?researcher .
+    ?researcher_statement pq:P1545 "1" .
+    ?citing_work wdt:P2860 ?work .
+  }
+  GROUP BY ?work                   
+  ORDER BY DESC(?count)
+  LIMIT 20
+} AS %works
+WHERE {
+  # Label the works
+  INCLUDE %works
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" .
+  }
+}
+ORDER BY DESC(?count)
+
+#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 4 
+##defaultView:BarChart
+SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
+WITH {
+  # Find researchers affiliated with the organization
+  SELECT DISTINCT ?researcher WHERE {
+    ?researcher wdt:P108 | wdt:P463 | wdt:P1416/wdt:P361* wd:Q583725 .
+  }
+} AS %researchers 
+WITH {
+  # Find works of the researchers and count the number of citations
+  SELECT
+    ?researcher ?work ?year (COUNT(DISTINCT ?citing_work) / COUNT(DISTINCT ?researcher_of_paper) AS ?citations_per_author_)
+  WHERE {
+    INCLUDE %researchers
+    ?work wdt:P50 | wdt:P2093 ?researcher_of_paper .
+    ?work wdt:P50 ?researcher .
+    ?citing_work wdt:P2860 ?work .
+    ?work wdt:P577 ?date . 
+    BIND(STR(YEAR(?date)) AS ?year)
+  }
+  GROUP BY ?work ?researcher ?year
+} AS %counts
+WHERE {
+  # Label the results
+  INCLUDE %counts    
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
+}
+GROUP BY ?year ?researcher ?researcherLabel
+ORDER BY ?year
+
+
+#https://tools.wmflabs.org/scholia/pathway/Q30225516 iframe: 0 
+https://tools.wmflabs.org/pathway-viewer/?id=WP2586
+
+#https://tools.wmflabs.org/scholia/pathway/Q30225516 iframe: 1 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          {
+            ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q30225516 .
+          } union {
+            wd:Q30225516 wdt:P2860 ?work .
+          }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      {
+        ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q30225516 .
+      } union {
+        wd:Q30225516 wdt:P2860 ?work .
+      }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/printer/ iframe: 0 
+##defaultView:Map{"layer": "?counts"}
+SELECT
+  ?geo
+  ?printer ?printerLabel ?printerDescription
+  ?counts
+  ?example_work ?example_workLabel
+WHERE {
+  hint:Query hint:optimizer "None".
+  {
+    SELECT
+      (COUNT(?work) AS ?count)
+      ?printer
+      (SAMPLE(?work) AS ?example_work)
+    WHERE {
+      ?work wdt:P872 ?printer .
+    }
+    GROUP BY ?printer
+  }
+  BIND(IF(?count = 1, "1", IF(?count <= 5, "2-5", IF(?count <= 10, "6-10", "10+"))) AS ?counts)
+  ?printer wdt:P159? / wdt:P625 ?geo
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,it,jp,nl,no,ru,sv,zh". }
+}
+ORDER BY DESC(?count)
+LIMIT 1000
+
+
+#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 0 
+##defaultView:Map
+SELECT ?partner ?partnerLabel ?location
+WITH {
+  SELECT DISTINCT ?partner ?location WHERE {
+    wd:Q27990087 (^wdt:P1344 | wdt:P710)* / (wdt:P527 | wdt:P710 | wdt:P1416) ?partner .
+    ?partner wdt:P159* / wdt:P625 ?location .
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+
+#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 1 
+##defaultView:Timeline{"hide": ["?end_time", "?start_time"]}
+SELECT DISTINCT ?start_time ?end_time ?description WHERE {
+  {  
+    wd:Q27990087 (wdt:P571 | wdt:P580) ?start_time ;
+      (wdt:P576 | wdt:P582) ?end_time .
+    BIND("Project time" AS ?description)
+  } 
+  UNION 
+  {  
+    wd:Q27990087 (^wdt:P1344 | wdt:P710)+ ?project .
+    ?project (wdt:P571 | wdt:P580) ?start_time ;
+             (wdt:P576 | wdt:P582) ?end_time .
+    ?project rdfs:label ?projectName .
+    FILTER (lang(?projectName) = "en")
+    BIND(?projectName AS ?description)
+  }   
+  UNION 
+  {
+    ?work wdt:P859/(wdt:P1344|^wdt:P710)* wd:Q27990087 ;
+                wdt:P577 ?start_time .
+    BIND("Publication" AS ?description)
+  }
+  UNION
+  {
+    ?event wdt:P859 wd:Q27990087 .
+    ?event wdt:P585 | wdt:P580 ?start_time .
+    BIND("📅 Sponsored event" AS ?description)
+  }
+}
+
+#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 2 
+##defaultView:BubbleChart
+SELECT ?score ?topic ?topicLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?topic
+  WHERE {
+    { 
+      wd:Q27990087 wdt:P101 ?topic .
+      BIND(20 AS ?score_)
+    }
+    UNION 
+    {
+      SELECT (3 AS ?score_) ?topic WHERE {
+        ?work wdt:P859/wdt:P1344* wd:Q27990087 ;
+              wdt:P921 ?topic . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?topic WHERE {
+        ?work wdt:P859/wdt:P1344* wd:Q27990087 .
+        ?citing_work wdt:P2860 ?work .
+        ?citing_work wdt:P921 ?topic . 
+      }
+    }
+  }
+  GROUP BY ?topic
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 3 
+##defaultView:BarChart
+# Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
+# Shubhanshu Mishra, Vetle Torvik
+select ?year (count(?work) as ?number_of_publications) where {
+  {
+    select (str(?year_) as ?year) (0 as ?pages) where {
+      # default values = 0
+      ?year_item wdt:P31 wd:Q577 . 
+      ?year_item wdt:P585 ?date .
+      bind(year(?date) as ?year_)
+      {
+        select (min(?year_) as ?earliest_year) where {
+          { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q27990087 . }
+          union { ?work wdt:P921/wdt:P527+ wd:Q27990087 . }
+          union { ?work wdt:P921/wdt:P1269+ wd:Q27990087 . }
+          union { ?work wdt:P859/wdt:P1344* wd:Q27990087 . }
+          union { wd:Q27990087 ?propp ?statement .
+                  ?statement a wikibase:BestRank ;
+                             prov:wasDerivedFrom/pr:P248 ?work . }
+          ?work wdt:P577 ?publication_date . 
+          bind(year(?publication_date) as ?year_)
+        }
+      }
+      bind(year(now()) as ?next_year)
+      filter (?year_ >= ?earliest_year && ?year_ <= ?next_year)
+    }
+  }
+  union {
+    select ?work (min(?years) as ?year) where {
+      { ?work wdt:P921/wdt:P31*/wdt:P279* wd:Q27990087 . }
+      union { ?work wdt:P921/wdt:P527+ wd:Q27990087 . }
+      union { ?work wdt:P921/wdt:P1269+ wd:Q27990087 . }
+      union { ?work wdt:P859/wdt:P1344* wd:Q27990087 . }
+      union { wd:Q27990087 ?propp ?statement .
+              ?statement a wikibase:BestRank ;
+                         prov:wasDerivedFrom/pr:P248 ?work . }
+      ?work wdt:P577 ?dates .
+      bind(str(year(?dates)) as ?years) .
+    }
+    group by ?work 
+  }
+}
+group by ?year 
+order by ?year
+
+#https://tools.wmflabs.org/scholia/publisher/Q127992 iframe: 0 
+##defaultView:Timeline
+SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
+  # Publisher
+  ?venue wdt:P123 wd:Q127992 .
+  
+  # Periodic literature
+  ?venue wdt:P31 / wdt:P279* wd:Q1002697 .
+  
+  # When the journal was started 
+  ?venue wdt:P571 ?datetime.
+  
+  # Label the journal
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?datetime)
+LIMIT 50
+
+#https://tools.wmflabs.org/scholia/publisher/Q127992 iframe: 1 
+##defaultView:ScatterChart
+SELECT ?work_count ?citation_count ?journal ?journalLabel 
+WITH {
+  SELECT ?work_count ?citation_count ?journal {
+    {
+      SELECT ?journal (COUNT(?work) AS ?work_count) {
+  	    ?journal wdt:P123 wd:Q127992 .
+  	    ?work wdt:P1433 ?journal .
+      }
+      GROUP BY ?journal 
+    }
+    {
+      SELECT ?journal (COUNT(?citing_work) AS ?citation_count) {
+  	    ?journal wdt:P123 wd:Q127992 .
+  	    ?work wdt:P1433 ?journal .
+        ?citing_work wdt:P2860 ?work . 
+      }
+      GROUP BY ?journal 
+    } 
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+
+
+
+#https://tools.wmflabs.org/scholia/publisher/Q583725 iframe: 0 
+##defaultView:Timeline
+SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
+  # Publisher
+  ?venue wdt:P123 wd:Q583725 .
+  
+  # Periodic literature
+  ?venue wdt:P31 / wdt:P279* wd:Q1002697 .
+  
+  # When the journal was started 
+  ?venue wdt:P571 ?datetime.
+  
+  # Label the journal
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+ORDER BY DESC(?datetime)
+LIMIT 50
+
+#https://tools.wmflabs.org/scholia/publisher/Q583725 iframe: 1 
+##defaultView:ScatterChart
+SELECT ?work_count ?citation_count ?journal ?journalLabel 
+WITH {
+  SELECT ?work_count ?citation_count ?journal {
+    {
+      SELECT ?journal (COUNT(?work) AS ?work_count) {
+  	    ?journal wdt:P123 wd:Q583725 .
+  	    ?work wdt:P1433 ?journal .
+      }
+      GROUP BY ?journal 
+    }
+    {
+      SELECT ?journal (COUNT(?citing_work) AS ?citation_count) {
+  	    ?journal wdt:P123 wd:Q583725 .
+  	    ?work wdt:P1433 ?journal .
+        ?citing_work wdt:P2860 ?work . 
+      }
+      GROUP BY ?journal 
+    } 
+  }
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
+}
+
+
+
+#https://tools.wmflabs.org/scholia/sponsor/Q4314967 iframe: 0 
+##defaultView:BubbleChart
+SELECT ?count ?topic ?topicLabel
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?topic
+  WHERE {
+    ?work wdt:P859+ wd:Q4314967 .
+    ?work wdt:P921 ?topic .
+  } 
+  GROUP BY ?topic
+  ORDER BY DESC(?count)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
+} 
+ORDER BY DESC(?count)
+
+
+#https://tools.wmflabs.org/scholia/sponsor/Q4314967 iframe: 1 
+##defaultView:ScatterChart
+SELECT ?start_time ?budget ?project ?projectLabel WHERE {
+  ?project wdt:P859+ wd:Q4314967 .
+  ?project wdt:P2769 ?budget .
+  ?project (wdt:P580 | wdt:P571) ?start_time .
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+
+#https://tools.wmflabs.org/scholia/sponsor/Q583725 iframe: 0 
+##defaultView:BubbleChart
+SELECT ?count ?topic ?topicLabel
+WITH {
+  SELECT (COUNT(?work) AS ?count) ?topic
+  WHERE {
+    ?work wdt:P859+ wd:Q583725 .
+    ?work wdt:P921 ?topic .
+  } 
+  GROUP BY ?topic
+  ORDER BY DESC(?count)
+  LIMIT 200
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
+} 
+ORDER BY DESC(?count)
+
+
+#https://tools.wmflabs.org/scholia/sponsor/Q583725 iframe: 1 
+##defaultView:ScatterChart
+SELECT ?start_time ?budget ?project ?projectLabel WHERE {
+  ?project wdt:P859+ wd:Q583725 .
+  ?project wdt:P2769 ?budget .
+  ?project (wdt:P580 | wdt:P571) ?start_time .
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
+}
+
+#https://tools.wmflabs.org/scholia/series/Q924044 iframe: 0 
+##defaultView:BubbleChart
+SELECT ?count ?topic ?topicLabel
+WITH {
+  SELECT (COUNT(*) AS ?count) ?topic
+  WHERE {
+    # Topics of series
+    { wd:Q924044 wdt:P921 ?topic . }
+    
+    # Topics of collections in series
+    UNION { ?collection wdt:P179 wd:Q924044 ; wdt:P921 ?topic . }
+    
+    # Topics of works in collections in series
+    UNION { ?work wdt:P1433/wdt:P179 wd:Q924044 ; wdt:P921 ?topic . }
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
+}
+ORDER BY DESC(?count)
+DESC(?count)
+LIMIT 100
+
+
+#https://tools.wmflabs.org/scholia/series/Q924044 iframe: 1 
+##defaultView:BarChart
+SELECT ?year ?count ?organization ?organizationLabel
+WITH {
+  SELECT (MIN(?year_) AS ?year) ?work WHERE {
+    ?collection wdt:P179 wd:Q924044 . 
+    ?work wdt:P1433 ?collection .
+    ?work wdt:P577 ?datetimes .
+    BIND(STR(YEAR(?datetimes)) AS ?year_)
+  } 
+  GROUP BY ?work
+} AS %works                
+WITH {
+  SELECT ?year (COUNT(?work) AS ?count) ?organization
+  WHERE {
+    INCLUDE %works
+	?work wdt:P50 ?author .
+    
+    # For now, only employment relation
+    # We could add affiliation with "| wdt:P1416/wdt:P361*" 
+    # Note that this extra term will double count.
+    ?author wdt:P108  ?organization . 
+   }
+   GROUP BY ?year ?organization
+                  
+   # Exclude organizations with only a single count
+   # HAVING(?count > 1)
+} AS %result
+WHERE {
+ INCLUDE %result
+ SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" }
+}
+ORDER BY ?year
+
+
+#https://tools.wmflabs.org/scholia/taxon/Q15978631 iframe: 0 
+##defaultView:Graph
+SELECT
+  ?child ?childLabel
+  ?rgb 
+  ?parent ?parentLabel
+WITH {
+  SELECT ?child ?rgb ?parent WHERE {
+    { 
+      # Parent taxons
+      SELECT ?child ?rgb ?parent  WHERE {
+        SERVICE gas:service {
+          gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                  gas:in wd:Q15978631 ;
+                  # We should not do undirected here because this could result
+                  # in very big graphs.
+                  gas:traversalDirection "Forward" ;
+                  gas:out ?child ;
+                  gas:out1 ?depth ;
+                  gas:out2 ?parent1 ;
+                  gas:linkType wdt:P171 ;
+        }
+        ?child wdt:P171 ?parent .
+        BIND(IF(?child = wd:Q15978631, "FF0000", "FFFFFF") AS ?rgb) 
+      }
+    }
+    UNION 
+    {
+      # Child taxons
+      SELECT ?child ?rgb ?parent WHERE {
+        BIND(wd:Q15978631 AS ?parent)
+        ?child wdt:P171 ?parent . 
+        BIND("DDDDDD" AS ?rgb)
+      }
+      LIMIT 100
+    }
+  }
+} AS %results
+WHERE {
+  INCLUDE %results 
+          
+  ?child rdfs:label ?child_label . FILTER(LANG(?child_label) = 'en')
+  ?parent rdfs:label ?parent_label . FILTER(LANG(?parent_label) = 'en')
+  OPTIONAL {
+    ?child wdt:P105 / rdfs:label ?child_rank_label . FILTER (LANG(?child_rank_label) = 'en')
+  }
+  OPTIONAL {
+    ?parent wdt:P105 / rdfs:label ?parent_rank_label . FILTER (LANG(?parent_rank_label) = 'en')
+  }
+  BIND(CONCAT(?child_label, " - ", COALESCE(?child_rank_label, "???")) AS ?childLabel)
+  BIND(CONCAT(?parent_label, " - ", COALESCE(?parent_rank_label, "???")) AS ?parentLabel)
+
+}
+
+#https://tools.wmflabs.org/scholia/taxon/Q82069695 iframe: 0 
+##defaultView:Graph
+SELECT
+  ?child ?childLabel
+  ?rgb 
+  ?parent ?parentLabel
+WITH {
+  SELECT ?child ?rgb ?parent WHERE {
+    { 
+      # Parent taxons
+      SELECT ?child ?rgb ?parent  WHERE {
+        SERVICE gas:service {
+          gas:program gas:gasClass "com.bigdata.rdf.graph.analytics.BFS" ;
+                  gas:in wd:Q82069695 ;
+                  # We should not do undirected here because this could result
+                  # in very big graphs.
+                  gas:traversalDirection "Forward" ;
+                  gas:out ?child ;
+                  gas:out1 ?depth ;
+                  gas:out2 ?parent1 ;
+                  gas:linkType wdt:P171 ;
+        }
+        ?child wdt:P171 ?parent .
+        BIND(IF(?child = wd:Q82069695, "FF0000", "FFFFFF") AS ?rgb) 
+      }
+    }
+    UNION 
+    {
+      # Child taxons
+      SELECT ?child ?rgb ?parent WHERE {
+        BIND(wd:Q82069695 AS ?parent)
+        ?child wdt:P171 ?parent . 
+        BIND("DDDDDD" AS ?rgb)
+      }
+      LIMIT 100
+    }
+  }
+} AS %results
+WHERE {
+  INCLUDE %results 
+          
+  ?child rdfs:label ?child_label . FILTER(LANG(?child_label) = 'en')
+  ?parent rdfs:label ?parent_label . FILTER(LANG(?parent_label) = 'en')
+  OPTIONAL {
+    ?child wdt:P105 / rdfs:label ?child_rank_label . FILTER (LANG(?child_rank_label) = 'en')
+  }
+  OPTIONAL {
+    ?parent wdt:P105 / rdfs:label ?parent_rank_label . FILTER (LANG(?parent_rank_label) = 'en')
+  }
+  BIND(CONCAT(?child_label, " - ", COALESCE(?child_rank_label, "???")) AS ?childLabel)
+  BIND(CONCAT(?parent_label, " - ", COALESCE(?parent_rank_label, "???")) AS ?parentLabel)
+
+}
+
+#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q52 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q52 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q52 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q52 != ?topic1 && wd:Q52 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q52 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q52 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q52 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q52 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q52 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q532 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q532 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q532 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q532 != ?topic1 && wd:Q532 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q532 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q532 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q532 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q532 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q532 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q12156 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q12156 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q12156 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q12156 != ?topic1 && wd:Q12156 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q12156 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q12156 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q12156 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q12156 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q12156 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q583725 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q583725 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q583725 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q583725 != ?topic1 && wd:Q583725 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q583725 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q583725 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q583725 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q583725 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q583725 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q81068910 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q81068910 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q81068910 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q81068910 != ?topic1 && wd:Q81068910 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q81068910 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q81068910 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q81068910 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q81068910 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q81068910 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q82069695 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q82069695 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q82069695 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q82069695 != ?topic1 && wd:Q82069695 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q82069695 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q82069695 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q82069695 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q82069695 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q82069695 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 0 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (COUNT(?work) AS ?number_of_publications)
+
+  # Work type used to color the bar chart
+  ?type
+WITH {
+  # Find works with the topic. Also report the year
+  SELECT
+    ?work (MIN(?years) AS ?year_) (1 AS ?dummy) (SAMPLE(?article_type_) AS ?article_type)
+  WHERE {
+    ?work wdt:P921 / (wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q84263196 .
+    ?work wdt:P577 ?dates .
+    BIND(YEAR(?dates) AS ?years) .
+
+    ?work wdt:P31 ?article_type_ .
+  }
+  GROUP BY ?work 
+} AS %works
+WITH {
+  SELECT ?year_ WHERE {
+    # default values = 0
+    ?year_item wdt:P31 wd:Q577 . 
+    ?year_item wdt:P585 ?date .
+    BIND(YEAR(?date) AS ?year_)
+  }
+} AS %default_counts
+WITH {
+  # Find earliest publication year
+  SELECT (MIN(?year_) AS ?earliest_year) WHERE {
+    INCLUDE %works
+  }
+  GROUP BY ?dummy
+} AS %earliest  
+WHERE {
+  {
+    INCLUDE %works
+    ?article_type rdfs:label ?type . FILTER (LANG(?type) = "en")
+  }
+  UNION
+  {
+    INCLUDE %default_counts
+    BIND("_" AS ?type)
+  }
+  INCLUDE %earliest
+  BIND(YEAR(NOW()) AS ?this_year)
+  FILTER (?year_ >= ?earliest_year && ?year_ <= ?this_year && ?year_ >= YEAR("1900-01-01"^^xsd:dateTime))
+}
+GROUP BY ?year_ ?type
+ORDER BY ?year
+
+#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works with the topic
+  SELECT ?work WHERE {
+    ?work wdt:P921 / (wdt:P31* / wdt:P279* | wdt:P361+ | wdt:P1269+) wd:Q84263196 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 25
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 250
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?topic1 ?topic1Label ?topic2 ?topic2Label
+WITH {
+  SELECT
+    (COUNT(?work) AS ?count) ?topic1 ?topic2
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q84263196 .
+    
+    # Identify co-occuring topics. 
+    ?work wdt:P921 ?topic1, ?topic2 . 
+
+    # Exclude the topic it self
+    FILTER (wd:Q84263196 != ?topic1 && wd:Q84263196 != ?topic2 && ?topic1 != ?topic2)
+  }
+  GROUP BY ?topic1 ?topic2
+  ORDER BY DESC(?count)
+
+  # There a performance problems in the browser: We cannot show large graphs,
+  # so we put a limit on the number of links displayed.
+  LIMIT 400
+
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+
+#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 3 
+##defaultView:Map
+SELECT
+  ?location ?locationLabel
+  ?geo
+  ?example_work ?example_workLabel
+WITH {
+  SELECT
+    ?location ?geo
+    (SAMPLE(?work) AS ?example_work)
+  WHERE {
+    # Find works that are marked with main subject of the topic.
+    ?work wdt:P921 / ( wdt:P31*/wdt:P279* | wdt:P361+ | wdt:P1269+ ) wd:Q84263196 .
+    
+    # Identify co-occuring topic that is geo-locatable. 
+    ?work wdt:P921 ?location .
+    ?location wdt:P625 ?geo .
+  }
+  GROUP BY ?location ?geo
+} AS %results
+WHERE {
+  INCLUDE %results
+  
+  # Label the results
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 4 
+##defaultView:BubbleChart
+SELECT ?score ?author ?authorLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?author
+  WHERE {
+    { 
+      ?author wdt:P101/wdt:P279* wd:Q84263196 .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (3 AS ?score_) ?author WHERE {
+        ?work wdt:P50 ?author ;
+              wdt:P921/wdt:P279* wd:Q84263196 . 
+      }
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?author WHERE {
+        ?cited_work wdt:P50 ?author .
+        ?citing_work wdt:P2860 ?cited_work .
+        ?citing_work wdt:P921/wdt:P279* wd:Q84263196 . 
+      }
+    }
+  }
+  GROUP BY ?author
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 5 
+##defaultView:Map
+SELECT ?organization ?organizationLabel ?geo ?count ?layer
+WITH {
+  SELECT DISTINCT ?work WHERE {
+  # Works on the topic
+    ?work wdt:P921 / (wdt:P361+ | wdt:P1269+ | (wdt:P31* / wdt:P279*) ) wd:Q84263196 .
+  }
+  LIMIT 20000
+} AS %works
+WITH {
+  SELECT DISTINCT ?organization ?geo (COUNT(DISTINCT ?work) AS ?count) WHERE {
+    INCLUDE %works
+    # Authors who have published works on the topic
+    ?work wdt:P50 ?author . 
+    ?author ( wdt:P108 | wdt:P463 | wdt:P1416 ) / wdt:P361* ?organization . 
+    ?organization wdt:P625 ?geo .
+  }
+  GROUP BY ?organization ?geo
+  ORDER BY DESC (?count)
+  LIMIT 200
+} AS %organizations
+WHERE {
+  INCLUDE %organizations
+  BIND(IF( (?count < 1), "No results", IF((?count < 10), "1 ≤ results < 10 ", IF((?count < 100), "10 ≤ results < 100 results", IF((?count < 1000), "100 ≤ results < 1000", IF((?count < 10000), "1000 ≤ results < 10000", IF((?count < 100000), "10000 ≤ results < 100000", "100000 or more results") ) ) ) )) AS ?layer )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }        
+ }
+ORDER BY DESC (?count)
+
+
+#https://tools.wmflabs.org/scholia/use/Q5140318 iframe: 0 
+##defaultView:BubbleChart
+SELECT ?count ?topic ?topicLabel
+WITH{
+  SELECT (COUNT(?work) AS ?count) ?topic WHERE {
+    ?work (wdt:P2283 | wdt:P4510) / wdt:P279* wd:Q5140318 .
+    ?work wdt:P921 ?topic .
+  }
+  GROUP BY ?topic
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)
+
+
+#https://tools.wmflabs.org/scholia/use/Q5140318 iframe: 1 
+##defaultView:BubbleChart
+SELECT ?count ?author ?authorLabel
+WITH{
+  SELECT (COUNT(?work) AS ?count) ?author WHERE {
+    ?work (wdt:P2283 | wdt:P4510) /wdt:P279* wd:Q5140318 .
+    ?work wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+ORDER BY DESC(?count)
+
+
+#https://tools.wmflabs.org/scholia/use/Q5140318 iframe: 2 
+##defaultView:BarChart
+SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel
+WITH{
+  SELECT
+    (MIN(?year_) AS ?year) ?work ?use
+  WHERE {
+    ?work (wdt:P2283 | wdt:P4510) ?use .
+    ?use wdt:P279* wd:Q5140318 .
+    ?work wdt:P577 ?publication_datetime .
+    BIND(STR(YEAR(?publication_datetime)) AS ?year_)
+  }
+  GROUP BY ?work ?use
+} AS %result
+WHERE {
+  INCLUDE %result
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,nl,no,ru,sv,zh" . }
+}
+GROUP BY ?year ?useLabel
+ORDER BY ?year
+
+
+#https://tools.wmflabs.org/scholia/venue/Q4775205 iframe: 0 
+##defaultView:ImageGrid
+SELECT (SAMPLE(?image_) AS ?image) ?author ?authorLabel ?count
+WITH {
+  SELECT ?author (COUNT(?work) AS ?count) WHERE {
+    ?work wdt:P1433 wd:Q4775205;
+          wdt:P50 ?author .
+  }
+  GROUP BY ?author
+} AS %authors
+WHERE {
+  INCLUDE %authors
+  ?author wdt:P18 ?image_ .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl.no,ru,sv,zh" . } 
+}
+GROUP BY ?author ?authorLabel ?count
+ORDER BY DESC(?count)
+LIMIT 50  
+
+#https://tools.wmflabs.org/scholia/venue/Q4775205 iframe: 1 
+##defaultView:Graph
+SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
+WITH {
+  # Find works published in the given venue
+  SELECT ?work WHERE {
+    ?work wdt:P1433 wd:Q4775205 .
+  }
+} AS %works
+WITH {
+  # Limit the number of authors
+  SELECT (COUNT(?work) AS ?count1) ?author1 WHERE {
+    INCLUDE %works
+    ?work wdt:P50 ?author1 .
+  }
+  GROUP BY ?author1
+  ORDER BY DESC(?count1)
+  LIMIT 15
+} AS %authors1
+WITH {
+  # Limit the number of coauthors
+  SELECT DISTINCT ?author2 ?author1  (COUNT(?work) AS ?count2)  WHERE {
+    INCLUDE %works
+    INCLUDE %authors1
+    ?work wdt:P50 ?author1 , ?author2 .
+    FILTER (?author1 != ?author2) 
+  }
+  GROUP BY ?author2 ?author1 
+  ORDER BY DESC(?count2)
+  LIMIT 150
+} AS %authors2
+WHERE {
+#  INCLUDE %authors1
+  INCLUDE %authors2
+  OPTIONAL { ?author1 wdt:P21 ?gender1 . }
+  BIND( IF(?gender1 = wd:Q6581097, "3182BD", "E6550D") AS ?rgb)
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp".
+  }
+}
+
+
+#https://tools.wmflabs.org/scholia/venue/Q4775205 iframe: 2 
+##defaultView:LineChart
+select ?number_of_citations (count(?work) as ?count) where {
+  {
+    SELECT ?work (COUNT(?citing_work) AS ?number_of_citations)
+    WHERE {
+      ?work wdt:P1433 wd:Q4775205.   
+      optional { ?citing_work wdt:P2860 ?work . }
+    }
+    GROUP BY ?work 
+  }
+} 
+group by ?number_of_citations
+order by desc(?number_of_citations)
+
+
+#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 0 
+##defaultView:BubbleChart
+SELECT ?score ?topic ?topicLabel
+WITH {
+  SELECT
+    (SUM(?score_) AS ?score)
+    ?topic
+  WHERE {
+    { 
+      wd:Q21090025 wdt:P921 ?topic .
+      BIND(20 AS ?score_)
+    }
+    UNION
+    { 
+     wd:Q21090025 wdt:P921/wdt:P279 ?topic .
+     BIND(3 AS ?score_)
+    }
+    UNION
+    {
+      # Topic of a cited work
+      wd:Q21090025 wdt:P2860/wdt:P921 ?topic .
+      BIND(1 AS ?score_)
+    }
+    UNION
+    {
+      SELECT (1 AS ?score_) ?topic WHERE {
+        ?citing_work wdt:P2860 wd:Q21090025 .
+        ?citing_work wdt:P921 ?topic . 
+      }
+    }
+  }
+  GROUP BY ?topic
+} AS %results 
+WHERE {
+  INCLUDE %results
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,jp,no,ru,sv,zh". }
+}
+ORDER BY DESC(?score)
+LIMIT 200
+
+#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 1 
+##defaultView:Timeline
+SELECT DISTINCT ?datetime ?description WHERE {
+  {
+    wd:Q21090025 wdt:P577 ?datetime .
+    BIND("🌞 publication date" AS ?description)
+  }
+  UNION 
+  {
+    wd:Q21090025 wdt:P2507 / wdt:P577 ?datetime .
+    BIND("❗ erratum" AS ?description)
+  }
+  UNION 
+  {
+    wd:Q21090025 wdt:P5824 / wdt:P577 ?datetime .
+    BIND("⛔ retracted" AS ?description)
+  }
+  UNION 
+  {
+    wd:Q21090025 p:P793 ?event_statement .
+    ?event_statement ps:P793 ?event_type .
+    ?event_type rdfs:label ?description_ .
+    ?event_statement pq:P585 ?datetime .
+    FILTER (LANG(?description_) = "en")
+    
+    # Warning icon for retraction
+    BIND(
+      IF(
+        ?event_type = wd:Q45203135,
+        CONCAT("⛔ ", ?description_),
+        IF(
+          ?event_type = wd:Q56478588,
+          CONCAT("❓ ", ?description_),
+          ?description_
+          )
+        ) AS ?description)
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:Q21090025 wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖➡️ cited work with earliest publication date" AS ?description)
+    }
+    ORDER BY ?datetime
+    LIMIT 1
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:Q21090025 wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖➡️ cited work with latest publication date" AS ?description)
+    }
+    ORDER BY DESC(?datetime)
+    LIMIT 1
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:Q21090025 ^wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖⬅️ citing work with earliest publication date" AS ?description)
+    }
+    ORDER BY ?datetime
+    LIMIT 1
+  }
+  UNION
+  {
+    SELECT ?datetime ?description WHERE {
+      wd:Q21090025 ^wdt:P2860 / wdt:P577 ?datetime
+      BIND("📖⬅️ citing work with latest publication date" AS ?description)
+    }
+    ORDER BY DESC(?datetime)
+    LIMIT 1
+  }
+    UNION
+  {
+    wd:Q21090025 (wdt:P747 | ^wdt:P629) / wdt:P577 ?datetime
+    BIND("🌞 Publication of edition" AS ?description)
+  }
+}
+
+#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 2 
+##defaultView:Graph
+SELECT
+  ?citing_work ?citing_workLabel ?rgb 
+  ?cited_work ?cited_workLabel
+WITH { 
+  SELECT (COUNT(*) AS ?count) ?citing_work WHERE {
+    wd:Q21090025 (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?citing_work .
+  }
+  GROUP BY ?citing_work
+  ORDER BY DESC(?count)
+  LIMIT 40
+} AS %citing_works
+WITH { 
+  SELECT (COUNT(*) AS ?count_) ?cited_work WHERE {
+    wd:Q21090025 (^wdt:P2860 | wdt:P2860) / (^wdt:P2860 | wdt:P2860)? ?cited_work .
+  }
+  GROUP BY ?cited_work
+  ORDER BY DESC(?count_)
+  LIMIT 40
+} AS %cited_works
+WITH {
+  SELECT (MAX(?count) AS ?max_count) WHERE {
+    INCLUDE %citing_works
+    BIND(1 AS ?dummy)
+  } 
+  GROUP BY ?dummy
+} AS %max_count
+WHERE {
+  INCLUDE %citing_works
+  INCLUDE %max_count
+  INCLUDE %cited_works
+  
+  ?citing_work wdt:P2860 ?cited_work .
+  
+  BIND(STR(xsd:integer(99 * (1 - ?count / ?max_count))) AS ?grey)
+  BIND(CONCAT(SUBSTR("0", 1, 2 - STRLEN(?grey)), ?grey) AS ?padded_grey)
+  BIND(CONCAT(?padded_grey, ?padded_grey, ?padded_grey) AS ?rgb)
+
+  { 
+      ?citing_work (p:P50) ?citing_author_statement . 
+      ?citing_author_statement pq:P1545 "1" .
+      ?citing_author_statement ps:P50 ?citing_author .
+      ?citing_author rdfs:label ?citing_author_name .
+      filter(lang(?citing_author_name) = 'en')
+    }
+    union 
+  	{ 
+      ?citing_work (p:P2093) ?citing_author_statement . 
+      ?citing_author_statement pq:P1545 "1" .
+      ?citing_author_statement ps:P2093 ?citing_author_name .
+    }
+  
+    { 
+      ?cited_work (p:P50) ?cited_author_statement . 
+      ?cited_author_statement pq:P1545 "1" .
+      ?cited_author_statement ps:P50 ?cited_author .
+      ?cited_author rdfs:label ?cited_author_name .
+      filter(lang(?cited_author_name) = 'en')
+    }
+    union 
+  	{ 
+      ?cited_work (p:P2093) ?cited_author_statement . 
+      ?cited_author_statement pq:P1545 "1" .
+      ?cited_author_statement ps:P2093 ?cited_author_name .
+    }
+
+    ?citing_work wdt:P577 ?citing_date . 
+    ?cited_work wdt:P577 ?cited_date . 
+    bind(year(?citing_date) as ?citing_year)
+    bind(year(?cited_date) as ?cited_year)
+    bind(concat(?citing_author_name, ", ", str(?citing_year)) as ?citing_workLabel)
+    bind(concat(?cited_author_name, ", ", str(?cited_year)) as ?cited_workLabel)
+}
+ORDER BY DESC(?count)
+
+#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 3 
+##defaultView:BarChart
+SELECT
+  (STR(?year_) AS ?year)
+  (SUM(?count_) AS ?count)
+  ?kind
+WHERE {
+  {
+    VALUES ?year_ { 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009
+                   2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 }
+    BIND(0 AS ?count_)
+    BIND("_" AS ?kind)
+  }
+  UNION 
+  {
+    SELECT
+      ?year_
+      (COUNT(DISTINCT ?citing_work) AS ?count_)
+      ?kind
+    WHERE {
+      ?citing_work wdt:P2860 wd:Q21090025 .
+  
+      # Detect self-citations
+      BIND(IF(EXISTS { wd:Q21090025 wdt:P50 ?selfauthor . ?citing_work  wdt:P50 ?selfauthor } ,
+        "detected incoming self-citations",
+        "citations from others or non-detected self-citations") AS ?kind)
+
+      # Year of citation
+      ?citing_work wdt:P577 ?date .
+      BIND(YEAR(?date) AS ?year_)
+    }
+    GROUP BY ?year_ ?kind
+  }
+  UNION 
+  {
+    SELECT
+      ?year_
+      (COUNT(DISTINCT ?cited_work) AS ?count_)
+      ?kind
+    WHERE {
+      wd:Q21090025 wdt:P2860 ?cited_work .
+  
+      # Detect self-citations
+      BIND(IF(EXISTS { ?cited_work wdt:P50 ?selfauthor . wd:Q21090025 wdt:P50 ?selfauthor },
+        "detected outgoing self-citations",
+        "outgoing citations to others or non-detected self-citations") AS ?kind)
+
+      # Year of citation
+      ?cited_work wdt:P577 ?date .
+      BIND(YEAR(?date) AS ?year_)
+    }
+    GROUP BY ?year_ ?kind
+  }
+}
+GROUP BY ?year_ ?kind
+ORDER BY DESC(?year_) 
+
