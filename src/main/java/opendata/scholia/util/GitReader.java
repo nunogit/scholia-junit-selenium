@@ -54,7 +54,8 @@ public class GitReader {
 
             buffer = new BufferedReader(input);
             while ((l = buffer.readLine()) != null) {
-                line.add(l);
+            	if(! l.trim().startsWith("#") )
+            		line.add(l);
             }
 
         } catch (FileNotFoundException e) {
