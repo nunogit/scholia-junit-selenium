@@ -1,6 +1,8 @@
 package opendata.scholia.Pages.Abstract;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,10 +20,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.prometheus.client.Counter;
 import opendata.scholia.Tests.TestBase;
+import opendata.scholia.util.DiskWriter;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public abstract class ScholiaContentPage{
+	
+	
+	static final int WEBPAGE_TIMEOUT = 30;
 	
 	protected WebDriver driver;
 	
@@ -43,7 +50,10 @@ public abstract class ScholiaContentPage{
     }
     
     public List<WebElement> getWebElementList() {
-    	return webElementList; 
+			System.out.println("loading... "+this.getURL() );
+			driver.get(this.getURL());	
+			List<WebElement> webElementList = driver.findElements(By.tagName("iframe"));
+			return webElementList;
     }
     
     public ScholiaContentPage() {
@@ -99,6 +109,19 @@ public abstract class ScholiaContentPage{
 		return idList;
 	} 
 	
+	public List<String> iframeWidgetURLList(){
+		List<String> iframeWidgetURLList = new ArrayList<String>();
+		
+		List<WebElement> webElementList = this.getWebElementList();
+		
+		for(WebElement webElement : webElementList) {
+			String url = webElement.getAttribute("src");
+			iframeWidgetURLList.add(url);
+		}
+		
+		return iframeWidgetURLList;
+	}	
+	
 	
 	public boolean checkDataTables() {
 		
@@ -114,18 +137,63 @@ public abstract class ScholiaContentPage{
 	}
 	
 	//TODO improve this in the future
-	public boolean iframeWidgetHasError(WebElement webelement) {
+	public boolean iframeWidgetHasError(String urlString, int iframeSeqid) {
+		System.err.println("start testing..."+urlString);
+		driver.get(urlString);
+		
+		//apparently the iframe was not rendering properly.
+		//now loading iframes in an independent way
+		/*webelement.driver.switchTo().frame(0);
+		driver.findElement(by.)		
+		System.out.println(driver.getPageSource());*/
+		
+		String pageSource = "";
+		int waitForSeconds = 0;
+		int checkOnceMore = 0;
+		boolean queryFinished = false;
+		
+		// Getting the page source once is not enough. The content changes with ajax async calls
+		// Polling, to find status changes
+		// Maximum running limit 60 seconds
+		while(waitForSeconds++ < ScholiaContentPage.WEBPAGE_TIMEOUT && !(queryFinished  && checkOnceMore > 0)) {
+			SimpleDateFormat formatter= new SimpleDateFormat("mmss");
+			Date date = new Date(System.currentTimeMillis());
+			String suffix = formatter.format(date);
+		
+			pageSource = driver.getPageSource().toLowerCase();
+			DiskWriter.write(this.url + "x" + iframeSeqid +"x"+ waitForSeconds , pageSource);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-		String html = webelement.getText().toLowerCase();
-
-		// compared with lower case
-		if(html.contains("query timeout limit reached") ||
-		   html.contains("unable to display result") ||
-		   html.contains("server error: unexpected end of json input")) {
-			return true;
+			if(!pageSource.contains("running query") && !pageSource.contains("<svg") ){
+				//not needed; present for documentation for logic purposes;
+		    } else if(pageSource.contains("running query") && !pageSource.contains("<svg") ) {
+		    	//present for logic purposes. Not needed, may be removed in the future
+		    } else if(pageSource.contains("running query") && pageSource.contains("<svg") ){
+		    	//ambiguous state, the svg graph is not totally loaded, but the query is still running
+		    	//not sure if this state is achievable; present for documentation purposes
+		    } else if(!pageSource.contains("running query") && pageSource.contains("<svg") ) {
+		    	queryFinished = true;
+		    	checkOnceMore++; //checkOnceMore. Updates on HTML may still happen and this gives it an extra oportunity
+		    }
+						
 		}
 		
-
+		
+		// compared with lower case
+		if(waitForSeconds >= ScholiaContentPage.WEBPAGE_TIMEOUT || 
+		   pageSource.contains("query timeout limit reached") ||
+		   pageSource.contains("unable to display result") ||
+		   pageSource.contains("server error: unexpected end of json input")
+		   ) {
+			return true;
+		 }
+		
+        //driver.switchTo().defaultContent();
 		return false;
 	}
 	

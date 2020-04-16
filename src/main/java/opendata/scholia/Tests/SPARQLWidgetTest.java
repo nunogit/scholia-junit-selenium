@@ -35,49 +35,44 @@ import org.junit.runners.Parameterized.Parameters;
 public class SPARQLWidgetTest extends TestBase {
 	
 	private ScholiaContentPage scholiaContentPage;
-	private WebElement webElement;
+	private String urlString;
 	
-	public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, WebElement webElement) {
+	private int iframeSeqId;
+	
+	//public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, int iframeSeqId) {
+	//	super();
+	//	this.scholiaContentPage = scholiaContentPage;
+	//	this.iframeSeqId = iframeSeqId;
+	//}
+	
+	public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, String urlString, int iframeSeqId) {
 		super();
 		this.scholiaContentPage = scholiaContentPage;
-		this.webElement = webElement;
+		this.urlString = urlString;
+		this.iframeSeqId = iframeSeqId;
 	}
 	
 
 	
-	void testPage(ScholiaContentPage scPage, WebElement webelement) {
-		if(scPage.iframeWidgetHasError(webelement)){
+	void testPage(ScholiaContentPage scPage, String urlString, int iframeSeqId) {
+		if(scPage.iframeWidgetHasError(urlString, iframeSeqId)){
 			System.out.println("found error");
+			assertTrue(false);
 		} else System.out.println("success");
-		assertTrue(scPage.iframeWidgetHasError(webelement));
+		
+		assertTrue(true);
 	}
 	
 	@Test
 	public void testDataTables3() {
-		System.out.println("testing...");
+		System.out.println("testing... " + scholiaContentPage.getURL());
 		scholiaContentPage.setDriver(driver);
 		System.out.println("testing  " + scholiaContentPage);
-		testPage(scholiaContentPage, webElement);
+		testPage(scholiaContentPage, urlString, this.iframeSeqId);
 	}
 		
-	
-	public static List<String> loadFromGit(){
-		GitReader gitReader = new GitReader();
-		try {
-			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
-			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("can't connect to retrieve test list");
-			System.out.flush();
-			e.printStackTrace();
-		}
-		
-		return gitReader.getList();
-	}
 	
 	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
-		
 		TestBase.loadLocalDriver();		
 		
 		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
@@ -92,6 +87,7 @@ public class SPARQLWidgetTest extends TestBase {
 				
 				ScholiaContentPage scholiaContentPage = (ScholiaContentPage) classtype.getDeclaredConstructor().newInstance();
 				scholiaContentPage.setURL(sURL);
+				scholiaContentPage.setDriver(driver);
 				scholiaContentPageList.add(scholiaContentPage);
 			} catch (MalformedURLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				System.out.println("URL "+sURL+" is invalid");
@@ -109,29 +105,45 @@ public class SPARQLWidgetTest extends TestBase {
 		System.out.println("loading URL list from Git...");
 		System.out.flush();
 				
-		List<String> pageList = SPARQLWidgetTest.loadFromGit();
-		System.out.println("Read "+ pageList.size()	+" URLs");
+		List<String> urlStringList = SPARQLWidgetTest.loadFromGit();
+		System.out.println("Read "+ urlStringList.size()	+" URLs");
 		
-		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getScholiaContentPageList(pageList);
-				
-		for(ScholiaContentPage scholiaContentPage : scholiaContentPageList) {
-			System.out.println("loading... "+scholiaContentPage.getURL() );
-			driver.get(scholiaContentPage.getURL());	
-			List<WebElement> webElementList = driver.findElements(By.tagName("iframe"));
-			scholiaContentPage.addWebElementList(webElementList);
-		}
+		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getScholiaContentPageList(urlStringList);
+
 		return scholiaContentPageList;
 	}
 	
+	
+	
 	@Parameters
+	public static Collection<Object[]> setupParametersURL() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
+		Collection<Object[]> stringURLCollection = new ArrayList<Object[]>();
+		
+		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getParameters();
+		
+		int iFrameSeqId = 0;
+		for(ScholiaContentPage scholiaContentPage: scholiaContentPageList) {
+			for(String urlString : scholiaContentPage.iframeWidgetURLList()) {
+				stringURLCollection.add( new Object[]{scholiaContentPage, urlString, iFrameSeqId++} );
+			}
+		}
+		
+		return stringURLCollection;
+	}
+	
+	
+	
+	
+	//old @parameters
 	public static Collection<Object[]> setupParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
 		Collection<Object[]> stringURLCollection = new ArrayList<Object[]>();
 		
-		List<ScholiaContentPage> webelementList = SPARQLWidgetTest.getParameters();
+		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getParameters();
 				
-		for(ScholiaContentPage scholiaContentPage: webelementList) {
+		for(ScholiaContentPage scholiaContentPage: scholiaContentPageList) {
+			int iframeSeqId = 0;
 			for(WebElement webElement : scholiaContentPage.getWebElementList()) {
-				stringURLCollection.add( new Object[]{scholiaContentPage, webElement} );
+				stringURLCollection.add( new Object[]{scholiaContentPage, iframeSeqId++} );
 			}
 		}
 		

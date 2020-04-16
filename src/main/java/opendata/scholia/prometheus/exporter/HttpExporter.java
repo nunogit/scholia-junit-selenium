@@ -14,6 +14,7 @@ import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
 import io.prometheus.client.exporter.HTTPServer;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
+import opendata.scholia.Tests.SPARQLWidgetTest;
 import opendata.scholia.Tests.TableTest;
 
 public class HttpExporter {
@@ -29,7 +30,7 @@ public class HttpExporter {
     
     static final Gauge total_time_running = Gauge.build().name("scholia_runningTime_seconds_total").help("total datatables tested").register();
    
-    static final Gauge memory_process = Gauge.build().labelNames("selenium_memory_processUsageTotal_bytes").help("memory spent by the exporter").register();
+    static final Gauge memory_process = Gauge.build().name("selenium_memory_processUsageTotal_bytes").help("memory spent by the exporter").register();
 
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
@@ -59,15 +60,15 @@ public class HttpExporter {
                     JUnitCore junit = new JUnitCore();
                     junit.addListener(new TextListener(System.out));
                     
-                    Result result = junit.run(TableTest.class);
-                    List<Failure> failureList = result.getFailures();
-                    int failureCount = result.getFailureCount();
-                    int runCount = result.getRunCount();
+                   // Result result = junit.run(TableTest.class);
+                   // List<Failure> failureList = result.getFailures();
+                   // int failureCount = result.getFailureCount();
+                   // int runCount = result.getRunCount();
                     
-                    Result result2 = junit.run(TableTest.class);
+                    Result result2 = junit.run(SPARQLWidgetTest.class);
                     List<Failure> failureList2 = result2.getFailures();
-                    int failureCount2 = result.getFailureCount();
-                    int runCount2 = result.getRunCount();
+                    int failureCount2 = result2.getFailureCount();
+                    int runCount2 = result2.getRunCount();
                     
                     
                     long end = System.currentTimeMillis();
@@ -76,14 +77,14 @@ public class HttpExporter {
                     total_time_running.set(deltaTime);
                     System.out.println("Delta "+deltaTime);
                     
-                    for(Failure failure : failureList) {
+                    for(Failure failure : failureList2) {
                     	System.out.println(failure.getMessage());
                     }
                     
-                    datatables_errors.set(failureCount);
+                    datatables_errors.set(failureCount2);
                     
-                    System.out.println("run count " + runCount);
-                    System.out.println("failure count " + (failureCount + failureCount2));
+                    System.out.println("run count " + runCount2);
+                    System.out.println("failure count " + (failureCount2 + failureCount2));
 
                     Runtime runtime = Runtime.getRuntime();
                     // Run the garbage collector

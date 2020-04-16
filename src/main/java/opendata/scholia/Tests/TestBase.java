@@ -10,13 +10,16 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import opendata.scholia.report.ReportStatistics;
+import opendata.scholia.util.GitReader;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -188,7 +191,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 			options.addArguments("--disable-gpu");
 			
 			TestBase.driver = new ChromeDriver(options);
-			TestBase.driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			TestBase.driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
 			
 	  		System.out.println("driver loaded...");
 	  		System.out.flush();
@@ -225,4 +228,20 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
             buildTag = System.getenv("SAUCE_BUILD_NAME");
         }
     }
+    
+	public static List<String> loadFromGit(){
+		GitReader gitReader = new GitReader();
+		try {
+			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
+			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			System.out.println("can't connect to retrieve test list");
+			System.out.flush();
+			e.printStackTrace();
+		}
+		
+		return gitReader.getList();
+	}
+    
 }
