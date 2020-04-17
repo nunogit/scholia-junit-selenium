@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -25,6 +27,8 @@ import opendata.scholia.util.DiskWriter;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public abstract class ScholiaContentPage{
+	
+	private static final Logger logger = LogManager.getLogger(ScholiaContentPage.class);
 	
 	
 	static final int WEBPAGE_TIMEOUT = 30;
@@ -50,7 +54,7 @@ public abstract class ScholiaContentPage{
     }
     
     public List<WebElement> getWebElementList() {
-			System.out.println("loading... "+this.getURL() );
+			logger.info( "loading... "+this.getURL() );
 			driver.get(this.getURL());	
 			List<WebElement> webElementList = driver.findElements(By.tagName("iframe"));
 			return webElementList;
@@ -62,7 +66,8 @@ public abstract class ScholiaContentPage{
     
     private void initDriver(WebDriver driver) {
     	//TODO improve
-    	if(driver==null) System.out.println("no driver");
+    	if(driver==null)
+    		logger.debug("Driver null");
     	
     	this.driver = driver;
     	PageFactory.initElements(driver, this);
@@ -80,15 +85,14 @@ public abstract class ScholiaContentPage{
     public void visitPage() {
     	//TODO  improve
     	if(driver==null)
-    		System.out.println("no driver");
+    		logger.debug("driver null");
     	
     	if(!url.contentEquals(this.driver.getCurrentUrl()))
     		this.driver.get(url);
     	else
-    		System.out.println("Already visited.");
-    }
-
-	
+    		logger.debug("URL already visited");
+	}
+    
 	public void addDataTable(String widgetId) {
 		//WebElement webelement = driver.findElement(By.id(widgetId));
 		//WebElement webelement = driver.findElement(By.id(widgetId));
@@ -138,7 +142,7 @@ public abstract class ScholiaContentPage{
 	
 	//TODO improve this in the future
 	public boolean iframeWidgetHasError(String urlString, int iframeSeqid) {
-		System.err.println("start testing..."+urlString);
+		
 		driver.get(urlString);
 		
 		//apparently the iframe was not rendering properly.
