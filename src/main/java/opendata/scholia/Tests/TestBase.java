@@ -43,6 +43,9 @@ import java.util.concurrent.TimeUnit;
 //@RunWith(ConcurrentParameterized.class)
 public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(FooFactory.class);
+	
     public static String username = System.getenv("SAUCE_USERNAME");
     public static String accesskey = System.getenv("SAUCE_ACCESS_KEY");
     public static String seleniumURI;
@@ -207,7 +210,8 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 	@After
     public void tearDown() throws Exception {
     	//ReportStatistics.getReportStatistics().executeBatchJob();
-        //driver.quit();
+        driver.quit();
+        driver = null;
     }
 
     /**

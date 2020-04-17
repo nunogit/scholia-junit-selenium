@@ -60,10 +60,10 @@ public class HttpExporter {
                     JUnitCore junit = new JUnitCore();
                     junit.addListener(new TextListener(System.out));
                     
-                   // Result result = junit.run(TableTest.class);
-                   // List<Failure> failureList = result.getFailures();
-                   // int failureCount = result.getFailureCount();
-                   // int runCount = result.getRunCount();
+                    Result result = junit.run(TableTest.class);
+                    List<Failure> failureList = result.getFailures();
+                    int failureCount = result.getFailureCount();
+                    int runCount = result.getRunCount();
                     
                     Result result2 = junit.run(SPARQLWidgetTest.class);
                     List<Failure> failureList2 = result2.getFailures();
@@ -83,8 +83,8 @@ public class HttpExporter {
                     
                     datatables_errors.set(failureCount2);
                     
-                    System.out.println("run count " + runCount2);
-                    System.out.println("failure count " + (failureCount2 + failureCount2));
+                    System.out.println("run count " + (runCount + runCount2));
+                    System.out.println("failure count " + (failureCount + failureCount2));
 
                     Runtime runtime = Runtime.getRuntime();
                     // Run the garbage collector

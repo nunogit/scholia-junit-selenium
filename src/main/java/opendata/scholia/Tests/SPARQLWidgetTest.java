@@ -55,12 +55,7 @@ public class SPARQLWidgetTest extends TestBase {
 
 	
 	void testPage(ScholiaContentPage scPage, String urlString, int iframeSeqId) {
-		if(scPage.iframeWidgetHasError(urlString, iframeSeqId)){
-			System.out.println("found error");
-			assertTrue(false);
-		} else System.out.println("success");
-		
-		assertTrue(true);
+		assertTrue("iframe widget fully rendered", scPage.iframeWidgetHasError(urlString, iframeSeqId));
 	}
 	
 	@Test
