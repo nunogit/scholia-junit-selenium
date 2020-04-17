@@ -110,8 +110,7 @@ public class HttpExporter {
                     
                     //collect memory being used (to find possible memory leaks)
                     long memory = runtime.totalMemory() - runtime.freeMemory();
-                    System.out.println("Used memory is bytes: " + memory);
-                    System.out.println("Used memory is megabytes: "
+                    logger.info("Used memory (in megabytes): "
                             + bytesToMegabytes(memory));
                     
                     
