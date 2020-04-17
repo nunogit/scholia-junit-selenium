@@ -56,7 +56,7 @@ public class SPARQLWidgetTest extends TestBase {
 	}
 
 	void testPage(ScholiaContentPage scPage, String urlString, int iframeSeqId) {
-		assertTrue("iframe widget fully rendered", scPage.iframeWidgetHasError(urlString, iframeSeqId));
+		assertTrue("WikiData iframe  SPARQL based widget fully rendered", scPage.iframeWidgetHasError(urlString, iframeSeqId));
 	}
 
 	@Test
@@ -101,10 +101,9 @@ public class SPARQLWidgetTest extends TestBase {
 			NoSuchMethodException, SecurityException, MalformedURLException {
 		TestBase.loadLocalDriver();
 
-		logger.info("loading URL list from Git...");
-		System.out.flush();
 
-		List<String> urlStringList = SPARQLWidgetTest.loadFromGit();
+
+		List<String> urlStringList = TableTest.loadFromGit();
 		System.out.println("Read " + urlStringList.size() + " URLs");
 
 		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getScholiaContentPageList(urlStringList);

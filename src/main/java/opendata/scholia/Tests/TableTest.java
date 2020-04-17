@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +34,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TableTest extends TestBase {
+	
+	private static final Logger logger = LogManager.getLogger(TableTest.class);
+
 	
 	private ScholiaContentPage scholiaContentPage;
 	private String widgetId;
@@ -123,14 +128,12 @@ public class TableTest extends TestBase {
 	}
 	
 	void testPage(ScholiaContentPage scPage, String widgetId) {
-		System.out.println("visitingPage");
 		scPage.visitPage();
-		System.out.println("visitedPage");
 
 		List<String> idList = scPage.dataTableIdList();
 		
 		int dataTableSize = scPage.getDataTableSize(widgetId);
-		System.out.println("-- " + widgetId+ " " + scPage.getDataTableSize(widgetId));
+		logger.debug(dataTableSize + " rows in" + widgetId+ " @ " + scPage.getURL());
 		assertTrue(dataTableSize > 0);
 
 	}
@@ -159,21 +162,6 @@ public class TableTest extends TestBase {
 	}
 	
 	
-	public static List<String> loadFromGit(){
-		GitReader gitReader = new GitReader();
-		try {
-			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
-			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("can't connect to retrieve test list");
-			System.out.flush();
-			e.printStackTrace();
-		}
-		
-		return gitReader.getList();
-	}
-	
 	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
 		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
 		
@@ -199,12 +187,8 @@ public class TableTest extends TestBase {
 	
 	@Parameters
 	public static Collection<Object[]> setupParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {
-		
-		System.out.println("loading URL list from Git...");
-		System.out.flush();
-				
+						
 		List<String> pageList = TableTest.loadFromGit();
-		System.out.println("Read "+ pageList.size()	+" URLs");
 		
 		List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(pageList);
 		Collection<Object[]> stringURLCollection = new ArrayList<Object[]>();
@@ -213,7 +197,7 @@ public class TableTest extends TestBase {
 		for(ScholiaContentPage scholiaContentPage : scholiaContentPageList) {
 			
 			List<String> dataTableIdList = scholiaContentPage.dataTableIdList();
-			System.out.println("There are "+ dataTableIdList.size()	+" dataTables in " + scholiaContentPage.getURL());	
+			logger.debug("There are "+ dataTableIdList.size()	+" dataTables in " + scholiaContentPage.getURL());	
 			
 			for(String dataTableId: dataTableIdList) {
 				//Object obj = new Object[][] { {scholiaContentPage, dataTableId},  {scholiaContentPage, dataTableId} };
@@ -222,8 +206,8 @@ public class TableTest extends TestBase {
 		}
 		
 		
-		System.out.println("Git list read success...");
-		System.out.flush();
+	
+	
 
 		return stringURLCollection;
 	}

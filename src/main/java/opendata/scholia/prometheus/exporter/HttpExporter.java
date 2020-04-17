@@ -3,6 +3,8 @@ package opendata.scholia.prometheus.exporter;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -19,6 +21,9 @@ import opendata.scholia.Tests.TableTest;
 
 public class HttpExporter {
 	//TOOD a bit ugly. Improve code
+	
+	private static final Logger logger = LogManager.getLogger(HttpExporter.class);
+
 	
     static final Gauge tested_pages_total = Gauge.build().name("scholia_pagesTested_total").help("total pages tested").register();
    
@@ -75,7 +80,7 @@ public class HttpExporter {
                     
                     float deltaTime = (end - start) / 1000;
                     total_time_running.set(deltaTime);
-                    System.out.println("Delta "+deltaTime);
+                    logger.info("Run time Delta: "+deltaTime+" seconds");
                     
                     for(Failure failure : failureList2) {
                     	System.out.println(failure.getMessage());
@@ -83,8 +88,13 @@ public class HttpExporter {
                     
                     datatables_errors.set(failureCount2);
                     
-                    System.out.println("run count " + (runCount + runCount2));
-                    System.out.println("failure count " + (failureCount + failureCount2));
+                    int totalFailures = failureCount + failureCount2;
+                    int totalRanTests = runCount + runCount2;
+                    int totalSuccess  = totalRanTests - totalFailures;
+                    
+                    logger.info("Run time delta: "+deltaTime+" seconds");
+                    logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
+                    
 
                     Runtime runtime = Runtime.getRuntime();
                     // Run the garbage collector
