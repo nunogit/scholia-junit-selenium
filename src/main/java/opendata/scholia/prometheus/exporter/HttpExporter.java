@@ -25,17 +25,17 @@ public class HttpExporter {
 	private static final Logger logger  = LogManager.getLogger(HttpExporter.class);
 
 	
-    static final Gauge tested_pages_total = Gauge.build().name("scholia_pagesTested_total").help("total pages tested").register();
+    static final Counter tested_pages_total = Counter.build().name("scholia_pagestested_total").help("total pages tested").register();
    
-    static final Gauge tested_datatables_total = Gauge.build().name("scholia_widgets_dataTablesTested_total").help("total datatables tested").register();
-    static final Gauge datatables_errors =       Gauge.build().name("scholia_widgets_dataTablesTested_errors_total").help("errors in datatables").register();
+    static final Counter tested_datatables_total = Counter.build().name("scholia_widgets_datatables_total").help("total datatables tested").register();
+    static final Counter datatables_errors =       Counter.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").register();
     
-    static final Gauge tested_SPARQLWidgets_total  = Gauge.build().name("scholia_widgets_SPARQLWidgetsTested_total").help("total datatables tested").register();
- 	static final Gauge tested_SPARQLWidgets_errors = Gauge.build().name("scholia_widgets_SPARQLWidgetsTested_errors_total").help("total datatables tested").register();
+    static final Counter tested_SPARQLWidgets_total  = Counter.build().name("scholia_widgets_sparqlwidgets_total").help("total datatables tested").register();
+ 	static final Counter tested_SPARQLWidgets_errors = Counter.build().name("scholia_widgets_sparqlwidgets_errors_total").help("total datatables tested").register();
     
-    static final Gauge total_time_running = Gauge.build().name("scholia_runningTime_seconds_total").help("total datatables tested").register();
+    static final Counter total_time_running = Counter.build().name("scholia_runtime_seconds_total").help("total datatables tested").register();
    
-    static final Gauge memory_process = Gauge.build().name("selenium_memory_processUsageTotal_bytes").help("memory spent by the exporter").register();
+    static final Gauge memory_process = Gauge.build().name("selenium_memory_processusage_bytes").help("memory spent by the exporter").register();
 
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
@@ -80,15 +80,28 @@ public class HttpExporter {
                     
                     float deltaTime = (end - start) / 1000;
                     
-                    datatables_errors.set(failureCount);
-                    tested_datatables_total.set(dataTableWidgetTotal);
                     
-                    tested_SPARQLWidgets_total.set(failureList2.size());
-                    tested_SPARQLWidgets_errors.set(failureCount2);
+                    Runtime runtime = Runtime.getRuntime();
+                    // force running the garbage collector
+                    runtime.gc();
                     
-                    tested_pages_total.set(sUrlList.size()); 
+                    //collect memory being used (to find possible memory leaks)
+                    long memory = runtime.totalMemory() - runtime.freeMemory();
+                    logger.info("Used memory (in megabytes): "
+                            + bytesToMegabytes(memory));
                     
-                    total_time_running.set(deltaTime);
+                    
+                    datatables_errors.inc(failureCount);
+                    tested_datatables_total.inc(dataTableWidgetTotal);
+                    
+                    tested_SPARQLWidgets_total.inc(failureList2.size());
+                    tested_SPARQLWidgets_errors.inc(failureCount2);
+                    
+                    tested_pages_total.inc(sUrlList.size()); 
+                    
+                    total_time_running.inc(deltaTime);
+                    
+                    memory_process.set(memory);
                     
                     //for(Failure failure : failureList) {
                     //	System.out.println(failure.getMessage());
@@ -104,15 +117,7 @@ public class HttpExporter {
                     logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
                     logger.info("Run time Delta: "+deltaTime+" seconds");
 
-                    Runtime runtime = Runtime.getRuntime();
-                    // force running the garbage collector
-                    runtime.gc();
-                    
-                    //collect memory being used (to find possible memory leaks)
-                    long memory = runtime.totalMemory() - runtime.freeMemory();
-                    logger.info("Used memory (in megabytes): "
-                            + bytesToMegabytes(memory));
-                    
+                                       
                     
                     Thread.sleep(1000 * 60* 60); //every hour
                     
