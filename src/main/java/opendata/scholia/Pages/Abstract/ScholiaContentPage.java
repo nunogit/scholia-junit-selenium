@@ -165,7 +165,9 @@ public abstract class ScholiaContentPage{
 			String suffix = formatter.format(date);
 		
 			pageSource = driver.getPageSource().toLowerCase();
-			DiskWriter.write(this.url + "x" + iframeSeqid +"x"+ waitForSeconds , pageSource);
+			
+			//DiskWriter.write(this.url + "x" + iframeSeqid +"x"+ waitForSeconds , pageSource);
+			
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {

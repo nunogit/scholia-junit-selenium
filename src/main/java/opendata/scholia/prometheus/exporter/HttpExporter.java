@@ -22,7 +22,7 @@ import opendata.scholia.Tests.TableTest;
 public class HttpExporter {
 	//TOOD a bit ugly. Improve code
 	
-	private static final Logger logger = LogManager.getLogger(HttpExporter.class);
+	private static final Logger logger  = LogManager.getLogger(HttpExporter.class);
 
 	
     static final Gauge tested_pages_total = Gauge.build().name("scholia_pagesTested_total").help("total pages tested").register();
@@ -51,14 +51,14 @@ public class HttpExporter {
             while (true) {
                 try {
                     List<String> sUrlList = TableTest.loadFromGit();
-                    tested_pages_total.set(sUrlList.size());  
+                     
                     
                     List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
                     int dataTableWidgetTotal  = 0;
                     for(ScholiaContentPage scp : scholiaContentPageList) 
                     	dataTableWidgetTotal += scp.dataTableIdList().size();
                     
-                    tested_datatables_total.set(dataTableWidgetTotal);
+                    
                     
                     long start = System.currentTimeMillis();
                     
@@ -79,14 +79,22 @@ public class HttpExporter {
                     long end = System.currentTimeMillis();
                     
                     float deltaTime = (end - start) / 1000;
+                    
+                    datatables_errors.set(failureCount);
+                    tested_datatables_total.set(dataTableWidgetTotal);
+                    
+                    tested_SPARQLWidgets_total.set(failureList2.size());
+                    tested_SPARQLWidgets_errors.set(failureCount2);
+                    
+                    tested_pages_total.set(sUrlList.size()); 
+                    
                     total_time_running.set(deltaTime);
-                    logger.info("Run time Delta: "+deltaTime+" seconds");
                     
-                    for(Failure failure : failureList2) {
-                    	System.out.println(failure.getMessage());
-                    }
+                    //for(Failure failure : failureList) {
+                    //	System.out.println(failure.getMessage());
+                    //}
                     
-                    datatables_errors.set(failureCount2);
+                    
                     
                     int totalFailures = failureCount + failureCount2;
                     int totalRanTests = runCount + runCount2;
@@ -94,12 +102,13 @@ public class HttpExporter {
                     
                     logger.info("Run time delta: "+deltaTime+" seconds");
                     logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
-                    
+                    logger.info("Run time Delta: "+deltaTime+" seconds");
 
                     Runtime runtime = Runtime.getRuntime();
-                    // Run the garbage collector
+                    // force running the garbage collector
                     runtime.gc();
                     
+                    //collect memory being used (to find possible memory leaks)
                     long memory = runtime.totalMemory() - runtime.freeMemory();
                     System.out.println("Used memory is bytes: " + memory);
                     System.out.println("Used memory is megabytes: "

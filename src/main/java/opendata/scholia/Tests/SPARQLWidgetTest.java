@@ -56,7 +56,7 @@ public class SPARQLWidgetTest extends TestBase {
 	}
 
 	void testPage(ScholiaContentPage scPage, String urlString, int iframeSeqId) {
-		assertTrue("WikiData iframe  SPARQL based widget fully rendered", scPage.iframeWidgetHasError(urlString, iframeSeqId));
+		assertTrue("WikiData iframe SPARQL based widget fully rendered", scPage.iframeWidgetHasError(urlString, iframeSeqId));
 	}
 
 	@Test
