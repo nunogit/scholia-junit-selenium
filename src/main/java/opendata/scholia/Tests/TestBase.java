@@ -1,6 +1,8 @@
 package opendata.scholia.Tests;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.*;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
@@ -44,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(FooFactory.class);
+	private static final Logger logger = LogManager.getLogger(TestBase.class);
 	
     public static String username = System.getenv("SAUCE_USERNAME");
     public static String accesskey = System.getenv("SAUCE_ACCESS_KEY");
@@ -145,7 +147,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         
         //TODO Improve driver selection
         
-        System.out.println("loading driver...");
+        logger.info("Loading driver...");
         
         //WebDriver driver = new FirefoxDriver();
 		//comment the above 2 lines and uncomment below 2 lines to use Chrome
@@ -167,7 +169,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 
     protected static WebDriver loadLocalDriver() {
     	if(TestBase.driver != null) {
-    		System.out.println("Driver already loaded... returning");
+    		logger.debug("Driver already loaded... returning");
     		return TestBase.driver;
     	}
         
@@ -179,8 +181,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
         	System.setProperty("webdriver.chrome.driver", "/chromedriver");
         }
 
-        System.out.println("system var set... " + javaHome);
-		System.out.flush();
+        logger.debug("System var webdriver.chrome.driver set: " + javaHome);
 		
 		try {
 			ChromeOptions options = new ChromeOptions();
@@ -196,8 +197,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 			TestBase.driver = new ChromeDriver(options);
 			TestBase.driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
 			
-	  		System.out.println("driver loaded...");
-	  		System.out.flush();
+			logger.info("Driver loaded...");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
