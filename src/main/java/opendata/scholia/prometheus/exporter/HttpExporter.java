@@ -30,12 +30,12 @@ public class HttpExporter {
     static final Counter tested_datatables_total = Counter.build().name("scholia_widgets_datatables_total").help("total datatables tested").register();
     static final Counter datatables_errors =       Counter.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").register();
     
-    static final Counter tested_SPARQLWidgets_total  = Counter.build().name("scholia_widgets_sparqlwidgets_total").help("total datatables tested").register();
- 	static final Counter tested_SPARQLWidgets_errors = Counter.build().name("scholia_widgets_sparqlwidgets_errors_total").help("total datatables tested").register();
+    static final Counter tested_SPARQLWidgets_total  = Counter.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").register();
+ 	static final Counter tested_SPARQLWidgets_errors = Counter.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").register();
     
-    static final Counter total_time_running = Counter.build().name("scholia_runtime_seconds_total").help("total datatables tested").register();
+    static final Counter total_time_running = Counter.build().name("scholia_seleniumtest_runtime_seconds_total").help("total datatables tested").register();
    
-    static final Gauge memory_process = Gauge.build().name("selenium_memory_processusage_bytes").help("memory spent by the exporter").register();
+    static final Gauge memory_process = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
@@ -90,35 +90,31 @@ public class HttpExporter {
                     logger.info("Used memory (in megabytes): "
                             + bytesToMegabytes(memory));
                     
+                    //for(Failure failure : failureList) {
+                    //	System.out.println(failure.getMessage());
+                    //}
+   
+                    int totalFailures = failureCount + failureCount2;
+                    int totalRanTests = runCount + runCount2;
+                    int totalSuccess  = totalRanTests - totalFailures;
+                    
                     
                     datatables_errors.inc(failureCount);
                     tested_datatables_total.inc(dataTableWidgetTotal);
                     
-                    tested_SPARQLWidgets_total.inc(failureList2.size());
                     tested_SPARQLWidgets_errors.inc(failureCount2);
+                    tested_SPARQLWidgets_total.inc(runCount2);
                     
-                    tested_pages_total.inc(sUrlList.size()); 
+                    tested_pages_total.inc(sUrlList.size());
                     
                     total_time_running.inc(deltaTime);
                     
                     memory_process.set(memory);
                     
-                    //for(Failure failure : failureList) {
-                    //	System.out.println(failure.getMessage());
-                    //}
-                    
-                    
-                    
-                    int totalFailures = failureCount + failureCount2;
-                    int totalRanTests = runCount + runCount2;
-                    int totalSuccess  = totalRanTests - totalFailures;
-                    
                     logger.info("Run time delta: "+deltaTime+" seconds");
                     logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
                     logger.info("Run time Delta: "+deltaTime+" seconds");
-
-                                       
-                    
+                        
                     Thread.sleep(1000 * 60* 60); //every hour
                     
 

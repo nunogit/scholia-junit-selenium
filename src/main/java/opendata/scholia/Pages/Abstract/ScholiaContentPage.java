@@ -42,12 +42,12 @@ public abstract class ScholiaContentPage{
 	
 	private String url = "";
 	
-	static final Counter widgetsTested = Counter.build()
-		      .name("widgets_tested")
-		      .help("Tested.").register();
-	static final Counter widgetsFailed = Counter.build()
-		      .name("widgets_failed")
-		      .help("Failed.").register();
+	//static final Counter widgetsTested = Counter.build()
+	//	      .name("widgets_tested")
+	//	      .help("Tested.").register();
+	//static final Counter widgetsFailed = Counter.build()
+	//	      .name("widgets_failed")
+	//	      .help("Failed.").register();
 	
     public ScholiaContentPage(WebDriver driver) {
     	initDriver(driver);
@@ -130,10 +130,10 @@ public abstract class ScholiaContentPage{
 	public boolean checkDataTables() {
 		
 		for (Map.Entry<String,WebElement> entry : dataTableMap.entrySet()) {  
-			widgetsTested.inc();
+			//widgetsTested.inc();
 			List<WebElement> rows = driver.findElements(By.xpath("//*[@id=\""+entry.getKey()+ "\"]/tbody/tr"));
 			if(rows.size()==0) {
-				widgetsFailed.inc();
+				//widgetsFailed.inc();
 				return false;
 			}
 		}
