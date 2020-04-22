@@ -21,9 +21,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import opendata.scholia.Pages.*;
-
-
-import opendata.scholia.Pages.Author;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.report.ReportStatistics;
 import opendata.scholia.util.GitReader;
@@ -161,29 +158,8 @@ public class TableTest extends TestBase {
 		}
 	}
 	
-	
-	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
-		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
-		
-		for(String sURL : sUrlList) {
-			Class[] cArg = new Class[0];
-	
-			Class classtype = null;
-			try {
-				classtype = PageType.getPageType(new URL(sURL));
-				System.out.println("Page type "+ classtype);
-				
-				ScholiaContentPage scholiaContentPage = (ScholiaContentPage) classtype.getDeclaredConstructor().newInstance();
-				scholiaContentPage.setURL(sURL);
-				scholiaContentPageList.add(scholiaContentPage);
-			} catch (MalformedURLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				System.out.println("URL "+sURL+" is invalid");
-			}
 
-		}
-		
-		return scholiaContentPageList;
-	}
+
 	
 	@Parameters
 	public static Collection<Object[]> setupParameters() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, MalformedURLException {

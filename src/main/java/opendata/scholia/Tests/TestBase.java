@@ -11,6 +11,8 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import opendata.scholia.Pages.PageFactory;
+import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.report.ReportStatistics;
 import opendata.scholia.util.GitReader;
 
@@ -22,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 
@@ -246,6 +249,24 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 		}
 		
 		return gitReader.getList();
+	}
+	
+	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
+		TestBase.loadLocalDriver();
+
+		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
+
+		for (String sURL : sUrlList) {
+			Class[] cArg = new Class[0];
+
+			Class classtype = null;
+			
+			ScholiaContentPage scholiaContentPage= PageFactory.instance().getPage(sURL);
+			scholiaContentPage.setDriver(driver);
+			scholiaContentPageList.add(scholiaContentPage);
+		}
+
+		return scholiaContentPageList;
 	}
     
 }

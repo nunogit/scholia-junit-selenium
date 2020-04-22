@@ -42,6 +42,9 @@ public abstract class ScholiaContentPage{
 	
 	private String url = "";
 	
+	private long backendPerformance = -1;
+	private long frontendPerformance = -1;
+	
 	//static final Counter widgetsTested = Counter.build()
 	//	      .name("widgets_tested")
 	//	      .help("Tested.").register();
@@ -87,9 +90,24 @@ public abstract class ScholiaContentPage{
     	if(driver==null)
     		logger.debug("driver null");
     	
-    	if(!url.contentEquals(this.driver.getCurrentUrl()))
+    	
+    	if(!url.contentEquals(this.driver.getCurrentUrl())) {
     		this.driver.get(url);
-    	else
+    		
+    		//A page can  be loaded more than once
+    		//We only want to use the load time of the first usage
+    		//Subsequent loads can have substancial better results due to proxy/caching mechanisms
+    		if(backendPerformance==-1) {
+    			JavascriptExecutor js = (JavascriptExecutor) driver;  
+    			long navigationStart = Long.parseLong( js.executeScript("return window.performance.timing.navigationStart").toString() );
+    			long responseStart =  Long.parseLong(js.executeScript("return window.performance.timing.responseStart").toString() );
+    			long domComplete =  Long.parseLong( js.executeScript("return window.performance.timing.domComplete").toString() );
+    			System.err.print(navigationStart + " - " +responseStart+" - "+domComplete);
+    			
+    			backendPerformance = responseStart - navigationStart;
+    			frontendPerformance = domComplete - responseStart;
+    		}
+    	} else
     		logger.debug("URL already visited");
 	}
     

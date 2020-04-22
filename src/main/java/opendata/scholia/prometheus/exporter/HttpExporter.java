@@ -37,6 +37,10 @@ public class HttpExporter {
    
     static final Gauge memory_process = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
+    static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_secons").help("backendperformance").register();
+    static final Histogram frontendperformance = Histogram.build().name("scholia_seleniumtest_memory_processusage_bytes").help("backendperformance").register();
+
+    
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
     //static final Summary  s = Summary.build().name("summary").help("meh").register();

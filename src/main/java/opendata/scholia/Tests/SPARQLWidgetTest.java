@@ -67,34 +67,7 @@ public class SPARQLWidgetTest extends TestBase {
 		testPage(scholiaContentPage, urlString, this.iframeSeqId);
 	}
 
-	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList) {
-		TestBase.loadLocalDriver();
 
-		List<ScholiaContentPage> scholiaContentPageList = new Vector<ScholiaContentPage>();
-
-		for (String sURL : sUrlList) {
-			Class[] cArg = new Class[0];
-
-			Class classtype = null;
-			try {
-				classtype = PageType.getPageType(new URL(sURL));
-
-				logger.debug("Page type identified" + classtype);
-
-				ScholiaContentPage scholiaContentPage = (ScholiaContentPage) classtype.getDeclaredConstructor()
-						.newInstance();
-				scholiaContentPage.setURL(sURL);
-				scholiaContentPage.setDriver(driver);
-				scholiaContentPageList.add(scholiaContentPage);
-			} catch (MalformedURLException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				logger.warn("URL " + sURL + " is invalid, skipping");
-			}
-
-		}
-
-		return scholiaContentPageList;
-	}
 
 	public static List<ScholiaContentPage> getParameters()
 			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
@@ -106,7 +79,7 @@ public class SPARQLWidgetTest extends TestBase {
 		List<String> urlStringList = TableTest.loadFromGit();
 		System.out.println("Read " + urlStringList.size() + " URLs");
 
-		List<ScholiaContentPage> scholiaContentPageList = SPARQLWidgetTest.getScholiaContentPageList(urlStringList);
+		List<ScholiaContentPage> scholiaContentPageList = TestBase.getScholiaContentPageList(urlStringList);
 
 		return scholiaContentPageList;
 	}
