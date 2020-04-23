@@ -33,12 +33,11 @@ public class HttpExporter {
     static final Counter tested_SPARQLWidgets_total  = Counter.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").register();
  	static final Counter tested_SPARQLWidgets_errors = Counter.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").register();
     
-    static final Counter total_time_running = Counter.build().name("scholia_seleniumtest_runtime_seconds_total").help("total datatables tested").register();
-   
+    static final Gauge total_time_running = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
     static final Gauge memory_process = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
-    static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_secons").help("backendperformance").register();
-    static final Histogram frontendperformance = Histogram.build().name("scholia_seleniumtest_memory_processusage_bytes").help("backendperformance").register();
+    static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
+    static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
 
     
     
