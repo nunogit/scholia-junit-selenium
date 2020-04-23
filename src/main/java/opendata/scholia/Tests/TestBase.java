@@ -14,6 +14,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import opendata.scholia.Pages.PageFactory;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.report.ReportStatistics;
+import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.GitReader;
 
 import org.openqa.selenium.WebDriver;
@@ -239,7 +240,8 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 	public static List<String> loadFromGit(){
 		GitReader gitReader = new GitReader();
 		try {
-			gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
+			String sURL = ConfigManager.instance().getConfig().getString("pagetestset");
+			gitReader.setURL(sURL);
 			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
