@@ -37,7 +37,7 @@ public class SPARQLWidgetTest extends TestBase {
 	private static final Logger logger = LogManager.getLogger(SPARQLWidgetTest.class);
 
 	private ScholiaContentPage scholiaContentPage;
-	private String urlString;
+	private String sURL;
 
 	private int iframeSeqId;
 
@@ -48,15 +48,18 @@ public class SPARQLWidgetTest extends TestBase {
 	// this.iframeSeqId = iframeSeqId;
 	// }
 
-	public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, String urlString, int iframeSeqId) {
+	public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, String sURL, int iframeSeqId) {
 		super();
 		this.scholiaContentPage = scholiaContentPage;
-		this.urlString = urlString;
+		this.sURL = sURL;
 		this.iframeSeqId = iframeSeqId;
 	}
 
-	void testPage(ScholiaContentPage scPage, String urlString, int iframeSeqId) {
-		assertTrue("WikiData iframe SPARQL based widget fully rendered", scPage.iframeWidgetHasError(urlString, iframeSeqId));
+	void testPage(ScholiaContentPage scPage, String sURL, int iframeSeqId) {
+		boolean widgetSuccess = scPage.isIframeWidgetWorking(sURL, iframeSeqId);
+		
+		scPage.addTestResult(widgetSuccess, "sparql fframe widget", "iframe #"+iframeSeqId);
+		assertTrue("WikiData iframe SPARQL based widget fully rendered", widgetSuccess);
 	}
 
 	@Test
@@ -64,7 +67,7 @@ public class SPARQLWidgetTest extends TestBase {
 		System.out.println("testing... " + scholiaContentPage.getURL());
 		scholiaContentPage.setDriver(driver);
 		System.out.println("testing  " + scholiaContentPage);
-		testPage(scholiaContentPage, urlString, this.iframeSeqId);
+		testPage(scholiaContentPage, sURL, this.iframeSeqId);
 	}
 
 

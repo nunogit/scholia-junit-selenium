@@ -119,7 +119,12 @@ public class TableTest extends TestBase {
 			for(String id : idList) {
 				System.out.println( me.getValue());
 				System.out.println("-- " + id+ " " + scpage.getDataTableSize(id));
-				assertTrue(id, scpage.getDataTableSize(id) > 0);		
+				
+				boolean dataTableSizeMoreThanZero = (scpage.getDataTableSize(id) > 0);
+				
+				assertTrue(id, dataTableSizeMoreThanZero);
+				scpage.addTestResult(dataTableSizeMoreThanZero, "datatable", id);
+				
 			}
 		}	
 	}
