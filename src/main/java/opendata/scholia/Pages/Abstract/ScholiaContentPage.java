@@ -30,15 +30,19 @@ public abstract class ScholiaContentPage{
 	
 	private static final Logger logger = LogManager.getLogger(ScholiaContentPage.class);
 	
+	private String pageTypeId = "_unknown";
 	
 	static final int WEBPAGE_TIMEOUT = 30;
 	
 	protected WebDriver driver;
 	
-	Map<String, WebElement> dataTableMap;
-	Map<String, WebElement> widgetMap;
+	private Map<String, WebElement> dataTableMap;
+	private Map<String, WebElement> widgetMap;
 	
-	List<WebElement> webElementList;
+	private HashMap<String, ArrayList<String>> failureList = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> successList = new HashMap<String, ArrayList<String>>();
+	
+	private List<WebElement> webElementList;
 	
 	private String url = "";
 	
@@ -159,7 +163,7 @@ public abstract class ScholiaContentPage{
 	}
 	
 	//TODO improve this in the future
-	public boolean iframeWidgetHasError(String urlString, int iframeSeqid) {
+	public boolean isIframeWidgetWorking(String urlString, int iframeSeqid) {
 		
 		driver.get(urlString);
 		
@@ -214,11 +218,11 @@ public abstract class ScholiaContentPage{
 		   pageSource.contains("unable to display result") ||
 		   pageSource.contains("server error: unexpected end of json input")
 		   ) {
-			return true;
+			return false;
 		 }
 		
         //driver.switchTo().defaultContent();
-		return false;
+		return true;
 	}
 	
 	public int getDataTableSize(String dataTableId) {
@@ -237,6 +241,61 @@ public abstract class ScholiaContentPage{
 
 	public void addWebElementList(List<WebElement> webElementList) {
 		this.webElementList = webElementList;
+	}
+	
+	public String getPageTypeId() {
+		return pageTypeId;
+	}
+	
+	public void setPageTypeId(String pageTypeId) {
+		this.pageTypeId = pageTypeId;
+	}
+
+	public void addTestResult(boolean successResult, String tag,  String failureDescription) {
+		HashMap<String, ArrayList<String>> resultList;
+
+		resultList = successResult ? successList : failureList;
+
+		ArrayList list = resultList.get(tag);
+		if(list==null) {
+			list = new ArrayList();
+			resultList.put(tag, list);
+		}
+		
+		list.add(failureDescription);
+
+	}
+	
+	public List<String> getSuccessTestResultList() {
+		List<String> result = new ArrayList<String>();
+		for (List<String> value : successList.values()) {
+		 	result.addAll(value);
+		}
+		return result;
+	}
+	
+	public List<String> getSuccessTestResultList(String tag) {
+		return successList.get(tag);
+	}
+	
+	public List<String> getFailureTestResultList() {
+		List<String> result = new ArrayList<String>();
+		for (List<String> value : failureList.values()) {
+		 	result.addAll(value);
+		}
+		return result;
+	}
+	
+	public List<String> getFailureTestResultList(String tag) {
+		return failureList.get(tag);
+	}
+	
+	public long getBackendPerformance() {
+		return this.backendPerformance;
+	}
+	
+	public long getFrontendPerformance() {
+		return this.frontendPerformance;
 	}
 	
 }
