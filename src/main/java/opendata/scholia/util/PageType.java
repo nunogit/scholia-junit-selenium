@@ -32,10 +32,11 @@ import opendata.scholia.Pages.Use;
 import opendata.scholia.Pages.Venue;
 import opendata.scholia.Pages.Work;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
+import opendata.scholia.util.model.Pair;
 
 public class PageType {
 	
-	public static Class getPageType(URL url) {
+	public static Pair<Class, String> getPageType(URL url) {
 		
 		HashMap<Class, String> pageType = new HashMap<Class, String>();
 		
@@ -74,10 +75,10 @@ public class PageType {
 		
 		for( Entry<Class, String> entry : pageType.entrySet() ) {
 			if(path.matches(entry.getValue()))
-				return entry.getKey();
+				return Pair.makePair(entry.getKey(), entry.getValue());
 		}
 		
-		return GenericPage.class;
+		return Pair.makePair(GenericPage.class, "_unknown");
 	}
 	
 
