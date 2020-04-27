@@ -15,6 +15,7 @@ import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
 import io.prometheus.client.exporter.HTTPServer;
+import opendata.scholia.Pages.PageFactory;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.Tests.SPARQLWidgetTest;
 import opendata.scholia.Tests.TableTest;
@@ -79,10 +80,20 @@ public class HttpExporter {
                     int runCount2 = result2.getRunCount();
                     
                     
+                    List<ScholiaContentPage> scholiaContentPageL = PageFactory.instance().pageList();                   
+                    
+                    int tFailures = 0;
+                    int tSuccess = 0;
+                    int tTotal = 0;
+                    for(ScholiaContentPage scp : scholiaContentPageL){
+                    	tFailures += scp.getFailureTestResultList().size();
+                    	tSuccess += scp.getSuccessTestResultList().size();
+                    }
+                    tTotal = tFailures + tSuccess;
+                    
                     long end = System.currentTimeMillis();
-                    
+
                     float deltaTime = (end - start) / 1000;
-                    
                     
                     Runtime runtime = Runtime.getRuntime();
                     // force running the garbage collector
@@ -113,6 +124,13 @@ public class HttpExporter {
                     total_time_running.inc(deltaTime);
                     
                     memory_process.set(memory);
+                    
+                    List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
+                    for(ScholiaContentPage scp : scholiaContentPageList2) {
+                    	scp.getBackendPerformance();
+                        //scp.getSuccessTestResultList();
+                    	//scp.getFailureTestResultList();
+                    }
                     
                     logger.info("Run time delta: "+deltaTime+" seconds");
                     logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
