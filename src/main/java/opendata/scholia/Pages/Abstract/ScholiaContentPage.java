@@ -22,6 +22,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.prometheus.client.Counter;
 import opendata.scholia.Tests.TestBase;
+import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.DiskWriter;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -32,10 +33,10 @@ public abstract class ScholiaContentPage{
 	
 	private String pageTypeId = "_unknown";
 	
-	static final int WEBPAGE_TIMEOUT = 30;
-
 	public static final String SPARQL_IFRAME_WIDGET = "SPARQL_IFRAME_WIDGET";
 	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_IFRAME_WIDGET";
+	
+	private int webpageTimeout = 120;
 	
 	protected WebDriver driver;
 	
@@ -60,6 +61,7 @@ public abstract class ScholiaContentPage{
 	//	      .help("Failed.").register();
 	
     public ScholiaContentPage(WebDriver driver) {
+    	webpageTimeout = ConfigManager.instance().getConfig().getInt("webpageTimeout", 120);
     	initDriver(driver);
     }
     
@@ -184,7 +186,7 @@ public abstract class ScholiaContentPage{
 		// Getting the page source once is not enough. The content changes with ajax async calls
 		// Polling, to find status changes
 		// Maximum running limit 60 seconds
-		while(waitForSeconds++ < ScholiaContentPage.WEBPAGE_TIMEOUT && !(queryFinished  && checkOnceMore > 0)) {
+		while(waitForSeconds++ < ScholiaContentPage.webpageTimeout && !(queryFinished  && checkOnceMore > 0)) {
 			SimpleDateFormat formatter= new SimpleDateFormat("mmss");
 			Date date = new Date(System.currentTimeMillis());
 			String suffix = formatter.format(date);
@@ -216,7 +218,7 @@ public abstract class ScholiaContentPage{
 		
 		
 		// compared with lower case
-		if(waitForSeconds >= ScholiaContentPage.WEBPAGE_TIMEOUT || 
+		if(waitForSeconds >= ScholiaContentPage.webpageTimeout || 
 		   pageSource.contains("query timeout limit reached") ||
 		   pageSource.contains("unable to display result") ||
 		   pageSource.contains("server error: unexpected end of json input")
