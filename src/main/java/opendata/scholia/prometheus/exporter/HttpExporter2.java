@@ -20,22 +20,22 @@ import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.Tests.SPARQLWidgetTest;
 import opendata.scholia.Tests.TableTest;
 
-public class HttpExporter {
+public class HttpExporter2 {
 	//TOOD a bit ugly. Improve code
 	
-	private static final Logger logger  = LogManager.getLogger(HttpExporter.class);
+	private static final Logger logger  = LogManager.getLogger(HttpExporter2.class);
 
 	
-    static final Counter pages_total = Counter.build().name("scholia_pagestested_total").help("total pages tested").register();
+    static final Counter tested_pages_total = Counter.build().name("scholia_pagestested_total").help("total pages tested").register();
    
-    static final Counter datatablesTotal = Counter.build().name("scholia_widgets_datatables_total").help("total datatables tested").labelNames("page_family").register();
-    static final Counter datatablesErrors = Counter.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").labelNames("page_family").register();
+    static final Counter tested_datatables_total = Counter.build().name("scholia_widgets_datatables_total").help("total datatables tested").register();
+    static final Counter datatables_errors =       Counter.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").register();
     
-    static final Counter sparqlWidgetsTotal  = Counter.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").labelNames("page_family").register();
- 	static final Counter sparqlWidgetsErrors = Counter.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").labelNames("page_family").register();
+    static final Counter tested_SPARQLWidgets_total  = Counter.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").register();
+ 	static final Counter tested_SPARQLWidgets_errors = Counter.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").register();
     
-    static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
-    static final Gauge memoryProcess = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
+    static final Gauge total_time_running = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
+    static final Gauge memory_process = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
     static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
     static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
@@ -80,20 +80,10 @@ public class HttpExporter {
                     int runCount2 = result2.getRunCount();
                     
                     
-                    List<ScholiaContentPage> scholiaContentPageL = PageFactory.instance().pageList();                   
-                    
-                    int tFailures = 0;
-                    int tSuccess = 0;
-                    int tTotal = 0;
-                    for(ScholiaContentPage scp : scholiaContentPageL){
-                    	tFailures += scp.getFailureTestResultList().size();
-                    	tSuccess += scp.getSuccessTestResultList().size();
-                    }
-                    tTotal = tFailures + tSuccess;
-                    
                     long end = System.currentTimeMillis();
-
+                    
                     float deltaTime = (end - start) / 1000;
+                    
                     
                     Runtime runtime = Runtime.getRuntime();
                     // force running the garbage collector
@@ -104,35 +94,35 @@ public class HttpExporter {
                     logger.info("Used memory (in megabytes): "
                             + bytesToMegabytes(memory));
                     
+                    //for(Failure failure : failureList) {
+                    //	System.out.println(failure.getMessage());
+                    //}
+   
+                    int totalFailures = failureCount + failureCount2;
+                    int totalRanTests = runCount + runCount2;
+                    int totalSuccess  = totalRanTests - totalFailures;
                     
-                    pages_total.inc(sUrlList.size());
                     
-                    totalTimeRunning.inc(deltaTime);
+                    datatables_errors.inc(failureCount);
+                    tested_datatables_total.inc(dataTableWidgetTotal);
                     
-                    memoryProcess.set(memory);
+                    tested_SPARQLWidgets_errors.inc(failureCount2);
+                    tested_SPARQLWidgets_total.inc(runCount2);
+                    
+                    tested_pages_total.inc(sUrlList.size());
+                    
+                    total_time_running.inc(deltaTime);
+                    
+                    memory_process.set(memory);
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
                     for(ScholiaContentPage scp : scholiaContentPageList2) {
-                    	
-                    	double dtFailureCount = scp.getFailureTestResultList(ScholiaContentPage.SPARQL_DATATABLE_WIDGET).size();
-                    	double dtSuccessCount = scp.getSuccessTestResultList(ScholiaContentPage.SPARQL_DATATABLE_WIDGET).size();
-                    	double dtTotalTests   = dtFailureCount + dtSuccessCount;
-                    	
-                    	double isFailureCount = scp.getFailureTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
-                    	double isSuccessCount = scp.getSuccessTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
-                    	double isTotalTests   = dtFailureCount + dtSuccessCount;
-                    			
-                    	datatablesTotal.labels(scp.getPageTypeId()).inc(dtTotalTests);
-                    	datatablesErrors.labels(scp.getPageTypeId()).inc(dtFailureCount);
-                    	//tested_datatables_total.labels(labelValues)
-                    	//backendperformance. = scp.getBackendPerformance();
-                    	
-                        //scp.getSuccessTestResultList();
-                    	//scp.getFailureTestResultList();
+                    	//backendperformance.
+                    	//backendperformance.collect();
                     }
                     
                     logger.info("Run time delta: "+deltaTime+" seconds");
-                    //logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
+                    logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
                     logger.info("Run time Delta: "+deltaTime+" seconds");
                         
                     Thread.sleep(1000 * 60* 60); //every hour

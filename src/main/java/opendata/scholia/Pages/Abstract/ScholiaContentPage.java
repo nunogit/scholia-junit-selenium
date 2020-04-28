@@ -33,6 +33,9 @@ public abstract class ScholiaContentPage{
 	private String pageTypeId = "_unknown";
 	
 	static final int WEBPAGE_TIMEOUT = 30;
+
+	public static final String SPARQL_IFRAME_WIDGET = "SPARQL_IFRAME_WIDGET";
+	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_IFRAME_WIDGET";
 	
 	protected WebDriver driver;
 	
