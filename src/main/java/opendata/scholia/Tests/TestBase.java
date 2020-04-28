@@ -240,7 +240,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 	public static List<String> loadFromGit(){
 		GitReader gitReader = new GitReader();
 		try {
-			String sURL = ConfigManager.instance().getConfig().getString("pagetestset", "https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/.csv");
+			String sURL = ConfigManager.instance().getConfig().getString("pagetestset", "https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/pagetotest.csv");
 			gitReader.setURL(sURL);
 			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
 		} catch (MalformedURLException e) {
