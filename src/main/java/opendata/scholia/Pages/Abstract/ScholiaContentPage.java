@@ -186,7 +186,7 @@ public abstract class ScholiaContentPage{
 		// Getting the page source once is not enough. The content changes with ajax async calls
 		// Polling, to find status changes
 		// Maximum running limit 60 seconds
-		while(waitForSeconds++ < ScholiaContentPage.webpageTimeout && !(queryFinished  && checkOnceMore > 0)) {
+		while(waitForSeconds++ < webpageTimeout && !(queryFinished  && checkOnceMore > 0)) {
 			SimpleDateFormat formatter= new SimpleDateFormat("mmss");
 			Date date = new Date(System.currentTimeMillis());
 			String suffix = formatter.format(date);
@@ -218,7 +218,7 @@ public abstract class ScholiaContentPage{
 		
 		
 		// compared with lower case
-		if(waitForSeconds >= ScholiaContentPage.webpageTimeout || 
+		if(waitForSeconds >= webpageTimeout || 
 		   pageSource.contains("query timeout limit reached") ||
 		   pageSource.contains("unable to display result") ||
 		   pageSource.contains("server error: unexpected end of json input")
