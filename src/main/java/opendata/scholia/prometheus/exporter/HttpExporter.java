@@ -25,8 +25,7 @@ public class HttpExporter {
 	
 	private static final Logger logger  = LogManager.getLogger(HttpExporter.class);
 
-	
-    static final Counter pages_total = Counter.build().name("scholia_pagestested_total").help("total pages tested").register();
+    static final Counter pagesTotal = Counter.build().name("scholia_pagestested_total").help("total pages tested").register();
    
     static final Counter datatablesTotal = Counter.build().name("scholia_widgets_datatables_total").help("total datatables tested").labelNames("page_family").register();
     static final Counter datatablesErrors = Counter.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").labelNames("page_family").register();
@@ -34,6 +33,7 @@ public class HttpExporter {
     static final Counter sparqlWidgetsTotal  = Counter.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").labelNames("page_family").register();
  	static final Counter sparqlWidgetsErrors = Counter.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").labelNames("page_family").register();
     
+	static final Counter seleniumRunsTotal = Counter.build().name("scholia_seleniumtest_runs_total").help("total amount of times selenium has run").register();
     static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
     static final Gauge memoryProcess = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
@@ -105,7 +105,7 @@ public class HttpExporter {
                             + bytesToMegabytes(memory));
                     
                     
-                    pages_total.inc(sUrlList.size());
+                    pagesTotal.inc(sUrlList.size());
                     
                     totalTimeRunning.inc(deltaTime);
                     
@@ -130,6 +130,8 @@ public class HttpExporter {
                         //scp.getSuccessTestResultList();
                     	//scp.getFailureTestResultList();
                     }
+                    
+                    seleniumRunsTotal.inc();
                     
                     logger.info("Run time delta: "+deltaTime+" seconds");
                     //logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
