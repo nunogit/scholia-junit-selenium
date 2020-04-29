@@ -168,7 +168,7 @@ public abstract class ScholiaContentPage{
 	}
 	
 	//TODO improve this in the future
-	public boolean isIframeWidgetWorking(String urlString, int iframeSeqid) {
+	public int checkIframeWidgetRuntime(String urlString, int iframeSeqid) {
 		
 		driver.get(urlString);
 		
@@ -223,11 +223,11 @@ public abstract class ScholiaContentPage{
 		   pageSource.contains("unable to display result") ||
 		   pageSource.contains("server error: unexpected end of json input")
 		   ) {
-			return false;
+			return -1;
 		 }
 		
         //driver.switchTo().defaultContent();
-		return true;
+		return waitForSeconds;
 	}
 	
 	public int getDataTableSize(String dataTableId) {
