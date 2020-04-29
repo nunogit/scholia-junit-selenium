@@ -19,6 +19,7 @@ import opendata.scholia.Pages.PageFactory;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.Tests.SPARQLWidgetTest;
 import opendata.scholia.Tests.TableTest;
+import opendata.scholia.util.Uname;
 
 public class HttpExporter {
 	//TOOD a bit ugly. Improve code
@@ -40,7 +41,11 @@ public class HttpExporter {
     static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
     static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
 
-    
+    static final Gauge nodeInfo = Gauge.build().name("scholia_node_info").labelNames("sysname","nodename","release","version","machine","domainname","scholiaid").help("node information").register();
+        		
+    		
+    //node_uname_info{domainname="(none)",machine="x86_64",nodename="ubuntu-s-1vcpu-1gb-ams3-01",release="4.15.0-96-generic",sysname="Linux",version="#97-Ubuntu SMP Wed Apr 1 03:25:46 UTC 2020"} 1
+
     
     //static final Counter c = Counter.build().name("counter").help("meh").register();
     //static final Summary  s = Summary.build().name("summary").help("meh").register();
@@ -50,6 +55,9 @@ public class HttpExporter {
     public static void main(String[] args) throws Exception {
         new HTTPServer(1234);
         
+        
+        Uname uname = new Uname();
+        nodeInfo.labels(uname.sysname, uname.nodename, uname.release, uname.version, uname.machine, uname.domainname, uname.scholiaid).set(1);
         
         Thread bgThread = new Thread(() -> {
             while (true) {
