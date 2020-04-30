@@ -12,8 +12,8 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 
 
 public class ConfigManager {
-    private static final String PROPERTIES_FILE_NAME = "/home/nuno/dev/scholia/Java-Junit-Selenium/config.properties";
-    static private ConfigManager _instance = null;
+    private String propertiesFileName = "";
+    private static ConfigManager _instance = null;
     private  PropertiesConfiguration config;
     
     public  PropertiesConfiguration getConfig() {
@@ -22,13 +22,16 @@ public class ConfigManager {
 	
 	protected ConfigManager() {
         config = new PropertiesConfiguration();
+        
+        propertiesFileName = System.getenv("SCHOLIA_CONFIG");
+        
         Configurations configs = new Configurations();
 		try
 		{
 			FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
 				    new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
 				    .configure(new Parameters().properties()
-				        .setFileName(PROPERTIES_FILE_NAME)
+				        .setFileName(propertiesFileName)
 				        .setThrowExceptionOnMissing(true)
 //				        .setListDelimiterHandler(new DefaultListDelimiterHandler(';'))
 				        .setIncludesAllowed(false));
