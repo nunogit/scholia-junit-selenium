@@ -38,6 +38,8 @@ RUN ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
 ENV DRIVER /usr/local/bin/chromedriver
 ENV CHROME_BIN /usr/bin/google-chrome
 ENV DISPLAY ':99.0'
+ENV SCHOLIA_CONFIG /scholia/config-test.properties
+
 
 CMD /usr/bin/Xvfb &
 
