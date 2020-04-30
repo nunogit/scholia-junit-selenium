@@ -143,7 +143,7 @@ public class TableTest extends TestBase {
 	@Test
 	public void testDataTables3() {
 		scholiaContentPage.setDriver(driver);
-		System.out.println("testing  " + scholiaContentPage + "#" +widgetId);
+		System.out.println("[datatable] testing  " + scholiaContentPage + "#" +widgetId);
 		testPage(scholiaContentPage, widgetId);
 	}
 	

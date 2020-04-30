@@ -65,9 +65,8 @@ public class SPARQLWidgetTest extends TestBase {
 
 	@Test
 	public void testDataTables3() {
-		System.out.println("testing... " + scholiaContentPage.getURL());
+		System.out.println("[WidgetTest] testing " + scholiaContentPage.getURL() + " #" + iframeSeqId);
 		scholiaContentPage.setDriver(driver);
-		System.out.println("testing  " + scholiaContentPage);
 		testPage(scholiaContentPage, sURL, this.iframeSeqId);
 	}
 
