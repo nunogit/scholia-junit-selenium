@@ -7,11 +7,19 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import opendata.scholia.prometheus.exporter.HttpExporter;
+
 import org.apache.commons.configuration2.PropertiesConfiguration;
 
 
 
 public class ConfigManager {
+	
+	private static final Logger logger  = LogManager.getLogger(ConfigManager.class);
+	
     private String propertiesFileName = "";
     private static ConfigManager _instance = null;
     private  PropertiesConfiguration config;
@@ -24,6 +32,7 @@ public class ConfigManager {
         config = new PropertiesConfiguration();
         
         propertiesFileName = System.getenv("SCHOLIA_CONFIG");
+        System.out.println("Loading configuration file: "+propertiesFileName);
         
         Configurations configs = new Configurations();
 		try
