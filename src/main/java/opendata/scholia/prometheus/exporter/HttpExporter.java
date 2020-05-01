@@ -26,13 +26,13 @@ public class HttpExporter {
 	
 	private static final Logger logger  = LogManager.getLogger(HttpExporter.class);
 
-    static final Gauge pagesTotal = Gauge.build().name("scholia_pagestested_total").help("total pages tested").register();
+    static final Gauge pagesTotal = Gauge.build().name("scholia_pagestested").help("total pages tested").register();
    
-    static final Gauge datatablesTotal = Gauge.build().name("scholia_widgets_datatables_total").help("total datatables tested").labelNames("page_family").register();
-    static final Gauge datatablesErrors = Gauge.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").labelNames("page_family").register();
+    static final Gauge datatablesTotal = Gauge.build().name("scholia_widgets_datatables").help("total datatables tested").labelNames("page_family").register();
+    static final Gauge datatablesErrors = Gauge.build().name("scholia_widgets_datatables_errors").help("errors in datatables").labelNames("page_family").register();
     
-    static final Gauge sparqlWidgetsTotal  = Gauge.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").labelNames("page_family").register();
- 	static final Gauge sparqlWidgetsErrors = Gauge.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").labelNames("page_family").register();
+    static final Gauge sparqlWidgetsTotal  = Gauge.build().name("scholia_widgets_sparqliframe").help("total datatables tested").labelNames("page_family").register();
+ 	static final Gauge sparqlWidgetsErrors = Gauge.build().name("scholia_widgets_sparqliframe_errors").help("total datatables tested").labelNames("page_family").register();
     
 	static final Counter seleniumRunsTotal = Counter.build().name("scholia_seleniumtest_runs_total").help("total amount of times selenium has run").register();
     static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
