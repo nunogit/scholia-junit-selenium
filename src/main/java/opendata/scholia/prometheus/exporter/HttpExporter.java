@@ -26,13 +26,13 @@ public class HttpExporter {
 	
 	private static final Logger logger  = LogManager.getLogger(HttpExporter.class);
 
-    static final Counter pagesTotal = Counter.build().name("scholia_pagestested_total").help("total pages tested").register();
+    static final Gauge pagesTotal = Gauge.build().name("scholia_pagestested_total").help("total pages tested").register();
    
-    static final Counter datatablesTotal = Counter.build().name("scholia_widgets_datatables_total").help("total datatables tested").labelNames("page_family").register();
-    static final Counter datatablesErrors = Counter.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").labelNames("page_family").register();
+    static final Gauge datatablesTotal = Gauge.build().name("scholia_widgets_datatables_total").help("total datatables tested").labelNames("page_family").register();
+    static final Gauge datatablesErrors = Gauge.build().name("scholia_widgets_datatables_errors_total").help("errors in datatables").labelNames("page_family").register();
     
-    static final Counter sparqlWidgetsTotal  = Counter.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").labelNames("page_family").register();
- 	static final Counter sparqlWidgetsErrors = Counter.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").labelNames("page_family").register();
+    static final Gauge sparqlWidgetsTotal  = Gauge.build().name("scholia_widgets_sparqliframe_total").help("total datatables tested").labelNames("page_family").register();
+ 	static final Gauge sparqlWidgetsErrors = Gauge.build().name("scholia_widgets_sparqliframe_errors_total").help("total datatables tested").labelNames("page_family").register();
     
 	static final Counter seleniumRunsTotal = Counter.build().name("scholia_seleniumtest_runs_total").help("total amount of times selenium has run").register();
     static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
@@ -113,9 +113,9 @@ public class HttpExporter {
                             + bytesToMegabytes(memory));
                     
                     
-                    pagesTotal.inc(sUrlList.size());
+                    pagesTotal.set(sUrlList.size());
                     
-                    totalTimeRunning.inc(deltaTime);
+                    totalTimeRunning.set(deltaTime);
                     
                     memoryProcess.set(memory);
                     
@@ -130,8 +130,11 @@ public class HttpExporter {
                     	double isSuccessCount = scp.getSuccessTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
                     	double isTotalTests   = dtFailureCount + dtSuccessCount;
                     			
-                    	datatablesTotal.labels(scp.getPageTypeId()).inc(dtTotalTests);
-                    	datatablesErrors.labels(scp.getPageTypeId()).inc(dtFailureCount);
+                    	datatablesTotal.labels(scp.getPageTypeId()).set(dtTotalTests);
+                    	datatablesErrors.labels(scp.getPageTypeId()).set(dtFailureCount);
+                    	sparqlWidgetsTotal.labels(scp.getPageTypeId()).set(isTotalTests);
+                    	sparqlWidgetsErrors.labels(scp.getPageTypeId()).set(isFailureCount);
+                    	
                     	//tested_datatables_total.labels(labelValues)
                     	//backendperformance. = scp.getBackendPerformance();
                     	
