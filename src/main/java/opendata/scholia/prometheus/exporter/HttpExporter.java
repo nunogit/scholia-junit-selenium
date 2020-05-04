@@ -1,6 +1,8 @@
 package opendata.scholia.prometheus.exporter;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,9 +40,12 @@ public class HttpExporter {
     static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
     static final Gauge memoryProcess = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
-    static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
-    static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
+   // static final Gauge backendperformance = Gauge.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
+   // static final Gauge frontendperformance = Gauge.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
 
+    static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").labelNames("page_family").register();
+    static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").labelNames("page_family").register();
+    
     static final Gauge nodeInfo = Gauge.build().name("scholia_node_info").labelNames("sysname","nodename","release","version","machine","domainname","scholiaid").help("node information").register();
         		
     		
@@ -63,7 +68,9 @@ public class HttpExporter {
             while (true) {
                 try {
                     List<String> sUrlList = TableTest.loadFromGit();
-                     
+                    
+                    HashMap<String, List<Long>> backendPerformanceBag  = new HashMap<String, List<Long>>();
+                    HashMap<String, List<Long>> frontendPerformanceBag = new HashMap<String, List<Long>>();
                     
                     List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
                     int dataTableWidgetTotal  = 0;
@@ -134,6 +141,17 @@ public class HttpExporter {
                     	datatablesErrors.labels(scp.getPageTypeId()).set(dtFailureCount);
                     	sparqlWidgetsTotal.labels(scp.getPageTypeId()).set(isTotalTests);
                     	sparqlWidgetsErrors.labels(scp.getPageTypeId()).set(isFailureCount);
+                    	
+                    	//List<Long> backendbag = backendPerformanceBag.get(scp.getPageTypeId()) !=null ? backendPerformanceBag.get(scp.getPageTypeId()) : new ArrayList<Long>();  
+                    	//backendbag.add(scp.getBackendPerformance());
+                    	//backendPerformanceBag.put(scp.getPageTypeId(), backendbag);
+                    	
+                    	//List<Long> frontendbag = backendPerformanceBag.get(scp.getPageTypeId()) !=null ? backendPerformanceBag.get(scp.getPageTypeId()) : new ArrayList<Long>();  
+                    	//frontendbag.add(scp.getBackendPerformance());
+                    	//backendPerformanceBag.put(scp.getPageTypeId(), frontendbag);
+         
+                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance());
+                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance());
                     	
                     	//tested_datatables_total.labels(labelValues)
                     	//backendperformance. = scp.getBackendPerformance();
