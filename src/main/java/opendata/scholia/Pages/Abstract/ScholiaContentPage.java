@@ -69,11 +69,13 @@ public abstract class ScholiaContentPage{
 			logger.info( "loading... "+this.getURL() );
 			//if(driver.getCurrentUrl()!=this.getURL())
 			driver.get(this.getURL());	
-			driver.findElements(By.ByXPath());
+			
+			//driver.findElements(By.ByXPath());
 			
 			
 			//h2/following::iframe
 			//h2/following::iframe
+			//iframe/ancestor::h2
 			
 			List<WebElement> webElementList = driver.findElements(By.tagName("iframe"));
 			return webElementList;
