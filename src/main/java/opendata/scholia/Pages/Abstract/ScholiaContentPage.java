@@ -36,7 +36,7 @@ public abstract class ScholiaContentPage{
 	public static final String SPARQL_IFRAME_WIDGET = "SPARQL_IFRAME_WIDGET";
 	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_IFRAME_WIDGET";
 	
-	private int webpageTimeout = 120;
+	private int webpageTimeout;
 	
 	protected WebDriver driver;
 	
@@ -61,19 +61,26 @@ public abstract class ScholiaContentPage{
 	//	      .help("Failed.").register();
 	
     public ScholiaContentPage(WebDriver driver) {
-    	webpageTimeout = ConfigManager.instance().getConfig().getInt("webpageTimeout", 120);
-    	initDriver(driver);
+    	    initDriver(driver);
+    	    init();
     }
     
     public List<WebElement> getWebElementList() {
 			logger.info( "loading... "+this.getURL() );
+			//if(driver.getCurrentUrl()!=this.getURL())
 			driver.get(this.getURL());	
+			driver.findElements(By.ByXPath());
+			
+			
+			//h2/following::iframe
+			//h2/following::iframe
+			
 			List<WebElement> webElementList = driver.findElements(By.tagName("iframe"));
 			return webElementList;
     }
     
     public ScholiaContentPage() {
-    	init();
+    	    init();
     }
     
     private void initDriver(WebDriver driver) {
@@ -86,6 +93,9 @@ public abstract class ScholiaContentPage{
     }
     
     private void init() {
+    	webpageTimeout = ConfigManager.instance().getConfig().getInt("webpageTimeout", 11);
+    	System.out.println("--------------------------");
+    	System.out.println("timeout... "+ webpageTimeout);
     	dataTableMap = new HashMap();
     	widgetMap = new HashMap();
     }
@@ -101,6 +111,7 @@ public abstract class ScholiaContentPage{
     	
     	
     	if(!url.contentEquals(this.driver.getCurrentUrl())) {
+    		logger.debug("Loading URL: "+this.driver.getCurrentUrl());
     		this.driver.get(url);
     		
     		//A page can  be loaded more than once
@@ -117,7 +128,7 @@ public abstract class ScholiaContentPage{
     			frontendPerformance = domComplete - responseStart;
     		}
     	} else
-    		logger.debug("URL already visited");
+    		logger.debug("URL already visited: "+this.driver.getCurrentUrl());
 	}
     
 	public void addDataTable(String widgetId) {
@@ -170,6 +181,7 @@ public abstract class ScholiaContentPage{
 	//TODO improve this in the future
 	public int checkIframeWidgetRuntime(String urlString, int iframeSeqid) {
 		
+		System.out.println("Testing "+urlString);
 		driver.get(urlString);
 		
 		//apparently the iframe was not rendering properly.
@@ -201,6 +213,7 @@ public abstract class ScholiaContentPage{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			System.out.println("Waiting for..."+waitForSeconds);
 
 			if(!pageSource.contains("running query") && !pageSource.contains("<svg") ){
 				//not needed; present for documentation for logic purposes;

@@ -1,12 +1,17 @@
 package opendata.scholia.prometheus.exporter;
 
 
+import java.net.URISyntaxException;
+import java.security.Timestamp;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -21,6 +26,7 @@ import opendata.scholia.Pages.PageFactory;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.Tests.SPARQLWidgetTest;
 import opendata.scholia.Tests.TableTest;
+import opendata.scholia.util.GitWriter;
 import opendata.scholia.util.Uname;
 
 public class HttpExporter {
@@ -125,6 +131,7 @@ public class HttpExporter {
                     totalTimeRunning.set(deltaTime);
                     
                     memoryProcess.set(memory);
+                    String log4Git = "";
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
                     for(ScholiaContentPage scp : scholiaContentPageList2) {
@@ -153,12 +160,29 @@ public class HttpExporter {
                     	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance());
                     	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance());
                     	
+                    	for(String failure : scp.getFailureTestResultList()) {
+                       	 log4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
+                    	}
+                    	
                     	//tested_datatables_total.labels(labelValues)
                     	//backendperformance. = scp.getBackendPerformance();
                     	
                         //scp.getSuccessTestResultList();
                     	//scp.getFailureTestResultList();
+                    	
                     }
+                    
+                	try {
+                		System.out.println("Writing to git...");
+                		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+                		long timestamp = System.currentTimeMillis();
+                		String sTimestamp = sdf.format(timestamp);
+						GitWriter.write("/", sTimestamp+".log", log4Git);
+					} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
                     
                     seleniumRunsTotal.inc();
                     

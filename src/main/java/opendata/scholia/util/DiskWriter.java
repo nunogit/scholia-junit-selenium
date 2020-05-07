@@ -6,18 +6,32 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class DiskWriter {
-	private static String path = "/tmp/pages/";
+	private static String DEFAULT_PATH = "/tmp/pages/";
+	
+	
+	public static void write(String lpath, String fileName, String content, boolean replaceSpecialCharacter) {
+	 	FileWriter fileWriter;
+		try {
+			if(replaceSpecialCharacter)
+				fileName = fileName.replaceAll("\\W+", "");
+			fileWriter = new FileWriter(lpath+ fileName );
+		    PrintWriter printWriter = new PrintWriter(fileWriter);
+		    printWriter.print(content);
+		    printWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+	
+	
+	public static void write(String fileName, String content, boolean replaceSpecialCharacter) {
+			DiskWriter.write(DEFAULT_PATH, fileName, content, replaceSpecialCharacter);
+	}
 	
 	public static void write(String fileName, String content) {
-		 	FileWriter fileWriter;
-			try {
-				fileWriter = new FileWriter(path+ fileName.replaceAll("\\W+", "") );
-			    PrintWriter printWriter = new PrintWriter(fileWriter);
-			    printWriter.print(content);
-			    printWriter.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-	}
+		DiskWriter.write(DEFAULT_PATH, fileName, content, true);
+    }
+	
+	
+	
 }

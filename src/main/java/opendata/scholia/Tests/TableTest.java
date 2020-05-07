@@ -130,10 +130,7 @@ public class TableTest extends TestBase {
 	}
 	
 	void testPage(ScholiaContentPage scPage, String widgetId) {
-		scPage.visitPage();
-
 		List<String> idList = scPage.dataTableIdList();
-		
 		int dataTableSize = scPage.getDataTableSize(widgetId);
 		logger.debug(dataTableSize + " rows in" + widgetId+ " @ " + scPage.getURL());
 		assertTrue(dataTableSize > 0);
@@ -143,6 +140,7 @@ public class TableTest extends TestBase {
 	@Test
 	public void testDataTables3() {
 		scholiaContentPage.setDriver(driver);
+		scholiaContentPage.visitPage();
 		System.out.println("[datatable] testing  " + scholiaContentPage + "#" +widgetId);
 		testPage(scholiaContentPage, widgetId);
 	}
@@ -187,9 +185,6 @@ public class TableTest extends TestBase {
 		}
 		
 		
-	
-	
-
 		return stringURLCollection;
 	}
 	
