@@ -300,6 +300,8 @@ public abstract class ScholiaContentPage{
 	}
 	
 	public List<String> getSuccessTestResultList(String tag) {
+		if(successList.get(tag)==null)
+			successList.put(tag, new ArrayList<String>());
 		return successList.get(tag);
 	}
 	
@@ -312,6 +314,8 @@ public abstract class ScholiaContentPage{
 	}
 	
 	public List<String> getFailureTestResultList(String tag) {
+		if(failureList.get(tag)==null)
+			failureList.put(tag, new ArrayList<String>());
 		return failureList.get(tag);
 	}
 	
