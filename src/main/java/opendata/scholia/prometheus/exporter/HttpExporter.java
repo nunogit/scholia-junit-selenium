@@ -26,6 +26,7 @@ import opendata.scholia.Pages.PageFactory;
 import opendata.scholia.Pages.Abstract.ScholiaContentPage;
 import opendata.scholia.Tests.SPARQLWidgetTest;
 import opendata.scholia.Tests.TableTest;
+import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.GitWriter;
 import opendata.scholia.util.Uname;
 
@@ -80,8 +81,10 @@ public class HttpExporter {
                     
                     List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
                     int dataTableWidgetTotal  = 0;
-                    for(ScholiaContentPage scp : scholiaContentPageList) 
+                    for(ScholiaContentPage scp : scholiaContentPageList) {
+                    	scp.clearResults();
                     	dataTableWidgetTotal += scp.dataTableIdList().size();
+                    }
                     
                     
                     
@@ -135,7 +138,7 @@ public class HttpExporter {
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
                     for(ScholiaContentPage scp : scholiaContentPageList2) {
-                    	
+	                    	
                     	double dtFailureCount = scp.getFailureTestResultList(ScholiaContentPage.SPARQL_DATATABLE_WIDGET).size();
                     	double dtSuccessCount = scp.getSuccessTestResultList(ScholiaContentPage.SPARQL_DATATABLE_WIDGET).size();
                     	double dtTotalTests   = dtFailureCount + dtSuccessCount;
@@ -156,9 +159,12 @@ public class HttpExporter {
                     	//List<Long> frontendbag = backendPerformanceBag.get(scp.getPageTypeId()) !=null ? backendPerformanceBag.get(scp.getPageTypeId()) : new ArrayList<Long>();  
                     	//frontendbag.add(scp.getBackendPerformance());
                     	//backendPerformanceBag.put(scp.getPageTypeId(), frontendbag);
-         
-                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance());
-                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance());
+                    	
+                        System.out.println("Adding front end performance ("+scp.getPageTypeId()+"):"+scp.getFrontendPerformance());
+                        System.out.println("Adding back  end performance ("+scp.getPageTypeId()+"):"+scp.getBackendPerformance());
+
+                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance()/1000);
+                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000);
                     	
                     	for(String failure : scp.getFailureTestResultList()) {
                        	 log4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
@@ -190,8 +196,8 @@ public class HttpExporter {
                     //logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
                     logger.info("Run time Delta: "+deltaTime+" seconds");
                         
-                    Thread.sleep(1000 * 60* 60); //every hour
-                    
+                    int timeBetweenTests = ConfigManager.instance().getConfig().getInt("timeBetweenTests", 0);	
+                    Thread.sleep(1000 * 60* timeBetweenTests); //interval between tests
 
                     
                 } catch (InterruptedException e) {

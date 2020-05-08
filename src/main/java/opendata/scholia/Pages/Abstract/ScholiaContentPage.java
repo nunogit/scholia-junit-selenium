@@ -285,6 +285,11 @@ public abstract class ScholiaContentPage{
 		list.add(failureDescription);
 
 	}
+
+	public void clearResults() {
+		failureList = new HashMap<String, ArrayList<String>>();
+		successList = new HashMap<String, ArrayList<String>>();
+	}
 	
 	public List<String> getSuccessTestResultList() {
 		List<String> result = new ArrayList<String>();
