@@ -216,15 +216,19 @@ public abstract class ScholiaContentPage{
 				e.printStackTrace();
 			}
 			System.out.println("Waiting for..."+waitForSeconds);
-
-			if(!pageSource.contains("running query") && !pageSource.contains("<svg") ){
+			
+			//String successString = "<div id=\"loading-spinner\" style=\"display: none;\">";
+			//String successString = "<svg";
+			String successString = "<div class=\"action-bar\" style=\"display: none;\">";
+			
+			if(!pageSource.contains("running query") && !pageSource.contains(successString) ){
 				//not needed; present for documentation for logic purposes;
-		    } else if(pageSource.contains("running query") && !pageSource.contains("<svg") ) {
+		    } else if(pageSource.contains("running query") && !pageSource.contains(successString) ) {
 		    	//present for logic purposes. Not needed, may be removed in the future
-		    } else if(pageSource.contains("running query") && pageSource.contains("<svg") ){
+		    } else if(pageSource.contains("running query") && pageSource.contains(successString) ){
 		    	//ambiguous state, the svg graph is not totally loaded, but the query is still running
 		    	//not sure if this state is achievable; present for documentation purposes
-		    } else if(!pageSource.contains("running query") && pageSource.contains("<svg") ) {
+		    } else if(!pageSource.contains("running query") && pageSource.contains(successString) ) {
 		    	queryFinished = true;
 		    	checkOnceMore++; //checkOnceMore. Updates on HTML may still happen and this gives it an extra oportunity
 		    }
