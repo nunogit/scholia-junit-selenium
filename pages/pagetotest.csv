@@ -36,13 +36,24 @@ https://tools.wmflabs.org/scholia/sponsor/Q583725
 https://tools.wmflabs.org/scholia/series/Q924044
 https://tools.wmflabs.org/scholia/taxon/Q15978631
 https://tools.wmflabs.org/scholia/taxon/Q82069695
+https://tools.wmflabs.org/scholia/topic/Q15 # Africa; fails in multiple ways
 https://tools.wmflabs.org/scholia/topic/Q52
 https://tools.wmflabs.org/scholia/topic/Q532
 https://tools.wmflabs.org/scholia/topic/Q668
-https://tools.wmflabs.org/scholia/topic/Q41112
-https://tools.wmflabs.org/scholia/topic/Q41112/missing
-https://tools.wmflabs.org/scholia/topic/Q12156
-https://tools.wmflabs.org/scholia/topic/Q12156/missing
+https://tools.wmflabs.org/scholia/topic/Q41112 # schizophrenia; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q41112/missing # schizophrenia; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q12156 # malaria; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q12156/missing # malaria; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q12174	# obesity; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q12174/missing	# obesity; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q29496 # leukemia; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q29496/missing # leukemia; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q111140 # endothelium; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q111140/missing # endothelium; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q181600 # patient; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q181600/missing # patient; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q1492760	# teenager; over 50k publications
+https://tools.wmflabs.org/scholia/topic/Q1492760/missing	# teenager; over 50k publications
 https://tools.wmflabs.org/scholia/topic/Q583725
 https://tools.wmflabs.org/scholia/topic/Q81068910
 https://tools.wmflabs.org/scholia/topic/Q82069695
