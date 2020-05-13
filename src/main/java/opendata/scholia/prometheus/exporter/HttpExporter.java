@@ -76,8 +76,8 @@ public class HttpExporter {
                 try {
                     List<String> sUrlList = TableTest.loadFromGit();
                     
-                    HashMap<String, List<Long>> backendPerformanceBag  = new HashMap<String, List<Long>>();
-                    HashMap<String, List<Long>> frontendPerformanceBag = new HashMap<String, List<Long>>();
+                    //HashMap<String, List<Long>> backendPerformanceBag  = new HashMap<String, List<Long>>();
+                    //HashMap<String, List<Long>> frontendPerformanceBag = new HashMap<String, List<Long>>();
                     
                     List<ScholiaContentPage> scholiaContentPageList = TableTest.getScholiaContentPageList(sUrlList);
                     int dataTableWidgetTotal  = 0;
