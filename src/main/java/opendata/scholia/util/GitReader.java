@@ -54,7 +54,8 @@ public class GitReader {
 
             buffer = new BufferedReader(input);
             while ((l = buffer.readLine()) != null) {
-            	if(! l.trim().startsWith("#") )
+            	l = checkLine(l);
+            	if(l!=null)
             		line.add(l);
             }
 
@@ -74,6 +75,15 @@ public class GitReader {
     	return line;
 	}
 	
+	
+	private String checkLine(String line) {
+		if( line.trim().startsWith("#") ) return null;  //discard lines with comments
+		
+		if(line.contains(" #")) //check if it contains a comment
+			return line.split(" #")[0].trim(); //split by comment identifier. Pick firs substring, clean
+		else return line;
+		
+	}
 
 
 }
