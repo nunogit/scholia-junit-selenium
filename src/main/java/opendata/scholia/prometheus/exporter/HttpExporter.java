@@ -189,6 +189,7 @@ public class HttpExporter {
                 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
                 		long timestamp = System.currentTimeMillis();
                 		String sTimestamp = sdf.format(timestamp);
+                		System.out.println("FAILURE LOG"+failureLog4Git);
 						GitWriter.write("/", sTimestamp+".log", failureLog4Git);
 						GitWriter.write("/", "success-"+sTimestamp+".log", successLog4Git);
 					} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
