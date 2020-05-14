@@ -134,7 +134,9 @@ public class HttpExporter {
                     totalTimeRunning.set(deltaTime);
                     
                     memoryProcess.set(memory);
-                    String log4Git = "";
+                    String successLog4Git = "";
+                    String failureLog4Git = "";
+
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
                     for(ScholiaContentPage scp : scholiaContentPageList2) {
@@ -167,8 +169,12 @@ public class HttpExporter {
                     	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000);
                     	
                     	for(String failure : scp.getFailureTestResultList()) {
-                       	 log4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
+                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
                     	}
+                    	for(String failure : scp.getSuccessTestResultList()) {
+                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
+                       	}
+                    	 
                     	
                     	//tested_datatables_total.labels(labelValues)
                     	//backendperformance. = scp.getBackendPerformance();
@@ -183,7 +189,8 @@ public class HttpExporter {
                 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
                 		long timestamp = System.currentTimeMillis();
                 		String sTimestamp = sdf.format(timestamp);
-						GitWriter.write("/", sTimestamp+".log", log4Git);
+						GitWriter.write("/", sTimestamp+".log", failureLog4Git);
+						GitWriter.write("/", "success-"+sTimestamp+".log", successLog4Git);
 					} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

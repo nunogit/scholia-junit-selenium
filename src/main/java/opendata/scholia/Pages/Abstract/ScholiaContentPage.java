@@ -34,7 +34,7 @@ public abstract class ScholiaContentPage{
 	private String pageTypeId = "_unknown";
 	
 	public static final String SPARQL_IFRAME_WIDGET = "SPARQL_IFRAME_WIDGET";
-	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_IFRAME_WIDGET";
+	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_DATATABLE_WIDGET";
 	
 	private int webpageTimeout;
 	
@@ -286,13 +286,13 @@ public abstract class ScholiaContentPage{
 			resultList.put(tag, list);
 		}
 		
-		//dirty solution; make a proper structure to host the description and comment
-		list.add(widgetIdentifier+ "\t" + comment);
+		//dirty solution to showcase; make a proper structure to host the description and comment
+		list.add(widgetIdentifier + "\t" + comment);
 
 	}
 
-	public void addTestResult(boolean successResult, String tag,  String failureDescription) {
-		addTestResult(successResult, tag, failureDescription, "");
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier) {
+		addTestResult(successfulResult, tag, widgetIdentifier, "");
 	}
 	
 	public void clearResults() {
