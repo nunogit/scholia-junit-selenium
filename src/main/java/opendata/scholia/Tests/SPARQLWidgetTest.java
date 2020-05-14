@@ -38,6 +38,7 @@ public class SPARQLWidgetTest extends TestBase {
 
 	private ScholiaContentPage scholiaContentPage;
 	private String sURL;
+	private String iframeHeader;
 
 	private int iframeSeqId;
 
@@ -48,19 +49,20 @@ public class SPARQLWidgetTest extends TestBase {
 	// this.iframeSeqId = iframeSeqId;
 	// }
 
-	public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, String sURL, int iframeSeqId) {
+	public SPARQLWidgetTest(ScholiaContentPage scholiaContentPage, String sURL, int iframeSeqId, String iframeHeader) {
 		super();
 		this.scholiaContentPage = scholiaContentPage;
 		this.sURL = sURL;
 		this.iframeSeqId = iframeSeqId;
+		this.iframeHeader = iframeHeader;
 	}
 
 	void testPage(ScholiaContentPage scPage, String sURL, int iframeSeqId) {
 		int iframeRuntime = scPage.checkIframeWidgetRuntime(sURL, iframeSeqId);
 		
 		//TODO add load times registration
-		scPage.addTestResult(iframeRuntime > 0, ScholiaContentPage.SPARQL_IFRAME_WIDGET, "iframe #"+iframeSeqId);
-		assertTrue("WikiData iframe SPARQL based widget fully rendered", iframeRuntime > 0);
+		scPage.addTestResult(iframeRuntime > 0, ScholiaContentPage.SPARQL_IFRAME_WIDGET, "iframe #"+iframeSeqId, iframeHeader);
+		assertTrue("WikiData iframe SPARQL based widget fully rendered. iframe #"+iframeSeqId+" Header: "+ iframeHeader, iframeRuntime > 0);
 		
 		System.out.println("Took "+iframeRuntime+" seconds");
 	}
@@ -101,7 +103,8 @@ public class SPARQLWidgetTest extends TestBase {
 		for (ScholiaContentPage scholiaContentPage : scholiaContentPageList) {
 			int iFrameSeqId = 0;
 			for (String urlString : scholiaContentPage.iframeWidgetURLList()) {
-				stringURLCollection.add(new Object[] { scholiaContentPage, urlString, iFrameSeqId++ });
+				String headerString = scholiaContentPage.getIframeHeader(iFrameSeqId);
+				stringURLCollection.add(new Object[] { scholiaContentPage, urlString, iFrameSeqId++, headerString });
 			}
 		}
 

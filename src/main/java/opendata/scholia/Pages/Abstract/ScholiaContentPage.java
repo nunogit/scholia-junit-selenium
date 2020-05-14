@@ -34,7 +34,7 @@ public abstract class ScholiaContentPage{
 	private String pageTypeId = "_unknown";
 	
 	public static final String SPARQL_IFRAME_WIDGET = "SPARQL_IFRAME_WIDGET";
-	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_IFRAME_WIDGET";
+	public static final String SPARQL_DATATABLE_WIDGET = "SPARQL_DATATABLE_WIDGET";
 	
 	private int webpageTimeout;
 	
@@ -275,10 +275,10 @@ public abstract class ScholiaContentPage{
 		this.pageTypeId = pageTypeId;
 	}
 
-	public void addTestResult(boolean successResult, String tag,  String failureDescription) {
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment) {
 		HashMap<String, ArrayList<String>> resultList;
 
-		resultList = successResult ? successList : failureList;
+		resultList = successfulResult ? successList : failureList;
 
 		ArrayList list = resultList.get(tag);
 		if(list==null) {
@@ -286,10 +286,15 @@ public abstract class ScholiaContentPage{
 			resultList.put(tag, list);
 		}
 		
-		list.add(failureDescription);
+		//dirty solution to showcase; make a proper structure to host the description and comment
+		list.add(widgetIdentifier + "\t" + comment);
 
 	}
 
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier) {
+		addTestResult(successfulResult, tag, widgetIdentifier, "");
+	}
+	
 	public void clearResults() {
 		failureList = new HashMap<String, ArrayList<String>>();
 		successList = new HashMap<String, ArrayList<String>>();
@@ -329,6 +334,13 @@ public abstract class ScholiaContentPage{
 	
 	public long getFrontendPerformance() {
 		return this.frontendPerformance;
+	}
+	
+	public String getIframeHeader(int iframeIndex) {
+		WebElement element = driver.findElement(By.xpath("(//iframe)["+ (iframeIndex +1 ) +"]/../preceding-sibling::*[local-name() = \"h3\" or local-name() = \"h2\"][1]"));
+		if(element!=null)
+			return element.getText();
+		return "";
 	}
 	
 }
