@@ -321,6 +321,26 @@ public abstract class ScholiaContentPage{
 		return successList.get(tag);
 	}
 	
+	
+	public List<String> getFailureTestResultHistory(int index){
+		HashMap<String, ArrayList<String>>  failureList;
+		
+		try {
+		if(index < 0)
+			failureList = this.failureListHistory.get(failureListHistory.size()-index);
+		else
+			failureList = this.failureListHistory.get(index);
+		}catch(IndexOutOfBoundsException e) {
+			return new ArrayList<String>();
+		}
+		
+		List<String> result = new ArrayList<String>();
+		for (List<String> value : failureList.values()) {
+		 	result.addAll(value);
+		}
+		return result;		
+	}
+	
 	public List<String> getFailureTestResultList() {
 		List<String> result = new ArrayList<String>();
 		for (List<String> value : failureList.values()) {
@@ -333,6 +353,23 @@ public abstract class ScholiaContentPage{
 		if(failureList.get(tag)==null)
 			failureList.put(tag, new ArrayList<String>());
 		return failureList.get(tag);
+	}
+	
+	public List<String> getFailureTestResultDiffList(){
+		List<String> diffList = new ArrayList<String>();
+		List<String> oldFailuretResultList = getFailureTestResultHistory(-1);
+		List<String> failuretResultList = this.getFailureTestResultList();
+				
+		for(String s1 : failuretResultList) {
+			boolean foundAnEqual = false;
+			for(String s2: oldFailuretResultList) {
+				if(s1.contentEquals(s2))
+					foundAnEqual = true;
+			}
+			if(!foundAnEqual) diffList.add(s1); 
+		} 
+		
+		return diffList;
 	}
 	
 	public long getBackendPerformance() {

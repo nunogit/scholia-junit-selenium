@@ -136,6 +136,7 @@ public class HttpExporter {
                     memoryProcess.set(memory);
                     String successLog4Git = "";
                     String failureLog4Git = "";
+                    String failureLogDiff4Git = "";
 
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
@@ -171,9 +172,13 @@ public class HttpExporter {
                     	for(String failure : scp.getFailureTestResultList()) {
                        	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
                     	}
-                    	for(String failure : scp.getSuccessTestResultList()) {
-                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
+                    	for(String success : scp.getSuccessTestResultList()) {
+                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success + "\n";
                        	}
+                    	
+                    	for(String diffFailure: scp.getFailureTestResultDiffList()) {
+                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure + "\n";
+                    	}
                     	 
                     	
                     	//tested_datatables_total.labels(labelValues)
@@ -190,9 +195,12 @@ public class HttpExporter {
                 		long timestamp = System.currentTimeMillis();
                 		String sTimestamp = sdf.format(timestamp);
                 		System.out.println("FAILURE LOG"+failureLog4Git);
+                		
 						GitWriter.write("/", sTimestamp+".log", failureLog4Git);
 						GitWriter.write("/", "success-"+sTimestamp+".log", successLog4Git);
-					} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
+						GitWriter.write("/", "diff-"+sTimestamp+".log", failureLogDiff4Git);
+                	
+                	} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

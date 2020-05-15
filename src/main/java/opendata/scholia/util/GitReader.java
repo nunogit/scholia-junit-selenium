@@ -55,8 +55,10 @@ public class GitReader {
             buffer = new BufferedReader(input);
             while ((l = buffer.readLine()) != null) {
             	l = checkLine(l);
-            	if(l!=null)
+            	if(l!=null) {
+            		System.out.println("Reading url"+l);
             		line.add(l);
+            	}
             }
 
         } catch (FileNotFoundException e) {
