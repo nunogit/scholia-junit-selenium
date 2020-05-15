@@ -337,7 +337,12 @@ public abstract class ScholiaContentPage{
 	}
 	
 	public String getIframeHeader(int iframeIndex) {
-		WebElement element = driver.findElement(By.xpath("(//iframe)["+ (iframeIndex +1 ) +"]/../preceding-sibling::*[local-name() = \"h3\" or local-name() = \"h2\"][1]"));
+		WebElement element = null;
+		try {
+			element = driver.findElement(By.xpath("(//iframe)["+ (iframeIndex +1 ) +"]/../preceding-sibling::*[local-name() = \"h3\" or local-name() = \"h2\"][1]"));
+		} catch(org.openqa.selenium.NoSuchElementException e) {
+			//todo deal with this, probably by just logging. Not critical
+		}
 		if(element!=null)
 			return element.getText();
 		return "";
