@@ -56,7 +56,7 @@ public class GitReader {
             while ((l = buffer.readLine()) != null) {
             	l = checkLine(l);
             	if(l!=null) {
-            		System.out.println("Reading url"+l);
+            		System.out.println("Reading url "+l);
             		line.add(l);
             	}
             }
@@ -82,11 +82,11 @@ public class GitReader {
 		if( line.trim().startsWith("#") ) return null;  //discard lines with comments
 		
 		//tokenize
-		line = line.replace(" #",  "{{comment}}");
-		line = line.replace("\t#", "{{comment}}");
+		line = line.replace(" #",  "COMMENT_TOKEN");
+		line = line.replace("\t#", "COMMENT_TOKEN");
 				
-		if(line.contains("{{comment}}")) //check if it contains a comment
-			return line.split("{{comment}}")[0].trim(); //split by comment identifier. Pick firs substring, clean
+		if(line.contains("COMMENT_TOKEN")) //check if it contains a comment
+			return line.split("COMMENT_TOKEN")[0].trim(); //split by comment identifier. Pick firs substring, clean
 		else return line;
 		
 	}

@@ -186,14 +186,15 @@ public abstract class ScholiaContentPage{
 	
 	//TODO improve this in the future
 	public int checkIframeWidgetRuntime(String urlString, int iframeSeqid) {
-		
+		visitPage();
+
 		System.out.println("Testing "+urlString);
-		driver.get(urlString);
+		//driver.get(urlString);
 		
 		//apparently the iframe was not rendering properly.
 		//now loading iframes in an independent way
-		/*webelement.driver.switchTo().frame(0);
-		driver.findElement(by.)		
+		driver.switchTo().frame(0);
+		/*driver.findElement(by.)		
 		System.out.println(driver.getPageSource());*/
 		
 		String pageSource = "";
@@ -249,7 +250,7 @@ public abstract class ScholiaContentPage{
 			return -1;
 		 }
 		
-        //driver.switchTo().defaultContent();
+        driver.switchTo().defaultContent();
 		return waitForSeconds;
 	}
 	
