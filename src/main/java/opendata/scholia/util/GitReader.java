@@ -79,8 +79,12 @@ public class GitReader {
 	private String checkLine(String line) {
 		if( line.trim().startsWith("#") ) return null;  //discard lines with comments
 		
-		if(line.contains(" #")) //check if it contains a comment
-			return line.split(" #")[0].trim(); //split by comment identifier. Pick firs substring, clean
+		//tokenize
+		line = line.replace(" #",  "{{comment}}");
+		line = line.replace("\t#", "{{comment}}");
+				
+		if(line.contains("{{comment}}")) //check if it contains a comment
+			return line.split("{{comment}}")[0].trim(); //split by comment identifier. Pick firs substring, clean
 		else return line;
 		
 	}

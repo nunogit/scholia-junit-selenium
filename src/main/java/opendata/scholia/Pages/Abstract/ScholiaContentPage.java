@@ -46,6 +46,10 @@ public abstract class ScholiaContentPage{
 	private HashMap<String, ArrayList<String>> failureList = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, ArrayList<String>> successList = new HashMap<String, ArrayList<String>>();
 	
+	private List<HashMap<String, ArrayList<String>>> failureListHistory = new ArrayList();
+	private List<HashMap<String, ArrayList<String>>> successListHistory = new ArrayList();
+
+	
 	private List<WebElement> webElementList;
 	
 	private String url = "";
@@ -296,6 +300,9 @@ public abstract class ScholiaContentPage{
 	}
 	
 	public void clearResults() {
+		this.failureListHistory.add(failureList);
+		this.successListHistory.add(successList);
+		
 		failureList = new HashMap<String, ArrayList<String>>();
 		successList = new HashMap<String, ArrayList<String>>();
 	}
