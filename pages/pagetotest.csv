@@ -40,7 +40,8 @@ https://tools.wmflabs.org/scholia/taxon/Q82069695
 https://tools.wmflabs.org/scholia/topic/Q15	# Africa; fails in multiple ways
 https://tools.wmflabs.org/scholia/topic/Q52
 https://tools.wmflabs.org/scholia/topic/Q532
-https://tools.wmflabs.org/scholia/topic/Q668
+https://tools.wmflabs.org/scholia/topic/Q668	# India, used in WikiProject India
+https://tools.wmflabs.org/scholia/topic/Q668/missing	# India, used in WikiProject India
 https://tools.wmflabs.org/scholia/topic/Q41112	# schizophrenia; over 50k publications
 https://tools.wmflabs.org/scholia/topic/Q41112/missing	# schizophrenia; over 50k publications
 https://tools.wmflabs.org/scholia/topic/Q12156	# malaria; over 50k publications
@@ -58,9 +59,12 @@ https://tools.wmflabs.org/scholia/topic/Q1492760/missing	# teenager; over 50k pu
 https://tools.wmflabs.org/scholia/topic/Q180556	# Helicobacter pylori; over 30k publications
 https://tools.wmflabs.org/scholia/topic/Q180556/missing	# Helicobacter pylori; over 30k publications
 https://tools.wmflabs.org/scholia/topic/Q583725
-https://tools.wmflabs.org/scholia/topic/Q81068910
-https://tools.wmflabs.org/scholia/topic/Q82069695
-https://tools.wmflabs.org/scholia/topic/Q84263196
+https://tools.wmflabs.org/scholia/topic/Q81068910 # COVID-19 pandemic, used in WikiProject COVID-19
+https://tools.wmflabs.org/scholia/topic/Q81068910/missing # COVID-19 pandemic, used in WikiProject COVID-19
+https://tools.wmflabs.org/scholia/topic/Q82069695	# SARS-CoV-2, used in WikiProject COVID-19
+https://tools.wmflabs.org/scholia/topic/Q82069695/missing	# SARS-CoV-2, used in WikiProject COVID-19
+https://tools.wmflabs.org/scholia/topic/Q84263196	# COVID-19, used in WikiProject COVID-19
+https://tools.wmflabs.org/scholia/topic/Q84263196/missing	# COVID-19, used in WikiProject COVID-19
 https://tools.wmflabs.org/scholia/topics/Q84263196,Q668	# COVID-19 and India, used in WikiProject India
 https://tools.wmflabs.org/scholia/use/Q5140318
 https://tools.wmflabs.org/scholia/venue/Q4775205
