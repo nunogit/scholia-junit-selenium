@@ -1,6 +1,9 @@
 https://tools.wmflabs.org/scholia/author/Q97270
-https://tools.wmflabs.org/scholia/author/Q583725
+https://tools.wmflabs.org/scholia/author/Q97270/missing
+https://tools.wmflabs.org/scholia/author/Q583725	# U.S. CDC; useful content in multiple aspects
+https://tools.wmflabs.org/scholia/author/Q583725/missing	# U.S. CDC; useful content in multiple aspects
 https://tools.wmflabs.org/scholia/author/Q46826387
+https://tools.wmflabs.org/scholia/author/Q46826387/missing
 https://tools.wmflabs.org/scholia/author/Q55004959
 https://tools.wmflabs.org/scholia/author/Q55004959/missing
 https://tools.wmflabs.org/scholia/award/Q35637
@@ -21,19 +24,21 @@ https://tools.wmflabs.org/scholia/event-series/
 https://tools.wmflabs.org/scholia/gene/Q18030793
 https://tools.wmflabs.org/scholia/location/Q668
 https://tools.wmflabs.org/scholia/location/Q5465
-https://tools.wmflabs.org/scholia/location/Q583725
-https://tools.wmflabs.org/scholia/organization/Q131626
-https://tools.wmflabs.org/scholia/organization/Q583725
-https://tools.wmflabs.org/scholia/organization/Q583725/missing
+https://tools.wmflabs.org/scholia/location/Q583725	# U.S. CDC; useful content in multiple aspects
+https://tools.wmflabs.org/scholia/location/Q583725/missing	# U.S. CDC; useful content in multiple aspects
+https://tools.wmflabs.org/scholia/organization/Q131626	# Smithsonian Institution; lots of substructures with rich content
+https://tools.wmflabs.org/scholia/organization/Q131626/missing	# Smithsonian Institution; lots of substructures with rich content
+https://tools.wmflabs.org/scholia/organization/Q583725	# U.S. CDC; useful content in multiple aspects
+https://tools.wmflabs.org/scholia/organization/Q583725/missing	# U.S. CDC; useful content in multiple aspects
 https://tools.wmflabs.org/scholia/P577 # the "item counts" panel breaks for many properties, including this one
 https://tools.wmflabs.org/scholia/pathway/Q30225516
 https://tools.wmflabs.org/scholia/printer/
 https://tools.wmflabs.org/scholia/project/Q27990087
 https://tools.wmflabs.org/scholia/protein/
 https://tools.wmflabs.org/scholia/publisher/Q127992
-https://tools.wmflabs.org/scholia/publisher/Q583725
+https://tools.wmflabs.org/scholia/publisher/Q583725	# U.S. CDC; useful content in multiple aspects
 https://tools.wmflabs.org/scholia/sponsor/Q4314967
-https://tools.wmflabs.org/scholia/sponsor/Q583725
+https://tools.wmflabs.org/scholia/sponsor/Q583725	# U.S. CDC; useful content in multiple aspects
 https://tools.wmflabs.org/scholia/series/Q924044
 https://tools.wmflabs.org/scholia/taxon/Q15978631
 https://tools.wmflabs.org/scholia/taxon/Q82069695
@@ -57,10 +62,16 @@ https://tools.wmflabs.org/scholia/topic/Q1492760	# teenager; over 50k publicatio
 https://tools.wmflabs.org/scholia/topic/Q1492760/missing	# teenager; over 50k publications
 https://tools.wmflabs.org/scholia/topic/Q180556	# Helicobacter pylori; over 30k publications
 https://tools.wmflabs.org/scholia/topic/Q180556/missing	# Helicobacter pylori; over 30k publications
-https://tools.wmflabs.org/scholia/topic/Q583725
-https://tools.wmflabs.org/scholia/topic/Q81068910
-https://tools.wmflabs.org/scholia/topic/Q82069695
-https://tools.wmflabs.org/scholia/topic/Q84263196
+https://tools.wmflabs.org/scholia/topic/Q583725	# U.S. CDC; useful content in multiple aspects
+https://tools.wmflabs.org/scholia/topic/Q583725/missing	# U.S. CDC; useful content in multiple aspects
+https://tools.wmflabs.org/scholia/topic/Q18123741	# infectious disease; high-profile and currently high rate of failure
+https://tools.wmflabs.org/scholia/topic/Q18123741/missing	# infectious disease; high-profile and currently high rate of failure
+https://tools.wmflabs.org/scholia/topic/Q81068910	# COVID-19 pandemic; high-profile
+https://tools.wmflabs.org/scholia/topic/Q81068910/missing	# COVID-19 pandemic; high-profile
+https://tools.wmflabs.org/scholia/topic/Q82069695	# SARS-CoV-2; high-profile
+https://tools.wmflabs.org/scholia/topic/Q82069695/missing	# SARS-CoV-2; high-profile
+https://tools.wmflabs.org/scholia/topic/Q84263196	# COVID-19; high-profile
+https://tools.wmflabs.org/scholia/topic/Q84263196/missing	# COVID-19; high-profile
 https://tools.wmflabs.org/scholia/use/Q5140318
 https://tools.wmflabs.org/scholia/venue/Q4775205
 https://tools.wmflabs.org/scholia/work/Q21090025
