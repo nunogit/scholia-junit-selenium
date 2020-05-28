@@ -291,7 +291,7 @@ public abstract class ScholiaContentPage{
 			resultList.put(tag, list);
 		}
 		
-		//dirty solution to showcase; make a proper structure to host the description and comment
+		//dirty solutionm, by manually adding the tab, to showcase; make a proper structure to host the description and comment
 		list.add(widgetIdentifier + "\t" + comment);
 
 	}
@@ -326,15 +326,17 @@ public abstract class ScholiaContentPage{
 	public List<String> getFailureTestResultHistory(int index){
 		HashMap<String, ArrayList<String>>  failureList;
 		
+		int size = failureListHistory.size();
+		
 		try {
 		if(index < 0)
-			failureList = this.failureListHistory.get(failureListHistory.size()-index);
+			failureList = this.failureListHistory.get(failureListHistory.size()+index);
 		else
 			failureList = this.failureListHistory.get(index);
 		}catch(IndexOutOfBoundsException e) {
 			return new ArrayList<String>();
 		}
-		
+		//transform hashampa to list - discard keys
 		List<String> result = new ArrayList<String>();
 		for (List<String> value : failureList.values()) {
 		 	result.addAll(value);
@@ -359,15 +361,23 @@ public abstract class ScholiaContentPage{
 	public List<String> getFailureTestResultDiffList(){
 		List<String> diffList = new ArrayList<String>();
 		List<String> oldFailuretResultList = getFailureTestResultHistory(-1);
-		List<String> failuretResultList = this.getFailureTestResultList();
+		List<String> failureResultList = this.getFailureTestResultList();
 				
-		for(String s1 : failuretResultList) {
+		System.out.println("this is a comparison "+failureResultList.size() + " to " + oldFailuretResultList.size());
+		
+		for(String s1 : failureResultList) {
 			boolean foundAnEqual = false;
 			for(String s2: oldFailuretResultList) {
-				if(s1.contentEquals(s2))
+				System.out.println("Comparing "+s1 + " "+s2 + " ");
+				if(s1.equals(s2)) {
 					foundAnEqual = true;
+					System.out.println(foundAnEqual);
+				}
 			}
-			if(!foundAnEqual) diffList.add(s1); 
+			if(!foundAnEqual) {
+				System.out.println("adding "+ s1);
+				diffList.add(s1);
+			}
 		} 
 		
 		return diffList;
