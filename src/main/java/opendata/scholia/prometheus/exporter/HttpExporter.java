@@ -192,13 +192,17 @@ public class HttpExporter {
                 	try {
                 		System.out.println("Writing to git...");
                 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+                		SimpleDateFormat sdf4dir = new SimpleDateFormat("yyyy/MM/dd");
+      
+                		
                 		long timestamp = System.currentTimeMillis();
                 		String sTimestamp = sdf.format(timestamp);
+                		String directoryDate = sdf4dir.format(timestamp);
                 		System.out.println("FAILURE LOG"+failureLog4Git);
                 		
-						GitWriter.write("/", sTimestamp+".log", failureLog4Git);
-						GitWriter.write("/", "success-"+sTimestamp+".log", successLog4Git);
-						GitWriter.write("/", "diff-"+sTimestamp+".log", failureLogDiff4Git);
+						GitWriter.write("/"+directoryDate, sTimestamp+".log", failureLog4Git);
+						GitWriter.write("/"+directoryDate, "success-"+sTimestamp+".log", successLog4Git);
+						GitWriter.write("/"+directoryDate, "diff-"+sTimestamp+".log", failureLogDiff4Git);
                 	
                 	} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
 						// TODO Auto-generated catch block

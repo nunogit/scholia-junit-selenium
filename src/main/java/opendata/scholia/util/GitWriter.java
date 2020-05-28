@@ -57,7 +57,7 @@ public class GitWriter {
 	    System.out.println("file "+file);
 	    DiskWriter.write(TEMP_GIT_FOLDER+path, file, content, false);
 	    
-	    git.add().addFilepattern(file).call();
+	    git.add().addFilepattern(TEMP_GIT_FOLDER+path).call();
 	    git.commit().setMessage( "adding file" ).call();
 	    
 	    // push to remote:
