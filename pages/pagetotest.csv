@@ -19,6 +19,7 @@ https://scholia.toolforge.org/disease/Q84263196
 https://scholia.toolforge.org/event/
 https://scholia.toolforge.org/event-series/
 https://scholia.toolforge.org/gene/Q18030793
+https://scholia.toolforge.org/location/Q30	# U.S.A.; fails in multiple ways
 https://scholia.toolforge.org/location/Q668
 https://scholia.toolforge.org/location/Q5465
 https://scholia.toolforge.org/location/Q583725
@@ -38,7 +39,12 @@ https://scholia.toolforge.org/series/Q924044
 https://scholia.toolforge.org/taxon/Q15978631
 https://scholia.toolforge.org/taxon/Q82069695
 https://scholia.toolforge.org/topic/Q15	# Africa; fails in multiple ways
+https://scholia.toolforge.org/topic/Q15/missing	# Africa; fails in multiple ways
+https://scholia.toolforge.org/topic/Q30	# U.S.A.; fails in multiple ways
+https://scholia.toolforge.org/topic/Q30/missing	# U.S.A.; fails in multiple ways
 https://scholia.toolforge.org/topic/Q52
+https://scholia.toolforge.org/topic/Q64	# Berlin; Wikidata headquarters
+https://scholia.toolforge.org/topic/Q64/missing	# Berlin; Wikidata headquarters
 https://scholia.toolforge.org/topic/Q532
 https://scholia.toolforge.org/topic/Q668
 https://scholia.toolforge.org/topic/Q41112	# schizophrenia; over 50k publications
