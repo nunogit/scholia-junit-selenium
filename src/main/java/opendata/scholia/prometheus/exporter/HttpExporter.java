@@ -207,6 +207,9 @@ public class HttpExporter {
 						GitWriter.write("/"+directoryDate, sTimestamp+".log", failureLog4Git);
 						GitWriter.write("/"+directoryDate, "success-"+sTimestamp+".log", successLog4Git);
 						GitWriter.write("/"+directoryDate, "diff-"+sTimestamp+".log", failureLogDiff4Git);
+						
+						performanceReport = "Iteration: "+ seleniumRunsTotal.get() + " Runtime: " + directoryDate + "\n" + performanceReport;
+						
 						GitWriter.write("/"+directoryDate, "performance-"+sTimestamp+".log", performanceReport);
 
                 	
@@ -215,7 +218,6 @@ public class HttpExporter {
 						e.printStackTrace();
 					}
 
-                    
                     seleniumRunsTotal.inc();
                     
                     //logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
