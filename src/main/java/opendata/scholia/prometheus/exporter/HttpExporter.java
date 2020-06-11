@@ -29,6 +29,7 @@ import opendata.scholia.Tests.TableTest;
 import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.GitWriter;
 import opendata.scholia.util.Uname;
+import opendata.scholia.util.model.TestResult;
 
 public class HttpExporter {
 	//TOOD a bit ugly. Improve code
@@ -137,6 +138,7 @@ public class HttpExporter {
                     String successLog4Git = "";
                     String failureLog4Git = "";
                     String failureLogDiff4Git = "";
+                    String performanceReport = "";
 
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
@@ -169,15 +171,17 @@ public class HttpExporter {
                     	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance()/1000);
                     	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000);
                     	
-                    	for(String failure : scp.getFailureTestResultList()) {
-                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
+                    	for(TestResult failure : scp.getFailureTestResultList()) {
+                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getMessage() + "\n";
+                    	 performanceReport += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getMessage() + "\t" + failure.getTestDuration() + "\tfailure\n";
                     	}
-                    	for(String success : scp.getSuccessTestResultList()) {
-                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success + "\n";
-                       	}
+                    	for(TestResult success : scp.getSuccessTestResultList()) {
+                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getMessage() + "\n";
+                    	 performanceReport += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getMessage() + "\t" + success.getTestDuration() + "\tsuccess\n";
+                    	}
                     	
-                    	for(String diffFailure: scp.getFailureTestResultDiffList()) {
-                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure + "\n";
+                    	for(TestResult diffFailure: scp.getFailureTestResultDiffList()) {
+                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure.getMessage() + "\n";
                     	}
                     	 
                     	
@@ -203,6 +207,8 @@ public class HttpExporter {
 						GitWriter.write("/"+directoryDate, sTimestamp+".log", failureLog4Git);
 						GitWriter.write("/"+directoryDate, "success-"+sTimestamp+".log", successLog4Git);
 						GitWriter.write("/"+directoryDate, "diff-"+sTimestamp+".log", failureLogDiff4Git);
+						GitWriter.write("/"+directoryDate, "performance-"+sTimestamp+".log", performanceReport);
+
                 	
                 	} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
 						// TODO Auto-generated catch block
@@ -212,7 +218,6 @@ public class HttpExporter {
                     
                     seleniumRunsTotal.inc();
                     
-                    logger.info("Run time delta: "+deltaTime+" seconds");
                     //logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
                     logger.info("Run time Delta: "+deltaTime+" seconds");
                         

@@ -122,7 +122,7 @@ public class TableTest extends TestBase {
 				
 				boolean isDataTableSizeMoreThanZero = (scpage.getDataTableSize(id) > 0);
 				
-				scpage.addTestResult(isDataTableSizeMoreThanZero, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, id);
+				scpage.addTestResult(isDataTableSizeMoreThanZero, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, id, -1);
 				assertTrue(id, isDataTableSizeMoreThanZero);
 
 			}
@@ -134,7 +134,7 @@ public class TableTest extends TestBase {
 		int dataTableSize = scPage.getDataTableSize(widgetId);
 		logger.debug(dataTableSize + " rows in" + widgetId+ " @ " + scPage.getURL());
 		assertTrue(widgetId, dataTableSize > 0);
-		scPage.addTestResult(dataTableSize > 0, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, widgetId);
+		scPage.addTestResult(dataTableSize > 0, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, widgetId, -1);
 
 
 	}

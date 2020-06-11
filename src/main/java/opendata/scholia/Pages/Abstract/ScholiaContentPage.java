@@ -24,6 +24,7 @@ import io.prometheus.client.Counter;
 import opendata.scholia.Tests.TestBase;
 import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.DiskWriter;
+import opendata.scholia.util.model.TestResult;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -43,11 +44,11 @@ public abstract class ScholiaContentPage{
 	private Map<String, WebElement> dataTableMap;
 	private Map<String, WebElement> widgetMap;
 	
-	private HashMap<String, ArrayList<String>> failureList = new HashMap<String, ArrayList<String>>();
-	private HashMap<String, ArrayList<String>> successList = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<TestResult>> failureList = new HashMap<String, ArrayList<TestResult>>();
+	private HashMap<String, ArrayList<TestResult>> successList = new HashMap<String, ArrayList<TestResult>>();
 	
-	private List<HashMap<String, ArrayList<String>>> failureListHistory = new ArrayList();
-	private List<HashMap<String, ArrayList<String>>> successListHistory = new ArrayList();
+	private List<HashMap<String, ArrayList<TestResult>>> failureListHistory = new ArrayList();
+	private List<HashMap<String, ArrayList<TestResult>>> successListHistory = new ArrayList();
 
 	
 	private List<WebElement> webElementList;
@@ -280,8 +281,8 @@ public abstract class ScholiaContentPage{
 		this.pageTypeId = pageTypeId;
 	}
 
-	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment) {
-		HashMap<String, ArrayList<String>> resultList;
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment, int testDuration) {
+		HashMap<String, ArrayList<TestResult>> resultList;
 
 		resultList = successfulResult ? successList : failureList;
 
@@ -292,39 +293,41 @@ public abstract class ScholiaContentPage{
 		}
 		
 		//dirty solutionm, by manually adding the tab, to showcase; make a proper structure to host the description and comment
-		list.add(widgetIdentifier + "\t" + comment);
+		
+		
+		list.add( new TestResult(widgetIdentifier + "\t" + comment, testDuration) );
 
 	}
 
-	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier) {
-		addTestResult(successfulResult, tag, widgetIdentifier, "");
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, int testDuration) {
+		addTestResult(successfulResult, tag, widgetIdentifier, "", testDuration);
 	}
 	
 	public void clearResults() {
 		this.failureListHistory.add(failureList);
 		this.successListHistory.add(successList);
 		
-		failureList = new HashMap<String, ArrayList<String>>();
-		successList = new HashMap<String, ArrayList<String>>();
+		failureList = new HashMap<String, ArrayList<TestResult>>();
+		successList = new HashMap<String, ArrayList<TestResult>>();
 	}
 	
-	public List<String> getSuccessTestResultList() {
-		List<String> result = new ArrayList<String>();
-		for (List<String> value : successList.values()) {
+	public List<TestResult> getSuccessTestResultList() {
+		List<TestResult> result = new ArrayList<TestResult>();
+		for (List<TestResult> value : successList.values()) {
 		 	result.addAll(value);
 		}
 		return result;
 	}
 	
-	public List<String> getSuccessTestResultList(String tag) {
+	public List<TestResult> getSuccessTestResultList(String tag) {
 		if(successList.get(tag)==null)
-			successList.put(tag, new ArrayList<String>());
+			successList.put(tag, new ArrayList<TestResult>());
 		return successList.get(tag);
 	}
 	
 	
-	public List<String> getFailureTestResultHistory(int index){
-		HashMap<String, ArrayList<String>>  failureList;
+	public List<TestResult> getFailureTestResultHistory(int index){
+		HashMap<String, ArrayList<TestResult>>  failureList;
 		
 		int size = failureListHistory.size();
 		
@@ -334,48 +337,48 @@ public abstract class ScholiaContentPage{
 		else
 			failureList = this.failureListHistory.get(index);
 		}catch(IndexOutOfBoundsException e) {
-			return new ArrayList<String>();
+			return new ArrayList<TestResult>();
 		}
 		//transform hashampa to list - discard keys
-		List<String> result = new ArrayList<String>();
-		for (List<String> value : failureList.values()) {
+		List<TestResult> result = new ArrayList<TestResult>();
+		for (List<TestResult> value : failureList.values()) {
 		 	result.addAll(value);
 		}
 		return result;		
 	}
 	
-	public List<String> getFailureTestResultList() {
-		List<String> result = new ArrayList<String>();
-		for (List<String> value : failureList.values()) {
+	public List<TestResult> getFailureTestResultList() {
+		List<TestResult> result = new ArrayList<TestResult>();
+		for (List<TestResult> value : failureList.values()) {
 		 	result.addAll(value);
 		}
 		return result;
 	}
 	
-	public List<String> getFailureTestResultList(String tag) {
+	public List<TestResult> getFailureTestResultList(String tag) {
 		if(failureList.get(tag)==null)
-			failureList.put(tag, new ArrayList<String>());
+			failureList.put(tag, new ArrayList<TestResult>());
 		return failureList.get(tag);
 	}
 	
-	public List<String> getFailureTestResultDiffList(){
-		List<String> diffList = new ArrayList<String>();
-		List<String> oldFailuretResultList = getFailureTestResultHistory(-1);
-		List<String> failureResultList = this.getFailureTestResultList();
+	public List<TestResult> getFailureTestResultDiffList(){
+		List<TestResult> diffList = new ArrayList<TestResult>();
+		List<TestResult> oldFailuretResultList = getFailureTestResultHistory(-1);
+		List<TestResult> failureResultList = this.getFailureTestResultList();
 				
 		System.out.println("this is a comparison "+failureResultList.size() + " to " + oldFailuretResultList.size());
 		
-		for(String s1 : failureResultList) {
+		for(TestResult s1 : failureResultList) {
 			boolean foundAnEqual = false;
-			for(String s2: oldFailuretResultList) {
+			for(TestResult s2: oldFailuretResultList) {
 				System.out.println("Comparing "+s1 + " "+s2 + " ");
-				if(s1.equals(s2)) {
+				if(s1.getMessage().equals(s2.getMessage())) {
 					foundAnEqual = true;
 					System.out.println(foundAnEqual);
 				}
 			}
 			if(!foundAnEqual) {
-				System.out.println("adding "+ s1);
+				System.out.println("adding "+ s1.getMessage());
 				diffList.add(s1);
 			}
 		} 
