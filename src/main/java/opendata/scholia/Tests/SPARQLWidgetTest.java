@@ -61,7 +61,7 @@ public class SPARQLWidgetTest extends TestBase {
 		int iframeRuntime = scPage.checkIframeWidgetRuntime(sURL, iframeSeqId);
 		
 		//TODO add load times registration
-		scPage.addTestResult(iframeRuntime > 0, ScholiaContentPage.SPARQL_IFRAME_WIDGET, "iframe #"+iframeSeqId, iframeHeader);
+		scPage.addTestResult(iframeRuntime > 0, ScholiaContentPage.SPARQL_IFRAME_WIDGET, "iframe #"+iframeSeqId, iframeHeader, iframeRuntime * 1000);
 		assertTrue("WikiData iframe SPARQL based widget fully rendered. iframe #"+iframeSeqId+" Header: "+ iframeHeader, iframeRuntime > 0);
 		
 		System.out.println("Took "+iframeRuntime+" seconds");
