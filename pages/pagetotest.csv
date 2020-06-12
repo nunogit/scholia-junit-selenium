@@ -1,5 +1,7 @@
 https://scholia.toolforge.org/author/Q97270
 https://scholia.toolforge.org/author/Q583725
+https://scholia.toolforge.org/author/Q29253985 # Paul Lecoq, over 1000 publications, most with hundreds of co-authors
+https://scholia.toolforge.org/author/Q29253985/missing # Paul Lecoq, over 1000 publications, most with hundreds of co-authors
 https://scholia.toolforge.org/author/Q46826387
 https://scholia.toolforge.org/author/Q55004959
 https://scholia.toolforge.org/author/Q55004959/missing
@@ -65,3 +67,4 @@ https://scholia.toolforge.org/use/Q5140318
 https://scholia.toolforge.org/venue/Q4775205
 https://scholia.toolforge.org/work/Q21090025
 https://scholia.toolforge.org/organizations/Q1269766,Q193196
+https://scholia.toolforge.org/author/random	# to add some randomness to our testing
