@@ -29,6 +29,8 @@ public class Uname {
         nodename = getHostname("(none)");
         version = getVersion("1.0");
         domainname = getDomainName("localdomain");
+        scholiaid = ConfigManager.instance().getConfig().getString("id", "");
+        scholiaid = scholiaid.contentEquals("") ? "_unknown" : scholiaid;
     }
 
     private static String readFile(String name, String fallback) {
