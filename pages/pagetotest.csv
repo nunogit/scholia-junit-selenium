@@ -1,72 +1,72 @@
-https://tools.wmflabs.org/scholia/author/Q97270
-https://tools.wmflabs.org/scholia/author/Q583725
-https://tools.wmflabs.org/scholia/author/Q46826387
-https://tools.wmflabs.org/scholia/author/Q55004959
-https://tools.wmflabs.org/scholia/author/Q55004959/missing
-https://tools.wmflabs.org/scholia/award/Q35637
-https://tools.wmflabs.org/scholia/award/Q35637/missing
-https://tools.wmflabs.org/scholia/catalogue/Q42661788
-https://tools.wmflabs.org/scholia/chemical/Q2270
-https://tools.wmflabs.org/scholia/chemical-class/Q41581
-https://tools.wmflabs.org/scholia/chemical-element/Q623
-https://tools.wmflabs.org/scholia/clinical-trial/
-https://tools.wmflabs.org/scholia/country/Q35
-https://tools.wmflabs.org/scholia/country/Q668
-https://tools.wmflabs.org/scholia/country/Q668/topic/Q10737
-https://tools.wmflabs.org/scholia/disease/Q12156
-https://tools.wmflabs.org/scholia/disease/Q41112
-https://tools.wmflabs.org/scholia/disease/Q84263196
-https://tools.wmflabs.org/scholia/event/
-https://tools.wmflabs.org/scholia/event-series/
-https://tools.wmflabs.org/scholia/gene/Q18030793
-https://tools.wmflabs.org/scholia/location/Q668
-https://tools.wmflabs.org/scholia/location/Q5465
-https://tools.wmflabs.org/scholia/location/Q583725
-https://tools.wmflabs.org/scholia/organization/Q131626
-https://tools.wmflabs.org/scholia/organization/Q583725
-https://tools.wmflabs.org/scholia/organization/Q583725/missing
-https://tools.wmflabs.org/scholia/P577 # the "item counts" panel breaks for many properties, including this one
-https://tools.wmflabs.org/scholia/pathway/Q30225516
-https://tools.wmflabs.org/scholia/printer/
-https://tools.wmflabs.org/scholia/project/Q27990087
-https://tools.wmflabs.org/scholia/protein/
-https://tools.wmflabs.org/scholia/publisher/Q127992
-https://tools.wmflabs.org/scholia/publisher/Q583725
-https://tools.wmflabs.org/scholia/sponsor/Q4314967
-https://tools.wmflabs.org/scholia/sponsor/Q583725
-https://tools.wmflabs.org/scholia/series/Q924044
-https://tools.wmflabs.org/scholia/taxon/Q15978631
-https://tools.wmflabs.org/scholia/taxon/Q82069695
-https://tools.wmflabs.org/scholia/topic/Q15	# Africa; fails in multiple ways
-https://tools.wmflabs.org/scholia/topic/Q52
-https://tools.wmflabs.org/scholia/topic/Q532
-https://tools.wmflabs.org/scholia/topic/Q668	# India, used in WikiProject India
-https://tools.wmflabs.org/scholia/topic/Q668/missing	# India, used in WikiProject India
-https://tools.wmflabs.org/scholia/topic/Q41112	# schizophrenia; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q41112/missing	# schizophrenia; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q12156	# malaria; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q12156/missing	# malaria; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q12174	# obesity; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q12174/missing	# obesity; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q29496	# leukemia; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q29496/missing	# leukemia; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q111140	# endothelium; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q111140/missing	# endothelium; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q181600	# patient; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q181600/missing	# patient; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q1492760	# teenager; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q1492760/missing	# teenager; over 50k publications
-https://tools.wmflabs.org/scholia/topic/Q180556	# Helicobacter pylori; over 30k publications
-https://tools.wmflabs.org/scholia/topic/Q180556/missing	# Helicobacter pylori; over 30k publications
-https://tools.wmflabs.org/scholia/topic/Q583725
-https://tools.wmflabs.org/scholia/topic/Q81068910 # COVID-19 pandemic, used in WikiProject COVID-19
-https://tools.wmflabs.org/scholia/topic/Q81068910/missing # COVID-19 pandemic, used in WikiProject COVID-19
-https://tools.wmflabs.org/scholia/topic/Q82069695	# SARS-CoV-2, used in WikiProject COVID-19
-https://tools.wmflabs.org/scholia/topic/Q82069695/missing	# SARS-CoV-2, used in WikiProject COVID-19
-https://tools.wmflabs.org/scholia/topic/Q84263196	# COVID-19, used in WikiProject COVID-19
-https://tools.wmflabs.org/scholia/topic/Q84263196/missing	# COVID-19, used in WikiProject COVID-19
-https://tools.wmflabs.org/scholia/topics/Q84263196,Q668	# COVID-19 and India, used in WikiProject India
-https://tools.wmflabs.org/scholia/use/Q5140318
-https://tools.wmflabs.org/scholia/venue/Q4775205
-https://tools.wmflabs.org/scholia/work/Q21090025
-https://tools.wmflabs.org/scholia/organizations/Q1269766,Q193196
+https://scholia.toolforge.org/scholia/author/Q97270
+https://scholia.toolforge.org/scholia/author/Q583725
+https://scholia.toolforge.org/scholia/author/Q46826387
+https://scholia.toolforge.org/scholia/author/Q55004959
+https://scholia.toolforge.org/scholia/author/Q55004959/missing
+https://scholia.toolforge.org/scholia/award/Q35637
+https://scholia.toolforge.org/scholia/award/Q35637/missing
+https://scholia.toolforge.org/scholia/catalogue/Q42661788
+https://scholia.toolforge.org/scholia/chemical/Q2270
+https://scholia.toolforge.org/scholia/chemical-class/Q41581
+https://scholia.toolforge.org/scholia/chemical-element/Q623
+https://scholia.toolforge.org/scholia/clinical-trial/
+https://scholia.toolforge.org/scholia/country/Q35
+https://scholia.toolforge.org/scholia/country/Q668
+https://scholia.toolforge.org/scholia/country/Q668/topic/Q10737
+https://scholia.toolforge.org/scholia/disease/Q12156
+https://scholia.toolforge.org/scholia/disease/Q41112
+https://scholia.toolforge.org/scholia/disease/Q84263196
+https://scholia.toolforge.org/scholia/event/
+https://scholia.toolforge.org/scholia/event-series/
+https://scholia.toolforge.org/scholia/gene/Q18030793
+https://scholia.toolforge.org/scholia/location/Q668
+https://scholia.toolforge.org/scholia/location/Q5465
+https://scholia.toolforge.org/scholia/location/Q583725
+https://scholia.toolforge.org/scholia/organization/Q131626
+https://scholia.toolforge.org/scholia/organization/Q583725
+https://scholia.toolforge.org/scholia/organization/Q583725/missing
+https://scholia.toolforge.org/scholia/P577 # the "item counts" panel breaks for many properties, including this one
+https://scholia.toolforge.org/scholia/pathway/Q30225516
+https://scholia.toolforge.org/scholia/printer/
+https://scholia.toolforge.org/scholia/project/Q27990087
+https://scholia.toolforge.org/scholia/protein/
+https://scholia.toolforge.org/scholia/publisher/Q127992
+https://scholia.toolforge.org/scholia/publisher/Q583725
+https://scholia.toolforge.org/scholia/sponsor/Q4314967
+https://scholia.toolforge.org/scholia/sponsor/Q583725
+https://scholia.toolforge.org/scholia/series/Q924044
+https://scholia.toolforge.org/scholia/taxon/Q15978631
+https://scholia.toolforge.org/scholia/taxon/Q82069695
+https://scholia.toolforge.org/scholia/topic/Q15	# Africa; fails in multiple ways
+https://scholia.toolforge.org/scholia/topic/Q52
+https://scholia.toolforge.org/scholia/topic/Q532
+https://scholia.toolforge.org/scholia/topic/Q668	# India, used in WikiProject India
+https://scholia.toolforge.org/scholia/topic/Q668/missing	# India, used in WikiProject India
+https://scholia.toolforge.org/scholia/topic/Q41112	# schizophrenia; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q41112/missing	# schizophrenia; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q12156	# malaria; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q12156/missing	# malaria; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q12174	# obesity; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q12174/missing	# obesity; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q29496	# leukemia; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q29496/missing	# leukemia; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q111140	# endothelium; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q111140/missing	# endothelium; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q181600	# patient; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q181600/missing	# patient; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q1492760	# teenager; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q1492760/missing	# teenager; over 50k publications
+https://scholia.toolforge.org/scholia/topic/Q180556	# Helicobacter pylori; over 30k publications
+https://scholia.toolforge.org/scholia/topic/Q180556/missing	# Helicobacter pylori; over 30k publications
+https://scholia.toolforge.org/scholia/topic/Q583725
+https://scholia.toolforge.org/scholia/topic/Q81068910 # COVID-19 pandemic, used in WikiProject COVID-19
+https://scholia.toolforge.org/scholia/topic/Q81068910/missing # COVID-19 pandemic, used in WikiProject COVID-19
+https://scholia.toolforge.org/scholia/topic/Q82069695	# SARS-CoV-2, used in WikiProject COVID-19
+https://scholia.toolforge.org/scholia/topic/Q82069695/missing	# SARS-CoV-2, used in WikiProject COVID-19
+https://scholia.toolforge.org/scholia/topic/Q84263196	# COVID-19, used in WikiProject COVID-19
+https://scholia.toolforge.org/scholia/topic/Q84263196/missing	# COVID-19, used in WikiProject COVID-19
+https://scholia.toolforge.org/scholia/topics/Q84263196,Q668	# COVID-19 and India, used in WikiProject India
+https://scholia.toolforge.org/scholia/use/Q5140318
+https://scholia.toolforge.org/scholia/venue/Q4775205
+https://scholia.toolforge.org/scholia/work/Q21090025
+https://scholia.toolforge.org/scholia/organizations/Q1269766,Q193196
