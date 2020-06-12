@@ -23,6 +23,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -251,7 +252,21 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 			e.printStackTrace();
 		}
 		
-		return gitReader.getList();
+		String alternativedomain  = ConfigManager.instance().getConfig().getString("alternativedomain", "");
+		
+		List<String> sUrlList = gitReader.getList();
+		List<String> sUrlAltList = new ArrayList();
+		
+		//TODO think if this logic should move to another class
+		//TODO add the domain to a fixed domain or infer it
+		if(!alternativedomain.trim().equals("")) {
+			for(String sScholiaUrl : sUrlList) {
+				sUrlAltList.add( sScholiaUrl.replace("https://scholia.toolforge.org/", alternativedomain) );
+			}
+			return sUrlAltList;
+		}
+		
+		return sUrlList;
 	}
 	
 	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){
