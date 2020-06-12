@@ -204,13 +204,17 @@ public class HttpExporter {
                 		String directoryDate = sdf4dir.format(timestamp);
                 		System.out.println("FAILURE LOG"+failureLog4Git);
                 		
-						GitWriter.write("/"+directoryDate, sTimestamp+".log", failureLog4Git);
-						GitWriter.write("/"+directoryDate, "success-"+sTimestamp+".log", successLog4Git);
-						GitWriter.write("/"+directoryDate, "diff-"+sTimestamp+".log", failureLogDiff4Git);
+                		String id  = ConfigManager.instance().getConfig().getString("id", "");
+
+                		String dir = "/"+ id +"/"+directoryDate;
+                		
+						GitWriter.write(dir , sTimestamp+".log", failureLog4Git);
+						GitWriter.write(dir, "success-"+sTimestamp+".log", successLog4Git);
+						GitWriter.write(dir, "diff-"+sTimestamp+".log", failureLogDiff4Git);
 						
-						performanceReport = "Iteration: "+ seleniumRunsTotal.get() + " Runtime: " + directoryDate + "\n" + performanceReport;
+						performanceReport = "Iteration: "+ seleniumRunsTotal.get() + " Runtime: " +deltaTime+" "+ directoryDate + "\n" + performanceReport;
 						
-						GitWriter.write("/"+directoryDate, "performance-"+sTimestamp+".log", performanceReport);
+						GitWriter.write(dir, "performance-"+sTimestamp+".log", performanceReport);
 
                 	
                 	} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
