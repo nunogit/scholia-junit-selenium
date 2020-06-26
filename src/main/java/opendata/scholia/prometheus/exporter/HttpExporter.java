@@ -173,11 +173,11 @@ public class HttpExporter {
                     	
                     	for(TestResult failure : scp.getFailureTestResultList()) {
                        	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getMessage() + "\n";
-                    	 performanceReport += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getMessage() + "\t" + failure.getTestDuration() + "\tfailure\n";
+                    	 performanceReport += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" +scp.getBackendPerformance()+ "\t" + +scp.getFrontendPerformance() + "\t" + failure.getMessage() + "\t" + failure.getTestDuration() + "\tfailure\n";
                     	}
                     	for(TestResult success : scp.getSuccessTestResultList()) {
                     	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getMessage() + "\n";
-                    	 performanceReport += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getMessage() + "\t" + success.getTestDuration() + "\tsuccess\n";
+                    	 performanceReport += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + scp.getBackendPerformance()+ "\t" + +scp.getFrontendPerformance() + "\t" + success.getMessage() + "\t" + success.getTestDuration() + "\tsuccess\n";
                     	}
                     	
                     	for(TestResult diffFailure: scp.getFailureTestResultDiffList()) {
