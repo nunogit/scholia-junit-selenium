@@ -133,10 +133,8 @@ public class TableTest extends TestBase {
 		List<String> idList = scPage.dataTableIdList();
 		int dataTableSize = scPage.getDataTableSize(widgetId);
 		logger.debug(dataTableSize + " rows in" + widgetId+ " @ " + scPage.getURL());
+		scPage.addTestResult(dataTableSize > 0, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, widgetId, -1000);
 		assertTrue(widgetId, dataTableSize > 0);
-		scPage.addTestResult(dataTableSize > 0, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, widgetId, -1);
-
-
 	}
 	
 	@Test
