@@ -241,7 +241,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 	public static List<String> loadFromGit(){
 		GitReader gitReader0 = new GitReader();
 		GitReader gitReader1 = new GitReader();
-		try {
+		
 			String sURL0 = ConfigManager.instance().getConfig().getString("pagetestset", "https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
 			String sURL1 = ConfigManager.instance().getConfig().getString("pagetopset", "");
 
@@ -251,12 +251,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 			gitReader0.setURL(sURL0);
 			gitReader1.setURL(sURL1);
 			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("can't connect to retrieve test list");
-			System.out.flush();
-			e.printStackTrace();
-		}
+
 		
 		String alternativedomain  = ConfigManager.instance().getConfig().getString("alternativedomain", "");
 		
