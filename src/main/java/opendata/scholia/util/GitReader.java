@@ -7,17 +7,17 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 
 public class GitReader {
-
-	URL url;
+	String sUrl;
 	
 	
-	public void setURL(String url) throws MalformedURLException {
-		 this.url = new URL(url);
+	public void setURL(String url) {
+		 this.sUrl  = url;
 	}
 	
     public GitReader() {
@@ -30,6 +30,16 @@ public class GitReader {
 	}
 	
 	private List<String> readFile() {
+		
+		URL url;
+		try {
+			url = new URL(this.sUrl);
+		} catch (MalformedURLException e2) {
+			// TODO Auto-generated catch block
+			System.out.println("Error "+sUrl+ "is not a valid URL. Returning an empty list");
+			return new ArrayList<String>();
+		}
+		
 		List<String> line = new Vector<String>();
 		
         URLConnection connection = null;

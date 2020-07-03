@@ -246,7 +246,7 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
 			String sURL1 = ConfigManager.instance().getConfig().getString("pagetopset", "");
 
 			System.out.println("Loading test set: "+sURL0);		
-			System.out.println("Loading test set: "+sURL1);
+			System.out.println("Loading top set: "+sURL1);
 			
 			gitReader0.setURL(sURL0);
 			gitReader1.setURL(sURL1);
