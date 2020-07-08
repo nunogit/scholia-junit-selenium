@@ -36,7 +36,7 @@ public class GitReader {
 			url = new URL(this.sUrl);
 		} catch (MalformedURLException e2) {
 			// TODO Auto-generated catch block
-			System.out.println("Error \""+sUrl+ "\"is not a valid URL. Returning an empty list");
+			System.out.println("Error \""+sUrl+ "\" is not a valid URL. Returning an empty scholia validation URL list");
 			return new ArrayList<String>();
 		}
 		

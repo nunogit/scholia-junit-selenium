@@ -151,7 +151,7 @@ public class HttpExporter {
                     	
                     	double isFailureCount = scp.getFailureTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
                     	double isSuccessCount = scp.getSuccessTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
-                    	double isTotalTests   = dtFailureCount + dtSuccessCount;
+                    	double isTotalTests   = isFailureCount + isSuccessCount;
                     			
                     	datatablesTotal.labels(scp.getPageTypeId()).set(dtTotalTests);
                     	datatablesErrors.labels(scp.getPageTypeId()).set(dtFailureCount);
