@@ -105,7 +105,7 @@ Tests can be exported to Github. In this case one needs to provide login credent
 **github.repository** repository where the performance results will be stored
 
 
-#### prometheus variables explained
+### prometheus variables explained
 
 Scholia jUnit Selenium tests exports data to prometheus, to be rendered in Grafana.
 
