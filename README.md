@@ -57,6 +57,7 @@ If used as standalone this software can report:
  - automatically collect Sparql queries from Scholia pages
  - Run the queries on a cache server to speed up Scholia operation with a caching proxy
 
+---
 
 ## Usage
 
@@ -101,7 +102,7 @@ github.repository repository where the performance results will be stored
 
 #### prometheus validator explained
 
-
+---
 
 ## License
 
