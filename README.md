@@ -91,8 +91,11 @@ github.repository=
 ```
 
 **pagetestset** URL where the Scholia page list is located. This resource should be a simple text file. Each line should contain a valid Scholia URL. It accepts comments starting with an hash.
+
 **id** this is the test set running id. This is used on reports to identify which running instance generated the data
+
 **webpageTimout** maximum allowed time for a test to run in seconds
+
 **timeBetweenTests** the test batch runs continuously. Every time the batch end it restarts again producing results. A time between tests can be specified (in seconds) if there is the need to delay them
 
 Tests can be exported to Github. In this case one needs to provide login credential (its highly advised that these credentials should be unique to this task and not belonging a user)
