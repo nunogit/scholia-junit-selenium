@@ -108,19 +108,19 @@ Scholia jUnit Selenium tests exports data to prometheus, to be rendered in Grafa
 
 The following variables are currently being exported:
 
-**Backendpeformance
+**Backendpeformance**
 
 Time to start receiving data from the server. This includes server processing time and latency.
 This values should be low by default since there is almost no server side processing. 
 This is measured in milliseconds.
 
-**Frontendperformance
+**Frontendperformance**
 
 Frontend performance measures the time the browser takes to render the HTML content received from the server. 
 This values don't include any async calls that might request extra data (eg.:Datatables) to render content.
 This is measured in milliseconds.
 
-**Widget Iframe loading time
+**Widget Iframe loading time**
 
 The iframe loading time measures the time that a Sparql Widget (iframe based) takes to render.
 Since these are some of the most complex parts of the pages processing (remote query + rendering time) this can often take several seconds and it's very prone to failure.
@@ -128,14 +128,14 @@ Assessing when an iframe is fully loaded is not trivial due to the asynchronous 
 This probing is done every second. This time granularity seems to be enough for now.
 This metric is measured in seconds.
 
-**Page loading time
+**Page loading time**
 
 Page loading time is extremely difficult to get since the content is composed of several asynchronous calls. Some of them run in parallel. A good method to evaluate this still needs to be established. For now we can look at the individual results of each page component to assess its performance.
 Loaded/Failed DataTables
 This metric counts the number of falied/rendered data tables.
 This metric is rather poor since we test a limited set of pages (the most problematic / most used ones). Despite this it can give valuable information when comparing different setups of scholia. It allows a quick comparison to find if different architectural / performance approaches give better results 
 
-**Loaded/Failed Iframe Widgets
+**Loaded/Failed Iframe Widgets**
 
 This metric counts the number of failed/rendered iframe widgets.
 This metric is rather poor since we test a limited set of pages (the most problematic / most used ones). Despite this it can give valuable information when comparing different setups of scholia. //It allows a quic
