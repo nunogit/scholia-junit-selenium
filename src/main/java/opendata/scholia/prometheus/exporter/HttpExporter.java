@@ -48,12 +48,15 @@ public class HttpExporter {
     static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
     static final Gauge memoryProcess = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
-   // static final Gauge backendperformance = Gauge.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
-   // static final Gauge frontendperformance = Gauge.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
+    // static final Gauge backendperformance = Gauge.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
+    // static final Gauge frontendperformance = Gauge.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
 
     static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").labelNames("page_family").register();
     static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").labelNames("page_family").register();
     
+    //not being used yet
+    static final Histogram iframeSparqlPerformance = Histogram.build().name("scholia_widgets_sparqliframeperformance_seconds").help("sparqlwidget").labelNames("page_family").register();
+            
     static final Gauge nodeInfo = Gauge.build().name("scholia_node_info").labelNames("sysname","nodename","release","version","machine","domainname","scholiaid").help("node information").register();
         		
     		
@@ -169,21 +172,21 @@ public class HttpExporter {
                         System.out.println("Adding front end performance ("+scp.getPageTypeId()+"):"+scp.getFrontendPerformance());
                         System.out.println("Adding back  end performance ("+scp.getPageTypeId()+"):"+scp.getBackendPerformance());
 
-                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance()/1000);
-                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000);
+                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance()/1000); //convert to seconds
+                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000); //covert to seconds
                     	
                     	for(TestResult failure : scp.getFailureTestResultList()) {
-                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getMessage() + "\n";
-                    	 performanceReportWidget += scp.getURL() + "\t" + scp.getPageTypeId()  + "\t" + failure.getMessage() + "\t" + failure.getTestDuration() + "\tfailure\n";
+                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getIdentifier() +"\t"+ failure.getDescription() + "\t" + failure.getExtendedDescription() + "\n";
+                    	 performanceReportWidget += scp.getURL() + "\t" + scp.getPageTypeId()  + "\t" + failure.getIdentifier() +"\t"+ failure.getDescription() + "\t" + failure.getTestDuration() +"\tfailure\t"+failure.getExtendedDescription()+"\n";
                     	
                     	}
                     	for(TestResult success : scp.getSuccessTestResultList()) {
-                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getMessage() + "\n";
-                    	 performanceReportWidget += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getMessage() + "\t" + success.getTestDuration() + "\tsuccess\n";
+                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" +  success.getIdentifier() + "\t" + success.getDescription() + "\t" + success.getExtendedDescription() +"\n";
+                    	 performanceReportWidget += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getIdentifier() +"\t"+ success.getDescription() + "\t" + success.getTestDuration() + "\tsuccess\t"+success.getExtendedDescription()+"\n";
                     	}
                     	
                     	for(TestResult diffFailure: scp.getFailureTestResultDiffList()) {
-                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure.getMessage() + "\n";
+                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure.getIdentifier() +"\t" +  diffFailure.getDescription() + "\t" + diffFailure.getExtendedDescription() + "\n";
                     	}
                     	 
 
@@ -233,7 +236,7 @@ public class HttpExporter {
                     logger.info("Run time Delta: "+deltaTime+" seconds");
                         
                     int timeBetweenTests = ConfigManager.instance().getConfig().getInt("timeBetweenTests", 0);	
-                    Thread.sleep(1000 * 60* timeBetweenTests); //interval between tests
+                    Thread.sleep(1000 * 60 * timeBetweenTests); //interval between tests in seconds
 
                     
                 } catch (InterruptedException e) {

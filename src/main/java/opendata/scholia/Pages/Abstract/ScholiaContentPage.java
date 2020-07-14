@@ -280,8 +280,13 @@ public abstract class ScholiaContentPage{
 	public void setPageTypeId(String pageTypeId) {
 		this.pageTypeId = pageTypeId;
 	}
-
+	
 	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment, int testDuration) {
+		addTestResult( successfulResult,  tag,   widgetIdentifier,  comment,  testDuration, "");
+	}
+
+
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment, int testDuration, String extraDescription) {
 		HashMap<String, ArrayList<TestResult>> resultList;
 
 		resultList = successfulResult ? successList : failureList;
@@ -295,7 +300,7 @@ public abstract class ScholiaContentPage{
 		//dirty solutionm, by manually adding the tab, to showcase; make a proper structure to host the description and comment
 		
 		
-		list.add( new TestResult(widgetIdentifier + "\t" + comment, testDuration) );
+		list.add( new TestResult(widgetIdentifier, comment, testDuration, extraDescription) );
 
 	}
 

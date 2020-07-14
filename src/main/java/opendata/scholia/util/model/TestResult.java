@@ -1,23 +1,49 @@
 package opendata.scholia.util.model;
 
 public class TestResult {
-	String message = "";
-	int testDuration = -1; // miliseconds
+	String identifier;
+	String description;
+	int testDuration = -1000; // miliseconds
+	String extendedDescription = "";
 	
 	
 	
-	
-	public TestResult(String message, int testDuration) {
+	public TestResult(String identifier, String description, int testDuration) {
 		super();
-		this.message = message;
+		this.identifier = identifier;
+		this.description = description;
 		this.testDuration = testDuration;
 	}
 	
-	public String getMessage() {
-		return message;
+	public TestResult(String identifier, String description, int testDuration, String extendedDescription) {
+		super();
+		this.identifier = identifier;
+		this.description = description;
+		this.testDuration = testDuration;
+		this.extendedDescription = extendedDescription;
 	}
-	public void setMessage(String message) {
-		this.message = message;
+	
+	public void setExtendedMessage(String extendedDescription) {
+		this.extendedDescription = extendedDescription;
+	}
+	
+	public String getExtendedDescription() {
+		return extendedDescription;
+	}
+	
+	public String getDescription() {
+		return this.description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public String getIdentifier() {
+		return identifier;
+	}
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 	public int getTestDuration() {
 		return testDuration;
