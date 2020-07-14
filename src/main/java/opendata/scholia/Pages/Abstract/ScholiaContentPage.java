@@ -377,13 +377,13 @@ public abstract class ScholiaContentPage{
 			boolean foundAnEqual = false;
 			for(TestResult s2: oldFailuretResultList) {
 				System.out.println("Comparing "+s1 + " "+s2 + " ");
-				if(s1.getMessage().equals(s2.getMessage())) {
+				if(s1.getIdentifier().equals(s2.getIdentifier())) {
 					foundAnEqual = true;
 					System.out.println(foundAnEqual);
 				}
 			}
 			if(!foundAnEqual) {
-				System.out.println("adding "+ s1.getMessage());
+				System.out.println("adding "+ s1.getIdentifier() + " " + s1.getDescription());
 				diffList.add(s1);
 			}
 		} 

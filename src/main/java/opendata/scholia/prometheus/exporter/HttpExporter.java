@@ -143,6 +143,7 @@ public class HttpExporter {
                     String failureLogDiff4Git = "";
                     String performanceReportWidget = "";
                     String performanceReportPage = "";
+                    String preloadURLs = "";
 
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
