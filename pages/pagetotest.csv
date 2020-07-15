@@ -1,8 +1,9 @@
 https://scholia.toolforge.org/author/Q97270
-https://scholia.toolforge.org/author/Q583725
-https://scholia.toolforge.org/author/Q29253985 # Paul Lecoq, over 1000 publications, most with hundreds of co-authors
-https://scholia.toolforge.org/author/Q29253985/missing # Paul Lecoq, over 1000 publications, most with hundreds of co-authors
+https://scholia.toolforge.org/author/Q97270/missing
+https://scholia.toolforge.org/author/Q583725	# U.S. CDC; useful content in multiple aspects
+https://scholia.toolforge.org/author/Q583725/missing	# U.S. CDC; useful content in multiple aspects
 https://scholia.toolforge.org/author/Q46826387
+https://scholia.toolforge.org/author/Q46826387/missing
 https://scholia.toolforge.org/author/Q55004959
 https://scholia.toolforge.org/author/Q55004959/missing
 https://scholia.toolforge.org/award/Q35637
@@ -21,22 +22,23 @@ https://scholia.toolforge.org/disease/Q84263196
 https://scholia.toolforge.org/event/
 https://scholia.toolforge.org/event-series/
 https://scholia.toolforge.org/gene/Q18030793
-https://scholia.toolforge.org/location/Q30	# U.S.A.; fails in multiple ways
 https://scholia.toolforge.org/location/Q668
 https://scholia.toolforge.org/location/Q5465
-https://scholia.toolforge.org/location/Q583725
-https://scholia.toolforge.org/organization/Q131626
-https://scholia.toolforge.org/organization/Q583725
-https://scholia.toolforge.org/organization/Q583725/missing
+https://scholia.toolforge.org/location/Q583725	# U.S. CDC; useful content in multiple aspects
+https://scholia.toolforge.org/location/Q583725/missing	# U.S. CDC; useful content in multiple aspects
+https://scholia.toolforge.org/organization/Q131626	# Smithsonian Institution; lots of substructures with rich content
+https://scholia.toolforge.org/organization/Q131626/missing	# Smithsonian Institution; lots of substructures with rich content
+https://scholia.toolforge.org/organization/Q583725	# U.S. CDC; useful content in multiple aspects
+https://scholia.toolforge.org/organization/Q583725/missing	# U.S. CDC; useful content in multiple aspects
 https://scholia.toolforge.org/P577 # the "item counts" panel breaks for many properties, including this one
 https://scholia.toolforge.org/pathway/Q30225516
 https://scholia.toolforge.org/printer/
 https://scholia.toolforge.org/project/Q27990087
 https://scholia.toolforge.org/protein/
 https://scholia.toolforge.org/publisher/Q127992
-https://scholia.toolforge.org/publisher/Q583725
+https://scholia.toolforge.org/publisher/Q583725	# U.S. CDC; useful content in multiple aspects
 https://scholia.toolforge.org/sponsor/Q4314967
-https://scholia.toolforge.org/sponsor/Q583725
+https://scholia.toolforge.org/sponsor/Q583725	# U.S. CDC; useful content in multiple aspects
 https://scholia.toolforge.org/series/Q924044
 https://scholia.toolforge.org/taxon/Q15978631
 https://scholia.toolforge.org/taxon/Q82069695
@@ -65,12 +67,17 @@ https://scholia.toolforge.org/topic/Q1492760	# teenager; over 50k publications
 https://scholia.toolforge.org/topic/Q1492760/missing	# teenager; over 50k publications
 https://scholia.toolforge.org/topic/Q180556	# Helicobacter pylori; over 30k publications
 https://scholia.toolforge.org/topic/Q180556/missing	# Helicobacter pylori; over 30k publications
-https://scholia.toolforge.org/topic/Q583725
-https://scholia.toolforge.org/topic/Q81068910
-https://scholia.toolforge.org/topic/Q82069695
-https://scholia.toolforge.org/topic/Q84263196
+https://scholia.toolforge.org/topic/Q583725	# U.S. CDC; useful content in multiple aspects
+https://scholia.toolforge.org/topic/Q583725/missing	# U.S. CDC; useful content in multiple aspects
+https://scholia.toolforge.org/topic/Q18123741	# infectious disease; high-profile and currently high rate of failure
+https://scholia.toolforge.org/topic/Q18123741/missing	# infectious disease; high-profile and currently high rate of failure
+https://scholia.toolforge.org/topic/Q81068910	# COVID-19 pandemic; high-profile
+https://scholia.toolforge.org/topic/Q81068910/missing	# COVID-19 pandemic; high-profile
+https://scholia.toolforge.org/topic/Q82069695	# SARS-CoV-2; high-profile
+https://scholia.toolforge.org/topic/Q82069695/missing	# SARS-CoV-2; high-profile
+https://scholia.toolforge.org/topic/Q84263196	# COVID-19; high-profile
+https://scholia.toolforge.org/topic/Q84263196/missing	# COVID-19; high-profile
 https://scholia.toolforge.org/use/Q5140318
 https://scholia.toolforge.org/venue/Q4775205
 https://scholia.toolforge.org/work/Q21090025
 https://scholia.toolforge.org/organizations/Q1269766,Q193196
-https://scholia.toolforge.org/author/random	# to add some randomness to our testing
