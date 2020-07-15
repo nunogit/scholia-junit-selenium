@@ -187,14 +187,18 @@ public abstract class ScholiaContentPage{
 	
 	//TODO improve this in the future
 	public int checkIframeWidgetRuntime(String urlString, int iframeSeqid) {
+		if(true) return -1; //dryrun
+		
 		visitPage();
 
+		//apparently the iframe was not rendering properly.
+		//now loading iframes in an independent way
 		System.out.println("Testing "+urlString);
-		//driver.get(urlString);
+		driver.get(urlString);
 		
 		//apparently the iframe was not rendering properly.
 		//now loading iframes in an independent way
-		driver.switchTo().frame(0);
+		//driver.switchTo().frame(0);
 		/*driver.findElement(by.)		
 		System.out.println(driver.getPageSource());*/
 		
@@ -248,10 +252,11 @@ public abstract class ScholiaContentPage{
 		   pageSource.contains("unable to display result") ||
 		   pageSource.contains("server error: unexpected end of json input")
 		   ) {
+			//driver.switchTo().defaultContent();
 			return -1;
 		 }
 		
-        driver.switchTo().defaultContent();
+        //driver.switchTo().defaultContent();
 		return waitForSeconds;
 	}
 	
@@ -281,8 +286,8 @@ public abstract class ScholiaContentPage{
 		this.pageTypeId = pageTypeId;
 	}
 	
-	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment, int testDuration) {
-		addTestResult( successfulResult,  tag,   widgetIdentifier,  comment,  testDuration, "");
+	public void addTestResult(boolean success, String tag,  String widgetIdentifier, String comment, int testDuration) {
+		addTestResult( success,  tag,   widgetIdentifier,  comment,  testDuration, "");
 	}
 
 
@@ -295,17 +300,14 @@ public abstract class ScholiaContentPage{
 		if(list==null) {
 			list = new ArrayList();
 			resultList.put(tag, list);
-		}
-		
-		//dirty solutionm, by manually adding the tab, to showcase; make a proper structure to host the description and comment
-		
+		}		
 		
 		list.add( new TestResult(widgetIdentifier, comment, testDuration, extraDescription) );
 
 	}
 
-	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, int testDuration) {
-		addTestResult(successfulResult, tag, widgetIdentifier, "", testDuration);
+	public void addTestResult(boolean success, String tag,  String widgetIdentifier, int testDuration) {
+		addTestResult(success, tag, widgetIdentifier, "", testDuration);
 	}
 	
 	public void clearResults() {

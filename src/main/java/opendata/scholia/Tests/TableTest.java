@@ -122,7 +122,7 @@ public class TableTest extends TestBase {
 				
 				boolean isDataTableSizeMoreThanZero = (scpage.getDataTableSize(id) > 0);
 				
-				scpage.addTestResult(isDataTableSizeMoreThanZero, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, id, -1);
+				scpage.addTestResult(isDataTableSizeMoreThanZero, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, id, -1000);
 				assertTrue(id, isDataTableSizeMoreThanZero);
 
 			}
