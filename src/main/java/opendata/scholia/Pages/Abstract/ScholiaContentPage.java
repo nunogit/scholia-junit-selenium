@@ -187,7 +187,7 @@ public abstract class ScholiaContentPage{
 	
 	//TODO improve this in the future
 	public int checkIframeWidgetRuntime(String urlString, int iframeSeqid) {
-		if(true) return -1; //dryrun
+		//if(true) return -1; //dryrun
 		
 		visitPage();
 
