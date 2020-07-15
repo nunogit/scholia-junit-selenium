@@ -30,7 +30,7 @@ public class Venue extends ScholiaContentPage{
         this.addDataTable("topics");
         this.addDataTable("prolific-authors");
         
-        //https://tools.wmflabs.org/scholia/venue/Q4775205
+        //https://scholia.toolforge.org/venue/Q4775205
         //can be 0?
         //driver.this.addDataTable("co-authors");
         

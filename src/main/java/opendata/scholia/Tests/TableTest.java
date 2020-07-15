@@ -49,32 +49,32 @@ public class TableTest extends TestBase {
 				
 		//List<Class<ScholiaContentPage>> pageTestList = new Vector<Class<ScholiaContentPage>>();
 		Map<Class<?>, String> pageTestList = new HashMap<Class<?>, String>();
-		pageTestList.put(Author.class, "https://tools.wmflabs.org/scholia/author/Q97270");
-		pageTestList.put(Award.class, "https://tools.wmflabs.org/scholia/award/Q35637");
-		pageTestList.put(Catalogue.class, "https://tools.wmflabs.org/scholia/catalogue/Q42661788");
-		pageTestList.put(Chemical.class, "https://tools.wmflabs.org/scholia/chemical/Q2270");
-		pageTestList.put(ChemicalClasses.class, "https://tools.wmflabs.org/scholia/chemical-class/Q41581");
-		pageTestList.put(ChemicalElement.class, "https://tools.wmflabs.org/scholia/chemical-element/Q623");
-		pageTestList.put(ClinicalTrial.class, "https://tools.wmflabs.org/scholia/clinical-trial/");
-		pageTestList.put(Country.class, "https://tools.wmflabs.org/scholia/country/Q35");
-		pageTestList.put(Disease.class, "https://tools.wmflabs.org/scholia/disease/Q41112");
-		pageTestList.put(Event.class, "https://tools.wmflabs.org/scholia/event/");
-		pageTestList.put(EventSeries.class, "https://tools.wmflabs.org/scholia/event-series/");
-		pageTestList.put(Gene.class, "https://tools.wmflabs.org/scholia/gene/Q18030793");
-		pageTestList.put(Location.class, "https://tools.wmflabs.org/scholia/location/Q5465");
-		pageTestList.put(Organization.class, "https://tools.wmflabs.org/scholia/organization/Q131626");
-		pageTestList.put(Pathway.class, "https://tools.wmflabs.org/scholia/pathway/Q30225516");
-		pageTestList.put(Printer.class, "https://tools.wmflabs.org/scholia/printer/");
-		pageTestList.put(Project.class, "https://tools.wmflabs.org/scholia/project/Q27990087");
-		pageTestList.put(Protein.class, "https://tools.wmflabs.org/scholia/protein/");
-		pageTestList.put(Publisher.class, "https://tools.wmflabs.org/scholia/publisher/Q127992");
-		pageTestList.put(Sponsor.class, "https://tools.wmflabs.org/scholia/sponsor/Q4314967");
-		pageTestList.put(Series.class, "https://tools.wmflabs.org/scholia/series/Q924044");
-		pageTestList.put(Taxon.class, "https://tools.wmflabs.org/scholia/taxon/Q15978631");
-		pageTestList.put(Topic.class, "https://tools.wmflabs.org/scholia/topic/Q52");
-		pageTestList.put(Use.class, "https://tools.wmflabs.org/scholia/use/Q5140318");
-		pageTestList.put(Venue.class, "https://tools.wmflabs.org/scholia/venue/Q4775205");
-		pageTestList.put(Work.class, "https://tools.wmflabs.org/scholia/work/Q21090025");
+		pageTestList.put(Author.class, "https://scholia.toolforge.org/author/Q97270");
+		pageTestList.put(Award.class, "https://scholia.toolforge.org/award/Q35637");
+		pageTestList.put(Catalogue.class, "https://scholia.toolforge.org/catalogue/Q42661788");
+		pageTestList.put(Chemical.class, "https://scholia.toolforge.org/chemical/Q2270");
+		pageTestList.put(ChemicalClasses.class, "https://scholia.toolforge.org/chemical-class/Q41581");
+		pageTestList.put(ChemicalElement.class, "https://scholia.toolforge.org/chemical-element/Q623");
+		pageTestList.put(ClinicalTrial.class, "https://scholia.toolforge.org/clinical-trial/");
+		pageTestList.put(Country.class, "https://scholia.toolforge.org/country/Q35");
+		pageTestList.put(Disease.class, "https://scholia.toolforge.org/disease/Q41112");
+		pageTestList.put(Event.class, "https://scholia.toolforge.org/event/");
+		pageTestList.put(EventSeries.class, "https://scholia.toolforge.org/event-series/");
+		pageTestList.put(Gene.class, "https://scholia.toolforge.org/gene/Q18030793");
+		pageTestList.put(Location.class, "https://scholia.toolforge.org/location/Q5465");
+		pageTestList.put(Organization.class, "https://scholia.toolforge.org/organization/Q131626");
+		pageTestList.put(Pathway.class, "https://scholia.toolforge.org/pathway/Q30225516");
+		pageTestList.put(Printer.class, "https://scholia.toolforge.org/printer/");
+		pageTestList.put(Project.class, "https://scholia.toolforge.org/project/Q27990087");
+		pageTestList.put(Protein.class, "https://scholia.toolforge.org/protein/");
+		pageTestList.put(Publisher.class, "https://scholia.toolforge.org/publisher/Q127992");
+		pageTestList.put(Sponsor.class, "https://scholia.toolforge.org/sponsor/Q4314967");
+		pageTestList.put(Series.class, "https://scholia.toolforge.org/series/Q924044");
+		pageTestList.put(Taxon.class, "https://scholia.toolforge.org/taxon/Q15978631");
+		pageTestList.put(Topic.class, "https://scholia.toolforge.org/topic/Q52");
+		pageTestList.put(Use.class, "https://scholia.toolforge.org/use/Q5140318");
+		pageTestList.put(Venue.class, "https://scholia.toolforge.org/venue/Q4775205");
+		pageTestList.put(Work.class, "https://scholia.toolforge.org/work/Q21090025");
 		
 		
 		//Author author = new Author(driver);
@@ -122,7 +122,7 @@ public class TableTest extends TestBase {
 				
 				boolean isDataTableSizeMoreThanZero = (scpage.getDataTableSize(id) > 0);
 				
-				scpage.addTestResult(isDataTableSizeMoreThanZero, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, id);
+				scpage.addTestResult(isDataTableSizeMoreThanZero, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, id, -1000);
 				assertTrue(id, isDataTableSizeMoreThanZero);
 
 			}
@@ -133,10 +133,8 @@ public class TableTest extends TestBase {
 		List<String> idList = scPage.dataTableIdList();
 		int dataTableSize = scPage.getDataTableSize(widgetId);
 		logger.debug(dataTableSize + " rows in" + widgetId+ " @ " + scPage.getURL());
+		scPage.addTestResult(dataTableSize > 0, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, widgetId, -1000);
 		assertTrue(widgetId, dataTableSize > 0);
-		scPage.addTestResult(dataTableSize > 0, ScholiaContentPage.SPARQL_DATATABLE_WIDGET, widgetId);
-
-
 	}
 	
 	@Test
@@ -153,7 +151,7 @@ public class TableTest extends TestBase {
 		Author author = new Author(driver);
 	
 		//settingArgentina
-		author.setURL("https://tools.wmflabs.org/scholia/country/Q414");
+		author.setURL("https://scholia.toolforge.org/country/Q414");
 		author.visitPage();
 		
 		List<String> idList = author.dataTableIdList();

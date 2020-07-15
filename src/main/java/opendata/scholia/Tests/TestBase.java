@@ -23,6 +23,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -238,20 +239,47 @@ public class TestBase /*implements  SauceOnDemandSessionIdProvider  */{
     }
     
 	public static List<String> loadFromGit(){
-		GitReader gitReader = new GitReader();
-		try {
-			String sURL = ConfigManager.instance().getConfig().getString("pagetestset", "https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
-			System.out.println("Loading test set: "+sURL);			
-			gitReader.setURL(sURL);
+		GitReader gitReader0 = new GitReader();
+		GitReader gitReader1 = new GitReader();
+		
+			String sURL0 = ConfigManager.instance().getConfig().getString("pagetestset", "https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
+			String sURL1 = ConfigManager.instance().getConfig().getString("pagetopset", "");
+
+			System.out.println("Loading test set: "+sURL0);		
+			System.out.println("Loading top set: "+sURL1);
+			
+			gitReader0.setURL(sURL0);
+			gitReader1.setURL(sURL1);
 			//gitReader.setURL("https://raw.githubusercontent.com/nunogit/scholia-junit-selenium/master/pages/smalltestset.csv");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("can't connect to retrieve test list");
-			System.out.flush();
-			e.printStackTrace();
+
+		
+		String alternativedomain  = ConfigManager.instance().getConfig().getString("alternativedomain", "");
+		
+		List<String> sUrlList0 = gitReader0.getList();
+		List<String> sUrlList1 = gitReader1.getList();
+		
+		
+		//dedupliacate
+		for (String s : sUrlList1){
+			   if (!sUrlList0.contains(s))
+				   sUrlList0.add(s);
 		}
 		
-		return gitReader.getList();
+		
+		List<String> sUrlAltList = new ArrayList();
+		
+		
+		//TODO think if this logic should move to another class
+		//TODO add the domain to a fixed domain or infer it
+		if(!alternativedomain.trim().equals("")) {
+			for(String sScholiaUrl : sUrlList0) {
+				sUrlAltList.add( sScholiaUrl.replace("https://scholia.toolforge.org/", alternativedomain) );
+			}
+			
+			return sUrlAltList;
+		}
+		
+		return sUrlList0;
 	}
 	
 	public static List<ScholiaContentPage> getScholiaContentPageList(List<String> sUrlList){

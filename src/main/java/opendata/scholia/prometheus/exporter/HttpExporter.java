@@ -29,6 +29,7 @@ import opendata.scholia.Tests.TableTest;
 import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.GitWriter;
 import opendata.scholia.util.Uname;
+import opendata.scholia.util.model.TestResult;
 
 public class HttpExporter {
 	//TOOD a bit ugly. Improve code
@@ -47,12 +48,15 @@ public class HttpExporter {
     static final Gauge totalTimeRunning = Gauge.build().name("scholia_seleniumtest_runtime_seconds").help("total datatables tested").register();
     static final Gauge memoryProcess = Gauge.build().name("scholia_seleniumtest_memory_processusage_bytes").help("memory spent by the exporter").register();
 
-   // static final Gauge backendperformance = Gauge.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
-   // static final Gauge frontendperformance = Gauge.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
+    // static final Gauge backendperformance = Gauge.build().name("scholia_backendperformance_seconds").help("backendperformance").register();
+    // static final Gauge frontendperformance = Gauge.build().name("scholia_frontendperformance_seconds").help("backendperformance").register();
 
     static final Histogram backendperformance = Histogram.build().name("scholia_backendperformance_seconds").help("backendperformance").labelNames("page_family").register();
     static final Histogram frontendperformance = Histogram.build().name("scholia_frontendperformance_seconds").help("backendperformance").labelNames("page_family").register();
     
+    //not being used yet
+    static final Histogram iframeSparqlPerformance = Histogram.build().name("scholia_widgets_sparqliframeperformance_seconds").help("sparqlwidget").labelNames("page_family").register();
+            
     static final Gauge nodeInfo = Gauge.build().name("scholia_node_info").labelNames("sysname","nodename","release","version","machine","domainname","scholiaid").help("node information").register();
         		
     		
@@ -137,6 +141,9 @@ public class HttpExporter {
                     String successLog4Git = "";
                     String failureLog4Git = "";
                     String failureLogDiff4Git = "";
+                    String performanceReportWidget = "";
+                    String performanceReportPage = "";
+                    String preloadURLs = "";
 
                     
                     List<ScholiaContentPage> scholiaContentPageList2 = PageFactory.instance().pageList();
@@ -148,7 +155,7 @@ public class HttpExporter {
                     	
                     	double isFailureCount = scp.getFailureTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
                     	double isSuccessCount = scp.getSuccessTestResultList(ScholiaContentPage.SPARQL_IFRAME_WIDGET).size();
-                    	double isTotalTests   = dtFailureCount + dtSuccessCount;
+                    	double isTotalTests   = isFailureCount + isSuccessCount;
                     			
                     	datatablesTotal.labels(scp.getPageTypeId()).set(dtTotalTests);
                     	datatablesErrors.labels(scp.getPageTypeId()).set(dtFailureCount);
@@ -166,20 +173,26 @@ public class HttpExporter {
                         System.out.println("Adding front end performance ("+scp.getPageTypeId()+"):"+scp.getFrontendPerformance());
                         System.out.println("Adding back  end performance ("+scp.getPageTypeId()+"):"+scp.getBackendPerformance());
 
-                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance()/1000);
-                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000);
+                    	backendperformance.labels(scp.getPageTypeId()).observe(scp.getBackendPerformance()/1000); //convert to seconds
+                    	frontendperformance.labels(scp.getPageTypeId()).observe(scp.getFrontendPerformance()/1000); //covert to seconds
                     	
-                    	for(String failure : scp.getFailureTestResultList()) {
-                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure + "\n";
+                    	for(TestResult failure : scp.getFailureTestResultList()) {
+                       	 failureLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + failure.getIdentifier() +"\t"+ failure.getDescription() + "\t" + failure.getExtendedDescription() + "\n";
+                    	 performanceReportWidget += scp.getURL() + "\t" + scp.getPageTypeId()  + "\t" + failure.getIdentifier() +"\t"+ failure.getDescription() + "\t" + failure.getTestDuration() +"\tfailure\t"+failure.getExtendedDescription()+"\n";
+                    	
                     	}
-                    	for(String success : scp.getSuccessTestResultList()) {
-                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success + "\n";
-                       	}
+                    	for(TestResult success : scp.getSuccessTestResultList()) {
+                    	 successLog4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" +  success.getIdentifier() + "\t" + success.getDescription() + "\t" + success.getExtendedDescription() +"\n";
+                    	 performanceReportWidget += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + success.getIdentifier() +"\t"+ success.getDescription() + "\t" + success.getTestDuration() + "\tsuccess\t"+success.getExtendedDescription()+"\n";
+                    	}
                     	
-                    	for(String diffFailure: scp.getFailureTestResultDiffList()) {
-                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure + "\n";
+                    	for(TestResult diffFailure: scp.getFailureTestResultDiffList()) {
+                    	  failureLogDiff4Git += scp.getURL() + "\t" + scp.getPageTypeId() + "\t" + diffFailure.getIdentifier() +"\t" +  diffFailure.getDescription() + "\t" + diffFailure.getExtendedDescription() + "\n";
                     	}
                     	 
+
+                        performanceReportPage += "\n"+scp.getURL() +scp.getBackendPerformance()+ "\t" + +scp.getFrontendPerformance();
+                    	
                     	
                     	//tested_datatables_total.labels(labelValues)
                     	//backendperformance. = scp.getBackendPerformance();
@@ -192,28 +205,39 @@ public class HttpExporter {
                 	try {
                 		System.out.println("Writing to git...");
                 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+                		SimpleDateFormat sdf4dir = new SimpleDateFormat("yyyy/MM/dd");
+      
+                		
                 		long timestamp = System.currentTimeMillis();
                 		String sTimestamp = sdf.format(timestamp);
+                		String directoryDate = sdf4dir.format(timestamp);
                 		System.out.println("FAILURE LOG"+failureLog4Git);
                 		
-						GitWriter.write("/", sTimestamp+".log", failureLog4Git);
-						GitWriter.write("/", "success-"+sTimestamp+".log", successLog4Git);
-						GitWriter.write("/", "diff-"+sTimestamp+".log", failureLogDiff4Git);
+                		String id  = ConfigManager.instance().getConfig().getString("id", "");
+
+                		String dir = "/"+ id +"/"+directoryDate;
+                		
+						GitWriter.write(dir , sTimestamp+".log", failureLog4Git);
+						GitWriter.write(dir, "success-"+sTimestamp+".log", successLog4Git);
+						GitWriter.write(dir, "diff-"+sTimestamp+".log", failureLogDiff4Git);
+						
+						performanceReportWidget = "Iteration: "+ seleniumRunsTotal.get() + " Runtime: " +deltaTime+" "+ directoryDate + "\n" + performanceReportWidget;
+						
+						GitWriter.write(dir, "performance-"+sTimestamp+".log", performanceReportWidget + performanceReportPage);
+
                 	
                 	} catch (IllegalStateException | GitAPIException | URISyntaxException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
-                    
                     seleniumRunsTotal.inc();
                     
-                    logger.info("Run time delta: "+deltaTime+" seconds");
                     //logger.info("Total test result: " + totalSuccess + " (total success) /" + totalRanTests + " (total number tests)");
                     logger.info("Run time Delta: "+deltaTime+" seconds");
                         
                     int timeBetweenTests = ConfigManager.instance().getConfig().getInt("timeBetweenTests", 0);	
-                    Thread.sleep(1000 * 60* timeBetweenTests); //interval between tests
+                    Thread.sleep(1000 * 60 * timeBetweenTests); //interval between tests in seconds
 
                     
                 } catch (InterruptedException e) {

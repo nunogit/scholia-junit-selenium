@@ -1,4 +1,4 @@
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 0 
+#https://scholia.toolforge.org/author/Q97270 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -45,7 +45,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
 group by ?year ?role
 order by ?year
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 1 
+#https://scholia.toolforge.org/author/Q97270 iframe: 1 
 ##defaultView:BarChart
 select ?year ?number_of_pages ?work_label where {
   {
@@ -79,7 +79,7 @@ select ?year ?number_of_pages ?work_label where {
   }
 }
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 2 
+#https://scholia.toolforge.org/author/Q97270 iframe: 2 
 ##defaultView:BubbleChart
 SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
 WITH {
@@ -98,7 +98,7 @@ WHERE {
 GROUP BY ?venue ?count
 ORDER BY DESC(?count)  
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 3 
+#https://scholia.toolforge.org/author/Q97270 iframe: 3 
 ##defaultView:Graph
 # Egocentric co-author graph for an author
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
@@ -138,7 +138,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
 }
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 4 
+#https://scholia.toolforge.org/author/Q97270 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?topic ?topicLabel
 WITH {
@@ -175,7 +175,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 5 
+#https://scholia.toolforge.org/author/Q97270 iframe: 5 
 ##defaultView:ImageGrid
 SELECT DISTINCT ?image WHERE {
   {
@@ -200,7 +200,7 @@ SELECT DISTINCT ?image WHERE {
   }
 }   
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 6 
+#https://scholia.toolforge.org/author/Q97270 iframe: 6 
 ##defaultView:Timeline
 # Timeline for an author
 SELECT ?label ?beginning ?ending ?education_degree_label
@@ -298,7 +298,7 @@ WHERE {
 
 } 
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 7 
+#https://scholia.toolforge.org/author/Q97270 iframe: 7 
 ##defaultView:Graph
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
@@ -373,7 +373,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 8 
+#https://scholia.toolforge.org/author/Q97270 iframe: 8 
 ##defaultView:Map
 SELECT DISTINCT ?image ?item ?itemLabel ?geo (?property_item_label AS ?layer)
 WHERE {
@@ -387,7 +387,7 @@ WHERE {
   ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')
 }  
 
-#https://tools.wmflabs.org/scholia/author/Q97270 iframe: 9 
+#https://scholia.toolforge.org/author/Q97270 iframe: 9 
 ##defaultView:BarChart
 SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
   ?work wdt:P50 wd:Q97270 .
@@ -398,7 +398,7 @@ SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
 } group by ?year ?kind
 order by desc(?year)    
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 0 
+#https://scholia.toolforge.org/author/Q583725 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -445,7 +445,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
 group by ?year ?role
 order by ?year
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 1 
+#https://scholia.toolforge.org/author/Q583725 iframe: 1 
 ##defaultView:BarChart
 select ?year ?number_of_pages ?work_label where {
   {
@@ -479,7 +479,7 @@ select ?year ?number_of_pages ?work_label where {
   }
 }
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 2 
+#https://scholia.toolforge.org/author/Q583725 iframe: 2 
 ##defaultView:BubbleChart
 SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
 WITH {
@@ -498,7 +498,7 @@ WHERE {
 GROUP BY ?venue ?count
 ORDER BY DESC(?count)  
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 3 
+#https://scholia.toolforge.org/author/Q583725 iframe: 3 
 ##defaultView:Graph
 # Egocentric co-author graph for an author
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
@@ -538,7 +538,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
 }
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 4 
+#https://scholia.toolforge.org/author/Q583725 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?topic ?topicLabel
 WITH {
@@ -575,7 +575,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 5 
+#https://scholia.toolforge.org/author/Q583725 iframe: 5 
 ##defaultView:ImageGrid
 SELECT DISTINCT ?image WHERE {
   {
@@ -600,7 +600,7 @@ SELECT DISTINCT ?image WHERE {
   }
 }   
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 6 
+#https://scholia.toolforge.org/author/Q583725 iframe: 6 
 ##defaultView:Timeline
 # Timeline for an author
 SELECT ?label ?beginning ?ending ?education_degree_label
@@ -698,7 +698,7 @@ WHERE {
 
 } 
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 7 
+#https://scholia.toolforge.org/author/Q583725 iframe: 7 
 ##defaultView:Graph
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
@@ -773,7 +773,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 8 
+#https://scholia.toolforge.org/author/Q583725 iframe: 8 
 ##defaultView:Map
 SELECT DISTINCT ?image ?item ?itemLabel ?geo (?property_item_label AS ?layer)
 WHERE {
@@ -787,7 +787,7 @@ WHERE {
   ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')
 }  
 
-#https://tools.wmflabs.org/scholia/author/Q583725 iframe: 9 
+#https://scholia.toolforge.org/author/Q583725 iframe: 9 
 ##defaultView:BarChart
 SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
   ?work wdt:P50 wd:Q583725 .
@@ -798,7 +798,7 @@ SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
 } group by ?year ?kind
 order by desc(?year)    
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 0 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -845,7 +845,7 @@ select ?year (count(?work) as ?number_of_publications) ?role where {
 group by ?year ?role
 order by ?year
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 1 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 1 
 ##defaultView:BarChart
 select ?year ?number_of_pages ?work_label where {
   {
@@ -879,7 +879,7 @@ select ?year ?number_of_pages ?work_label where {
   }
 }
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 2 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 2 
 ##defaultView:BubbleChart
 SELECT ?count ?venue (SAMPLE(?venue_label_) AS ?venue_label) 
 WITH {
@@ -898,7 +898,7 @@ WHERE {
 GROUP BY ?venue ?count
 ORDER BY DESC(?count)  
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 3 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 3 
 ##defaultView:Graph
 # Egocentric co-author graph for an author
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
@@ -938,7 +938,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,ru,es,zh,jp". }
 }
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 4 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?topic ?topicLabel
 WITH {
@@ -975,7 +975,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 5 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 5 
 ##defaultView:ImageGrid
 SELECT DISTINCT ?image WHERE {
   {
@@ -1000,7 +1000,7 @@ SELECT DISTINCT ?image WHERE {
   }
 }   
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 6 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 6 
 ##defaultView:Timeline
 # Timeline for an author
 SELECT ?label ?beginning ?ending ?education_degree_label
@@ -1098,7 +1098,7 @@ WHERE {
 
 } 
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 7 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 7 
 ##defaultView:Graph
 # Doctoral student/advisor network with a source from a spectific researcher
 PREFIX gas: <http://www.bigdata.com/rdf/gas#>
@@ -1173,7 +1173,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 8 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 8 
 ##defaultView:Map
 SELECT DISTINCT ?image ?item ?itemLabel ?geo (?property_item_label AS ?layer)
 WHERE {
@@ -1187,7 +1187,7 @@ WHERE {
   ?property_item rdfs:label ?property_item_label . FILTER(LANG(?property_item_label) = 'en')
 }  
 
-#https://tools.wmflabs.org/scholia/author/Q55004959 iframe: 9 
+#https://scholia.toolforge.org/author/Q55004959 iframe: 9 
 ##defaultView:BarChart
 SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
   ?work wdt:P50 wd:Q55004959 .
@@ -1198,7 +1198,7 @@ SELECT ?year (count(distinct ?citing_work) as ?count) ?kind  WHERE {
 } group by ?year ?kind
 order by desc(?year)    
 
-#https://tools.wmflabs.org/scholia/award/Q35637 iframe: 0 
+#https://scholia.toolforge.org/award/Q35637 iframe: 0 
 ##defaultView:ImageGrid
 SELECT
   ?year
@@ -1223,7 +1223,7 @@ WHERE {
 ORDER BY DESC(?year)
   
 
-#https://tools.wmflabs.org/scholia/award/Q35637 iframe: 1 
+#https://scholia.toolforge.org/award/Q35637 iframe: 1 
 ##defaultView:BubbleChart
 # Count the number of time works by award recipients have set a main topic
 SELECT ?count ?topic ?topicLabel 
@@ -1242,7 +1242,7 @@ WHERE {
 ORDER BY DESC(?count)
 LIMIT 50
 
-#https://tools.wmflabs.org/scholia/award/Q35637 iframe: 2 
+#https://scholia.toolforge.org/award/Q35637 iframe: 2 
 ##defaultView:Map
 SELECT DISTINCT ?recipient ?recipientLabel ?image ?item ?itemLabel ?geo ?layer
 WITH {
@@ -1260,7 +1260,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh" . } 
 }
 
-#https://tools.wmflabs.org/scholia/catalogue/Q42661788 iframe: 0 
+#https://scholia.toolforge.org/catalogue/Q42661788 iframe: 0 
 ##defaultView:ImageGrid
 SELECT
   ?image
@@ -1272,7 +1272,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/chemical/Q2270 iframe: 0 
+#https://scholia.toolforge.org/chemical/Q2270 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -1316,7 +1316,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/chemical-class/Q41581 iframe: 0 
+#https://scholia.toolforge.org/chemical-class/Q41581 iframe: 0 
 ##defaultView:Graph
 SELECT ?class ?classLabel ?otherclass ?otherclassLabel ?rgb WITH {
   SELECT DISTINCT ?class ?otherclass ?rgb WHERE {
@@ -1337,7 +1337,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/chemical-class/Q41581 iframe: 1 
+#https://scholia.toolforge.org/chemical-class/Q41581 iframe: 1 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -1381,7 +1381,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/clinical-trial/ iframe: 0 
+#https://scholia.toolforge.org/clinical-trial/ iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -1403,7 +1403,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 }
 
-#https://tools.wmflabs.org/scholia/country/Q35 iframe: 0 
+#https://scholia.toolforge.org/country/Q35 iframe: 0 
 ##defaultView:Map{"markercluster":true}.
 SELECT 
   ?location ?locationLabel 
@@ -1434,7 +1434,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 } 
 
-#https://tools.wmflabs.org/scholia/country/Q35 iframe: 1 
+#https://scholia.toolforge.org/country/Q35 iframe: 1 
 ##defaultView:Map{"markercluster":true}.
 SELECT 
   ?location ?locationLabel 
@@ -1461,7 +1461,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en,da,de,es,fr,jp,nl,no,ru,sv,zh". }
 } 
 
-#https://tools.wmflabs.org/scholia/country/Q35 iframe: 2 
+#https://scholia.toolforge.org/country/Q35 iframe: 2 
 ##defaultView:Map
 SELECT ?coorganization ?coorganizationLabel ?geocoordinates ?example_coauthor ?example_coauthorLabel ?example_work ?example_workLabel
 WITH {  
@@ -1485,7 +1485,7 @@ WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 
-#https://tools.wmflabs.org/scholia/country/Q668/topic/Q10737 iframe: 0 
+#https://scholia.toolforge.org/country/Q668/topic/Q10737 iframe: 0 
 ##defaultView:Graph
 SELECT
   ?author1 ?author1Label
@@ -1510,7 +1510,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/country/Q668/topic/Q10737 iframe: 1 
+#https://scholia.toolforge.org/country/Q668/topic/Q10737 iframe: 1 
 ##defaultView:Graph
 SELECT
   ?author1 ?author1Label
@@ -1556,7 +1556,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/disease/Q12156 iframe: 0 
+#https://scholia.toolforge.org/disease/Q12156 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -1594,7 +1594,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/disease/Q41112 iframe: 0 
+#https://scholia.toolforge.org/disease/Q41112 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -1632,7 +1632,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/disease/Q84263196 iframe: 0 
+#https://scholia.toolforge.org/disease/Q84263196 iframe: 0 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -1670,7 +1670,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 0 
+#https://scholia.toolforge.org/organization/Q131626 iframe: 0 
 ##defaultView:Graph
 SELECT
   ?author1 ?author1Label ?image1 ?rgb
@@ -1708,7 +1708,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 1 
+#https://scholia.toolforge.org/organization/Q131626 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label 
 WITH {
@@ -1729,7 +1729,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 2 
+#https://scholia.toolforge.org/organization/Q131626 iframe: 2 
 ##defaultView:BarChart
 # Pages per year bar chart of an organization
 SELECT
@@ -1762,7 +1762,7 @@ WHERE {
 GROUP BY ?year ?researcher_label 
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 3 
+#https://scholia.toolforge.org/organization/Q131626 iframe: 3 
 ##defaultView:BubbleChart
 # Bubble chart of most cited works of first author associated
 # with an organization
@@ -1794,7 +1794,7 @@ WHERE {
 }
 ORDER BY DESC(?count)
 
-#https://tools.wmflabs.org/scholia/organization/Q131626 iframe: 4 
+#https://scholia.toolforge.org/organization/Q131626 iframe: 4 
 ##defaultView:BarChart
 SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
 WITH {
@@ -1826,7 +1826,7 @@ GROUP BY ?year ?researcher ?researcherLabel
 ORDER BY ?year
 
 
-#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 0 
+#https://scholia.toolforge.org/organization/Q583725 iframe: 0 
 ##defaultView:Graph
 SELECT
   ?author1 ?author1Label ?image1 ?rgb
@@ -1864,7 +1864,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 1 
+#https://scholia.toolforge.org/organization/Q583725 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label 
 WITH {
@@ -1885,7 +1885,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 2 
+#https://scholia.toolforge.org/organization/Q583725 iframe: 2 
 ##defaultView:BarChart
 # Pages per year bar chart of an organization
 SELECT
@@ -1918,7 +1918,7 @@ WHERE {
 GROUP BY ?year ?researcher_label 
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 3 
+#https://scholia.toolforge.org/organization/Q583725 iframe: 3 
 ##defaultView:BubbleChart
 # Bubble chart of most cited works of first author associated
 # with an organization
@@ -1950,7 +1950,7 @@ WHERE {
 }
 ORDER BY DESC(?count)
 
-#https://tools.wmflabs.org/scholia/organization/Q583725 iframe: 4 
+#https://scholia.toolforge.org/organization/Q583725 iframe: 4 
 ##defaultView:BarChart
 SELECT ?year (SUM(?citations_per_author_) AS ?citations_per_author) ?researcherLabel
 WITH {
@@ -1982,10 +1982,10 @@ GROUP BY ?year ?researcher ?researcherLabel
 ORDER BY ?year
 
 
-#https://tools.wmflabs.org/scholia/pathway/Q30225516 iframe: 0 
+#https://scholia.toolforge.org/pathway/Q30225516 iframe: 0 
 https://tools.wmflabs.org/pathway-viewer/?id=WP2586
 
-#https://tools.wmflabs.org/scholia/pathway/Q30225516 iframe: 1 
+#https://scholia.toolforge.org/pathway/Q30225516 iframe: 1 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -2027,7 +2027,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/printer/ iframe: 0 
+#https://scholia.toolforge.org/printer/ iframe: 0 
 ##defaultView:Map{"layer": "?counts"}
 SELECT
   ?geo
@@ -2054,7 +2054,7 @@ ORDER BY DESC(?count)
 LIMIT 1000
 
 
-#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 0 
+#https://scholia.toolforge.org/project/Q27990087 iframe: 0 
 ##defaultView:Map
 SELECT ?partner ?partnerLabel ?location
 WITH {
@@ -2069,7 +2069,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 1 
+#https://scholia.toolforge.org/project/Q27990087 iframe: 1 
 ##defaultView:Timeline{"hide": ["?end_time", "?start_time"]}
 SELECT DISTINCT ?start_time ?end_time ?description WHERE {
   {  
@@ -2100,7 +2100,7 @@ SELECT DISTINCT ?start_time ?end_time ?description WHERE {
   }
 }
 
-#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 2 
+#https://scholia.toolforge.org/project/Q27990087 iframe: 2 
 ##defaultView:BubbleChart
 SELECT ?score ?topic ?topicLabel
 WITH {
@@ -2137,7 +2137,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/project/Q27990087 iframe: 3 
+#https://scholia.toolforge.org/project/Q27990087 iframe: 3 
 ##defaultView:BarChart
 # Inspired from LEGOLAS - http://abel.lis.illinois.edu/legolas/
 # Shubhanshu Mishra, Vetle Torvik
@@ -2183,7 +2183,7 @@ select ?year (count(?work) as ?number_of_publications) where {
 group by ?year 
 order by ?year
 
-#https://tools.wmflabs.org/scholia/publisher/Q127992 iframe: 0 
+#https://scholia.toolforge.org/publisher/Q127992 iframe: 0 
 ##defaultView:Timeline
 SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
   # Publisher
@@ -2201,7 +2201,7 @@ SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
 ORDER BY DESC(?datetime)
 LIMIT 50
 
-#https://tools.wmflabs.org/scholia/publisher/Q127992 iframe: 1 
+#https://scholia.toolforge.org/publisher/Q127992 iframe: 1 
 ##defaultView:ScatterChart
 SELECT ?work_count ?citation_count ?journal ?journalLabel 
 WITH {
@@ -2230,7 +2230,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/publisher/Q583725 iframe: 0 
+#https://scholia.toolforge.org/publisher/Q583725 iframe: 0 
 ##defaultView:Timeline
 SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
   # Publisher
@@ -2248,7 +2248,7 @@ SELECT DISTINCT ?datetime ?venue ?venueLabel WHERE {
 ORDER BY DESC(?datetime)
 LIMIT 50
 
-#https://tools.wmflabs.org/scholia/publisher/Q583725 iframe: 1 
+#https://scholia.toolforge.org/publisher/Q583725 iframe: 1 
 ##defaultView:ScatterChart
 SELECT ?work_count ?citation_count ?journal ?journalLabel 
 WITH {
@@ -2277,7 +2277,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/sponsor/Q4314967 iframe: 0 
+#https://scholia.toolforge.org/sponsor/Q4314967 iframe: 0 
 ##defaultView:BubbleChart
 SELECT ?count ?topic ?topicLabel
 WITH {
@@ -2297,7 +2297,7 @@ WHERE {
 ORDER BY DESC(?count)
 
 
-#https://tools.wmflabs.org/scholia/sponsor/Q4314967 iframe: 1 
+#https://scholia.toolforge.org/sponsor/Q4314967 iframe: 1 
 ##defaultView:ScatterChart
 SELECT ?start_time ?budget ?project ?projectLabel WHERE {
   ?project wdt:P859+ wd:Q4314967 .
@@ -2307,7 +2307,7 @@ SELECT ?start_time ?budget ?project ?projectLabel WHERE {
     bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }
 
-#https://tools.wmflabs.org/scholia/sponsor/Q583725 iframe: 0 
+#https://scholia.toolforge.org/sponsor/Q583725 iframe: 0 
 ##defaultView:BubbleChart
 SELECT ?count ?topic ?topicLabel
 WITH {
@@ -2327,7 +2327,7 @@ WHERE {
 ORDER BY DESC(?count)
 
 
-#https://tools.wmflabs.org/scholia/sponsor/Q583725 iframe: 1 
+#https://scholia.toolforge.org/sponsor/Q583725 iframe: 1 
 ##defaultView:ScatterChart
 SELECT ?start_time ?budget ?project ?projectLabel WHERE {
   ?project wdt:P859+ wd:Q583725 .
@@ -2337,7 +2337,7 @@ SELECT ?start_time ?budget ?project ?projectLabel WHERE {
     bd:serviceParam wikibase:language "en,da,es,fr,jp,nl,no,ru,sv,zh". }
 }
 
-#https://tools.wmflabs.org/scholia/series/Q924044 iframe: 0 
+#https://scholia.toolforge.org/series/Q924044 iframe: 0 
 ##defaultView:BubbleChart
 SELECT ?count ?topic ?topicLabel
 WITH {
@@ -2363,7 +2363,7 @@ DESC(?count)
 LIMIT 100
 
 
-#https://tools.wmflabs.org/scholia/series/Q924044 iframe: 1 
+#https://scholia.toolforge.org/series/Q924044 iframe: 1 
 ##defaultView:BarChart
 SELECT ?year ?count ?organization ?organizationLabel
 WITH {
@@ -2398,7 +2398,7 @@ WHERE {
 ORDER BY ?year
 
 
-#https://tools.wmflabs.org/scholia/taxon/Q15978631 iframe: 0 
+#https://scholia.toolforge.org/taxon/Q15978631 iframe: 0 
 ##defaultView:Graph
 SELECT
   ?child ?childLabel
@@ -2452,7 +2452,7 @@ WHERE {
 
 }
 
-#https://tools.wmflabs.org/scholia/taxon/Q82069695 iframe: 0 
+#https://scholia.toolforge.org/taxon/Q82069695 iframe: 0 
 ##defaultView:Graph
 SELECT
   ?child ?childLabel
@@ -2506,7 +2506,7 @@ WHERE {
 
 }
 
-#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 0 
+#https://scholia.toolforge.org/topic/Q52 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -2559,7 +2559,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 1 
+#https://scholia.toolforge.org/topic/Q52 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -2601,7 +2601,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 2 
+#https://scholia.toolforge.org/topic/Q52 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -2637,7 +2637,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 3 
+#https://scholia.toolforge.org/topic/Q52 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -2667,7 +2667,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 4 
+#https://scholia.toolforge.org/topic/Q52 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -2704,7 +2704,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q52 iframe: 5 
+#https://scholia.toolforge.org/topic/Q52 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -2734,7 +2734,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 0 
+#https://scholia.toolforge.org/topic/Q532 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -2787,7 +2787,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 1 
+#https://scholia.toolforge.org/topic/Q532 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -2829,7 +2829,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 2 
+#https://scholia.toolforge.org/topic/Q532 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -2865,7 +2865,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 3 
+#https://scholia.toolforge.org/topic/Q532 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -2895,7 +2895,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 4 
+#https://scholia.toolforge.org/topic/Q532 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -2932,7 +2932,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q532 iframe: 5 
+#https://scholia.toolforge.org/topic/Q532 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -2962,7 +2962,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 0 
+#https://scholia.toolforge.org/topic/Q12156 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -3015,7 +3015,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 1 
+#https://scholia.toolforge.org/topic/Q12156 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -3057,7 +3057,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 2 
+#https://scholia.toolforge.org/topic/Q12156 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -3093,7 +3093,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 3 
+#https://scholia.toolforge.org/topic/Q12156 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -3123,7 +3123,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 4 
+#https://scholia.toolforge.org/topic/Q12156 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -3160,7 +3160,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q12156 iframe: 5 
+#https://scholia.toolforge.org/topic/Q12156 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -3190,7 +3190,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 0 
+#https://scholia.toolforge.org/topic/Q583725 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -3243,7 +3243,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 1 
+#https://scholia.toolforge.org/topic/Q583725 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -3285,7 +3285,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 2 
+#https://scholia.toolforge.org/topic/Q583725 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -3321,7 +3321,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 3 
+#https://scholia.toolforge.org/topic/Q583725 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -3351,7 +3351,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 4 
+#https://scholia.toolforge.org/topic/Q583725 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -3388,7 +3388,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q583725 iframe: 5 
+#https://scholia.toolforge.org/topic/Q583725 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -3418,7 +3418,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 0 
+#https://scholia.toolforge.org/topic/Q81068910 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -3471,7 +3471,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 1 
+#https://scholia.toolforge.org/topic/Q81068910 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -3513,7 +3513,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 2 
+#https://scholia.toolforge.org/topic/Q81068910 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -3549,7 +3549,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 3 
+#https://scholia.toolforge.org/topic/Q81068910 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -3579,7 +3579,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 4 
+#https://scholia.toolforge.org/topic/Q81068910 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -3616,7 +3616,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q81068910 iframe: 5 
+#https://scholia.toolforge.org/topic/Q81068910 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -3646,7 +3646,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 0 
+#https://scholia.toolforge.org/topic/Q82069695 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -3699,7 +3699,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 1 
+#https://scholia.toolforge.org/topic/Q82069695 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -3741,7 +3741,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 2 
+#https://scholia.toolforge.org/topic/Q82069695 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -3777,7 +3777,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 3 
+#https://scholia.toolforge.org/topic/Q82069695 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -3807,7 +3807,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 4 
+#https://scholia.toolforge.org/topic/Q82069695 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -3844,7 +3844,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q82069695 iframe: 5 
+#https://scholia.toolforge.org/topic/Q82069695 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -3874,7 +3874,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 0 
+#https://scholia.toolforge.org/topic/Q84263196 iframe: 0 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)
@@ -3927,7 +3927,7 @@ WHERE {
 GROUP BY ?year_ ?type
 ORDER BY ?year
 
-#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 1 
+#https://scholia.toolforge.org/topic/Q84263196 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -3969,7 +3969,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 2 
+#https://scholia.toolforge.org/topic/Q84263196 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?topic1 ?topic1Label ?topic2 ?topic2Label
@@ -4005,7 +4005,7 @@ WHERE {
 
 
 
-#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 3 
+#https://scholia.toolforge.org/topic/Q84263196 iframe: 3 
 ##defaultView:Map
 SELECT
   ?location ?locationLabel
@@ -4035,7 +4035,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 4 
+#https://scholia.toolforge.org/topic/Q84263196 iframe: 4 
 ##defaultView:BubbleChart
 SELECT ?score ?author ?authorLabel
 WITH {
@@ -4072,7 +4072,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/topic/Q84263196 iframe: 5 
+#https://scholia.toolforge.org/topic/Q84263196 iframe: 5 
 ##defaultView:Map
 SELECT ?organization ?organizationLabel ?geo ?count ?layer
 WITH {
@@ -4102,7 +4102,7 @@ WHERE {
 ORDER BY DESC (?count)
 
 
-#https://tools.wmflabs.org/scholia/use/Q5140318 iframe: 0 
+#https://scholia.toolforge.org/use/Q5140318 iframe: 0 
 ##defaultView:BubbleChart
 SELECT ?count ?topic ?topicLabel
 WITH{
@@ -4119,7 +4119,7 @@ WHERE {
 ORDER BY DESC(?count)
 
 
-#https://tools.wmflabs.org/scholia/use/Q5140318 iframe: 1 
+#https://scholia.toolforge.org/use/Q5140318 iframe: 1 
 ##defaultView:BubbleChart
 SELECT ?count ?author ?authorLabel
 WITH{
@@ -4136,7 +4136,7 @@ WHERE {
 ORDER BY DESC(?count)
 
 
-#https://tools.wmflabs.org/scholia/use/Q5140318 iframe: 2 
+#https://scholia.toolforge.org/use/Q5140318 iframe: 2 
 ##defaultView:BarChart
 SELECT ?year (COUNT(?work) AS ?number_of_works) ?useLabel
 WITH{
@@ -4158,7 +4158,7 @@ GROUP BY ?year ?useLabel
 ORDER BY ?year
 
 
-#https://tools.wmflabs.org/scholia/venue/Q4775205 iframe: 0 
+#https://scholia.toolforge.org/venue/Q4775205 iframe: 0 
 ##defaultView:ImageGrid
 SELECT (SAMPLE(?image_) AS ?image) ?author ?authorLabel ?count
 WITH {
@@ -4177,7 +4177,7 @@ GROUP BY ?author ?authorLabel ?count
 ORDER BY DESC(?count)
 LIMIT 50  
 
-#https://tools.wmflabs.org/scholia/venue/Q4775205 iframe: 1 
+#https://scholia.toolforge.org/venue/Q4775205 iframe: 1 
 ##defaultView:Graph
 SELECT ?author1 ?author1Label ?rgb ?author2 ?author2Label
 WITH {
@@ -4219,7 +4219,7 @@ WHERE {
 }
 
 
-#https://tools.wmflabs.org/scholia/venue/Q4775205 iframe: 2 
+#https://scholia.toolforge.org/venue/Q4775205 iframe: 2 
 ##defaultView:LineChart
 select ?number_of_citations (count(?work) as ?count) where {
   {
@@ -4235,7 +4235,7 @@ group by ?number_of_citations
 order by desc(?number_of_citations)
 
 
-#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 0 
+#https://scholia.toolforge.org/work/Q21090025 iframe: 0 
 ##defaultView:BubbleChart
 SELECT ?score ?topic ?topicLabel
 WITH {
@@ -4275,7 +4275,7 @@ WHERE {
 ORDER BY DESC(?score)
 LIMIT 200
 
-#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 1 
+#https://scholia.toolforge.org/work/Q21090025 iframe: 1 
 ##defaultView:Timeline
 SELECT DISTINCT ?datetime ?description WHERE {
   {
@@ -4355,7 +4355,7 @@ SELECT DISTINCT ?datetime ?description WHERE {
   }
 }
 
-#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 2 
+#https://scholia.toolforge.org/work/Q21090025 iframe: 2 
 ##defaultView:Graph
 SELECT
   ?citing_work ?citing_workLabel ?rgb 
@@ -4431,7 +4431,7 @@ WHERE {
 }
 ORDER BY DESC(?count)
 
-#https://tools.wmflabs.org/scholia/work/Q21090025 iframe: 3 
+#https://scholia.toolforge.org/work/Q21090025 iframe: 3 
 ##defaultView:BarChart
 SELECT
   (STR(?year_) AS ?year)

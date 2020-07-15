@@ -24,6 +24,7 @@ import io.prometheus.client.Counter;
 import opendata.scholia.Tests.TestBase;
 import opendata.scholia.util.ConfigManager;
 import opendata.scholia.util.DiskWriter;
+import opendata.scholia.util.model.TestResult;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -43,11 +44,11 @@ public abstract class ScholiaContentPage{
 	private Map<String, WebElement> dataTableMap;
 	private Map<String, WebElement> widgetMap;
 	
-	private HashMap<String, ArrayList<String>> failureList = new HashMap<String, ArrayList<String>>();
-	private HashMap<String, ArrayList<String>> successList = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<TestResult>> failureList = new HashMap<String, ArrayList<TestResult>>();
+	private HashMap<String, ArrayList<TestResult>> successList = new HashMap<String, ArrayList<TestResult>>();
 	
-	private List<HashMap<String, ArrayList<String>>> failureListHistory = new ArrayList();
-	private List<HashMap<String, ArrayList<String>>> successListHistory = new ArrayList();
+	private List<HashMap<String, ArrayList<TestResult>>> failureListHistory = new ArrayList();
+	private List<HashMap<String, ArrayList<TestResult>>> successListHistory = new ArrayList();
 
 	
 	private List<WebElement> webElementList;
@@ -186,14 +187,18 @@ public abstract class ScholiaContentPage{
 	
 	//TODO improve this in the future
 	public int checkIframeWidgetRuntime(String urlString, int iframeSeqid) {
+		//if(true) return -1; //dryrun
+		
 		visitPage();
 
+		//apparently the iframe was not rendering properly.
+		//now loading iframes in an independent way
 		System.out.println("Testing "+urlString);
-		//driver.get(urlString);
+		driver.get(urlString);
 		
 		//apparently the iframe was not rendering properly.
 		//now loading iframes in an independent way
-		driver.switchTo().frame(0);
+		//driver.switchTo().frame(0);
 		/*driver.findElement(by.)		
 		System.out.println(driver.getPageSource());*/
 		
@@ -247,10 +252,11 @@ public abstract class ScholiaContentPage{
 		   pageSource.contains("unable to display result") ||
 		   pageSource.contains("server error: unexpected end of json input")
 		   ) {
+			//driver.switchTo().defaultContent();
 			return -1;
 		 }
 		
-        driver.switchTo().defaultContent();
+        //driver.switchTo().defaultContent();
 		return waitForSeconds;
 	}
 	
@@ -279,9 +285,14 @@ public abstract class ScholiaContentPage{
 	public void setPageTypeId(String pageTypeId) {
 		this.pageTypeId = pageTypeId;
 	}
+	
+	public void addTestResult(boolean success, String tag,  String widgetIdentifier, String comment, int testDuration) {
+		addTestResult( success,  tag,   widgetIdentifier,  comment,  testDuration, "");
+	}
 
-	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment) {
-		HashMap<String, ArrayList<String>> resultList;
+
+	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier, String comment, int testDuration, String extraDescription) {
+		HashMap<String, ArrayList<TestResult>> resultList;
 
 		resultList = successfulResult ? successList : failureList;
 
@@ -289,85 +300,94 @@ public abstract class ScholiaContentPage{
 		if(list==null) {
 			list = new ArrayList();
 			resultList.put(tag, list);
-		}
+		}		
 		
-		//dirty solution to showcase; make a proper structure to host the description and comment
-		list.add(widgetIdentifier + "\t" + comment);
+		list.add( new TestResult(widgetIdentifier, comment, testDuration, extraDescription) );
 
 	}
 
-	public void addTestResult(boolean successfulResult, String tag,  String widgetIdentifier) {
-		addTestResult(successfulResult, tag, widgetIdentifier, "");
+	public void addTestResult(boolean success, String tag,  String widgetIdentifier, int testDuration) {
+		addTestResult(success, tag, widgetIdentifier, "", testDuration);
 	}
 	
 	public void clearResults() {
 		this.failureListHistory.add(failureList);
 		this.successListHistory.add(successList);
 		
-		failureList = new HashMap<String, ArrayList<String>>();
-		successList = new HashMap<String, ArrayList<String>>();
+		failureList = new HashMap<String, ArrayList<TestResult>>();
+		successList = new HashMap<String, ArrayList<TestResult>>();
 	}
 	
-	public List<String> getSuccessTestResultList() {
-		List<String> result = new ArrayList<String>();
-		for (List<String> value : successList.values()) {
+	public List<TestResult> getSuccessTestResultList() {
+		List<TestResult> result = new ArrayList<TestResult>();
+		for (List<TestResult> value : successList.values()) {
 		 	result.addAll(value);
 		}
 		return result;
 	}
 	
-	public List<String> getSuccessTestResultList(String tag) {
+	public List<TestResult> getSuccessTestResultList(String tag) {
 		if(successList.get(tag)==null)
-			successList.put(tag, new ArrayList<String>());
+			successList.put(tag, new ArrayList<TestResult>());
 		return successList.get(tag);
 	}
 	
 	
-	public List<String> getFailureTestResultHistory(int index){
-		HashMap<String, ArrayList<String>>  failureList;
+	public List<TestResult> getFailureTestResultHistory(int index){
+		HashMap<String, ArrayList<TestResult>>  failureList;
+		
+		int size = failureListHistory.size();
 		
 		try {
 		if(index < 0)
-			failureList = this.failureListHistory.get(failureListHistory.size()-index);
+			failureList = this.failureListHistory.get(failureListHistory.size()+index);
 		else
 			failureList = this.failureListHistory.get(index);
 		}catch(IndexOutOfBoundsException e) {
-			return new ArrayList<String>();
+			return new ArrayList<TestResult>();
 		}
-		
-		List<String> result = new ArrayList<String>();
-		for (List<String> value : failureList.values()) {
+		//transform hashampa to list - discard keys
+		List<TestResult> result = new ArrayList<TestResult>();
+		for (List<TestResult> value : failureList.values()) {
 		 	result.addAll(value);
 		}
 		return result;		
 	}
 	
-	public List<String> getFailureTestResultList() {
-		List<String> result = new ArrayList<String>();
-		for (List<String> value : failureList.values()) {
+	public List<TestResult> getFailureTestResultList() {
+		List<TestResult> result = new ArrayList<TestResult>();
+		for (List<TestResult> value : failureList.values()) {
 		 	result.addAll(value);
 		}
 		return result;
 	}
 	
-	public List<String> getFailureTestResultList(String tag) {
+	public List<TestResult> getFailureTestResultList(String tag) {
 		if(failureList.get(tag)==null)
-			failureList.put(tag, new ArrayList<String>());
+			failureList.put(tag, new ArrayList<TestResult>());
 		return failureList.get(tag);
 	}
 	
-	public List<String> getFailureTestResultDiffList(){
-		List<String> diffList = new ArrayList<String>();
-		List<String> oldFailuretResultList = getFailureTestResultHistory(-1);
-		List<String> failuretResultList = this.getFailureTestResultList();
+	public List<TestResult> getFailureTestResultDiffList(){
+		List<TestResult> diffList = new ArrayList<TestResult>();
+		List<TestResult> oldFailuretResultList = getFailureTestResultHistory(-1);
+		List<TestResult> failureResultList = this.getFailureTestResultList();
 				
-		for(String s1 : failuretResultList) {
+		System.out.println("this is a comparison "+failureResultList.size() + " to " + oldFailuretResultList.size());
+		
+		for(TestResult s1 : failureResultList) {
 			boolean foundAnEqual = false;
-			for(String s2: oldFailuretResultList) {
-				if(s1.contentEquals(s2))
+			for(TestResult s2: oldFailuretResultList) {
+				System.out.println("Comparing "+s1 + " "+s2 + " ");
+				if(s1.getIdentifier().equals(s2.getIdentifier())) {
 					foundAnEqual = true;
+					System.out.println(foundAnEqual);
+				}
 			}
-			if(!foundAnEqual) diffList.add(s1); 
+			if(!foundAnEqual) {
+				System.out.println("adding "+ s1.getIdentifier() + " " + s1.getDescription());
+				diffList.add(s1);
+			}
 		} 
 		
 		return diffList;

@@ -1,9 +1,11 @@
 package opendata.scholia.util;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 
 public class DiskWriter {
 	private static String DEFAULT_PATH = "/tmp/pages/";
@@ -12,6 +14,11 @@ public class DiskWriter {
 	public static void write(String lpath, String fileName, String content, boolean replaceSpecialCharacter) {
 	 	FileWriter fileWriter;
 		try {
+			File f = new File(lpath);
+			if (!f.exists()) {
+				f.mkdirs();
+			}
+			
 			if(replaceSpecialCharacter)
 				fileName = fileName.replaceAll("\\W+", "");
 			fileWriter = new FileWriter(lpath+ fileName );

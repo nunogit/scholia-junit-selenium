@@ -30,6 +30,8 @@ public class GitWriter {
 	
 	public static void write(String path, String file, String content) throws IllegalStateException, GitAPIException, URISyntaxException {
 		
+		if(!path.endsWith("/")) path = path + "/";
+		
 	    String username = ConfigManager.instance().getConfig().getString("github.username");
 	    String password = ConfigManager.instance().getConfig().getString("github.password");
 	    String repository = ConfigManager.instance().getConfig().getString("github.repository");
@@ -57,8 +59,10 @@ public class GitWriter {
 	    System.out.println("file "+file);
 	    DiskWriter.write(TEMP_GIT_FOLDER+path, file, content, false);
 	    
-	    git.add().addFilepattern(file).call();
-	    git.commit().setMessage( "adding file" ).call();
+	    String pathForGit = path;
+	    if(path.startsWith("/")) pathForGit = path.substring(1);
+	    git.add().addFilepattern(pathForGit+file).call();
+	    git.commit().setMessage( "adding file "+ path+file ).call();
 	    
 	    // push to remote:
 	    PushCommand pushCommand = git.push();
@@ -80,6 +84,6 @@ public class GitWriter {
 		String sTimestamp = sdf.format(timestamp);
     	GitWriter gw = new GitWriter();
     	System.out.println(sTimestamp);
-    	gw.write("/", "hellor-"+sTimestamp, "hello2");
+    	gw.write("/hello/", "hellor-"+sTimestamp, "hello2");
     }
 }
