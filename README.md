@@ -138,7 +138,7 @@ This metric is rather poor since we test a limited set of pages (the most proble
 **Loaded/Failed Iframe Widgets**
 
 This metric counts the number of failed/rendered iframe widgets.
-This metric is rather poor since we test a limited set of pages (the most problematic / most used ones). Despite this it can give valuable information when comparing different setups of scholia. //It allows a quic
+This metric is rather poor since we test a limited set of pages (the most problematic / most used ones). Despite this it can give valuable information when comparing different setups of scholia. 
 
 
 ---
