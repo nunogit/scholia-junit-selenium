@@ -10,7 +10,7 @@
 
 > If your `README` has a lot of info, section headers might be nice.
 
-- [Install and run](#install and run)
+- [Install and run](#install-and-run)
 - [Features](#features)
 - [Contributing](#contributing)
 - [Team](#team)
